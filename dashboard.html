@@ -1270,8 +1270,7 @@ async function runAIAnalysis() {
 
   const top5 = lastScored.slice(0,5).map((z,i) => 
     `${i+1}. ${z.name} — Score ${z.score}/100 (Tráfico:${z.data.trafico}, NSE:${z.data.nse}, Competencia:${denue_competencia[z.id]?.[selectedType]??'?'}/100 libre)`
-  ).join('
-');
+  ).join('\n');
 
   const userMsg = `Soy un emprendedor en Saltillo. Quiero abrir: ${typeLabels[selectedType]}. Presupuesto de renta: ${selectedBudget} (${ {bajo:'$5-15k',medio:'$15-35k',alto:'$35k+'}[selectedBudget] } MXN/mes).
 
@@ -1299,8 +1298,7 @@ Sé directo, específico y usa datos concretos. Máximo 200 palabras.`;
     });
     const data = await res.json();
     const text = data.content?.[0]?.text || 'No se pudo obtener respuesta.';
-    result.innerHTML = '<strong style="color:#a78bfa;font-family:'Syne',sans-serif;">✨ Recomendación IA</strong><br><br>' + text.replace(/
-/g,'<br>');
+    result.innerHTML = '<strong style="color:#a78bfa;font-family:Syne,sans-serif;">✨ Recomendación IA</strong><br><br>' + text.replace(/\n/g,'<br>');
     result.style.display = 'block';
   } catch(e) {
     result.innerHTML = '⚠️ Error al conectar con la IA. Intenta de nuevo.';
@@ -1315,7 +1313,7 @@ Sé directo, específico y usa datos concretos. Máximo 200 palabras.`;
 // ASESOR IA — con PMD Saltillo 2025-2027 como contexto
 // ══════════════════════════════════════════════════════════
 
-const PMD_CONTEXT = `Eres el Asesor IA de LocaIA, la plataforma de inteligencia comercial para Saltillo. Tienes conocimiento profundo de:
+const PMD_CONTEXT2 = `Eres el Asesor IA de LocaIA, la plataforma de inteligencia comercial para Saltillo. Tienes conocimiento profundo de:
 
 SALTILLO — DATOS GENERALES (PMD 2025-2027 + DENUE Feb 2026):
 - Población 2024: 961,895 habitantes (CONAPO). ZM ~1.1M. Crecimiento ~20k hab/año.
@@ -1478,7 +1476,7 @@ async function sendAI(){
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514',
         max_tokens: 1000,
-        system: PMD_CONTEXT,
+        system: PMD_CONTEXT2,
         messages: aiHistory
       })
     });
