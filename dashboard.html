@@ -284,7 +284,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
     <div style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:6px;padding:3px 9px;font-size:.65rem;color:#4ade80;font-weight:600;display:flex;align-items:center;gap:4px;">⚡ vs. $3,500/mo — mismo análisis</div>
   <div class="topbar-right">
     <button class="topbar-btn" id="aiBtn" onclick="openAIModal()" style="border-color:rgba(139,92,246,.4);color:#a78bfa;">🤖 Asesor IA</button>
-    <button class="topbar-btn" onclick="openProModal()" style="border-color:rgba(249,115,22,.5);color:var(--accent);font-weight:600;">✦ Pro $299</button>
+    <button class="topbar-btn" id="proBtn" onclick="openProModal()" style="border-color:rgba(34,197,94,.5);color:#22c55e;font-weight:700;background:rgba(34,197,94,.08);">✦ Pro Activo</button>
     <button class="topbar-btn highlight" onclick="openAnalysesModal()">
       📊 Mis análisis
       <span class="badge-count" id="badge-count">0</span>
@@ -589,6 +589,46 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
         <div class="budget-opt" data-budget="medio">Medio<small>$15–35k</small></div>
         <div class="budget-opt" data-budget="alto">Alto<small>$35k+</small></div>
       </div>
+
+      <!-- ESTACIONAMIENTO -->
+      <div class="slabel" style="margin-top:12px">🅿️ Estacionamiento necesario</div>
+      <div class="budget-row" id="parkingGroup">
+        <div class="budget-opt active" data-parking="poco" style="font-size:.72rem">Poco<small>Calle/mínimo</small></div>
+        <div class="budget-opt" data-parking="medio" style="font-size:.72rem">Medio<small>Cajones cerca</small></div>
+        <div class="budget-opt" data-parking="alto" style="font-size:.72rem">Alto<small>Plaza/propio</small></div>
+      </div>
+
+      <!-- NSE OBJETIVO -->
+      <div class="slabel" style="margin-top:12px">👥 NSE objetivo</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap" id="nseGroup">
+        <div class="budget-opt active" data-nse="todos" style="font-size:.68rem;flex:none;padding:6px 8px">Todos</div>
+        <div class="budget-opt" data-nse="D" style="font-size:.68rem;flex:none;padding:6px 8px;color:#6b7280">D</div>
+        <div class="budget-opt" data-nse="C-" style="font-size:.68rem;flex:none;padding:6px 8px;color:#8b5cf6">C−</div>
+        <div class="budget-opt" data-nse="C" style="font-size:.68rem;flex:none;padding:6px 8px;color:#10b981">C</div>
+        <div class="budget-opt" data-nse="C+" style="font-size:.68rem;flex:none;padding:6px 8px;color:#3b82f6">C+</div>
+        <div class="budget-opt" data-nse="AB" style="font-size:.68rem;flex:none;padding:6px 8px;color:#f59e0b">AB</div>
+        <div class="budget-opt" data-nse="A" style="font-size:.68rem;flex:none;padding:6px 8px;color:#ef4444">A/AB+</div>
+      </div>
+
+      <!-- COMPETENCIA -->
+      <div class="slabel" style="margin-top:12px">🏪 Nivel de competencia tolerable</div>
+      <div style="display:flex;gap:4px" id="competenciaGroup">
+        <div class="budget-opt active" data-comp="todos" style="font-size:.68rem;flex:1;padding:6px 4px">Todos</div>
+        <div class="budget-opt" data-comp="baja" style="font-size:.68rem;flex:1;padding:6px 4px;color:#22c55e">Baja</div>
+        <div class="budget-opt" data-comp="media" style="font-size:.68rem;flex:1;padding:6px 4px;color:#f59e0b">Media</div>
+        <div class="budget-opt" data-comp="alta" style="font-size:.68rem;flex:1;padding:6px 4px;color:#ef4444">Alta</div>
+        <div class="budget-opt" data-comp="total" style="font-size:.68rem;flex:1;padding:6px 4px;color:#7c3aed">Máx</div>
+      </div>
+
+      <!-- TRÁFICO -->
+      <div class="slabel" style="margin-top:12px">🚶 Mínimo de tráfico peatonal</div>
+      <div style="display:flex;gap:4px" id="traficoGroup">
+        <div class="budget-opt active" data-trafico="0" style="font-size:.65rem;flex:1;padding:6px 3px">Todos</div>
+        <div class="budget-opt" data-trafico="20" style="font-size:.65rem;flex:1;padding:6px 3px">Bajo</div>
+        <div class="budget-opt" data-trafico="40" style="font-size:.65rem;flex:1;padding:6px 3px">Medio</div>
+        <div class="budget-opt" data-trafico="65" style="font-size:.65rem;flex:1;padding:6px 3px">Alto</div>
+        <div class="budget-opt" data-trafico="80" style="font-size:.65rem;flex:1;padding:6px 3px">Muy alto</div>
+      </div>
     </div>
 
     <div>
@@ -878,6 +918,15 @@ const denue_competencia={
   n_teresitas:{comida_rapida:87,restaurante:100,cafeteria:100,panaderia:81,ropa:100,farmacia:99,papeleria:100,estetica:83,gym:90,tech:66,veterinaria:88,lavanderia:85,bar:78,ferreteria:80,supermercado:76,salon_eventos:86,escuela:90,consultorio:86},
   el_salvador:{comida_rapida:87,restaurante:95,cafeteria:100,panaderia:58,ropa:100,farmacia:94,papeleria:100,estetica:62,gym:75,tech:48,veterinaria:80,lavanderia:78,bar:70,ferreteria:72,supermercado:68,salon_eventos:78,escuela:83,consultorio:78},
   b_aires:{comida_rapida:64,restaurante:85,cafeteria:100,panaderia:39,ropa:100,farmacia:90,papeleria:100,estetica:35,gym:45,tech:36,veterinaria:55,lavanderia:58,bar:48,ferreteria:52,supermercado:42,salon_eventos:52,escuela:60,consultorio:52},
+  bosques:{comida_rapida:72,restaurante:88,cafeteria:100,panaderia:55,ropa:88,farmacia:82,papeleria:92,estetica:65,gym:75,tech:58,veterinaria:70,lavanderia:68,bar:55,ferreteria:50,supermercado:60,salon_eventos:75,escuela:72,consultorio:68},
+  parque_ind:{comida_rapida:30,restaurante:45,cafeteria:68,panaderia:28,ropa:60,farmacia:52,papeleria:72,estetica:30,gym:20,tech:35,veterinaria:25,lavanderia:50,bar:25,ferreteria:18,supermercado:40,salon_eventos:15,escuela:30,consultorio:28},
+  ramos_arizpe:{comida_rapida:35,restaurante:50,cafeteria:65,panaderia:30,ropa:55,farmacia:48,papeleria:68,estetica:35,gym:25,tech:40,veterinaria:30,lavanderia:55,bar:30,ferreteria:20,supermercado:42,salon_eventos:18,escuela:35,consultorio:30},
+  plaza_fiesta:{comida_rapida:68,restaurante:82,cafeteria:95,panaderia:60,ropa:90,farmacia:78,papeleria:90,estetica:70,gym:60,tech:72,veterinaria:62,lavanderia:65,bar:58,ferreteria:52,supermercado:70,salon_eventos:65,escuela:60,consultorio:65},
+  pedregal:{comida_rapida:60,restaurante:78,cafeteria:90,panaderia:52,ropa:82,farmacia:72,papeleria:85,estetica:68,gym:65,tech:60,veterinaria:65,lavanderia:62,bar:50,ferreteria:48,supermercado:58,salon_eventos:70,escuela:72,consultorio:65},
+  tecnologico:{comida_rapida:42,restaurante:62,cafeteria:78,panaderia:38,ropa:70,farmacia:60,papeleria:75,estetica:50,gym:55,tech:48,veterinaria:45,lavanderia:55,bar:42,ferreteria:40,supermercado:52,salon_eventos:48,escuela:55,consultorio:45},
+  cuauhtemoc:{comida_rapida:55,restaurante:70,cafeteria:82,panaderia:48,ropa:72,farmacia:65,papeleria:80,estetica:55,gym:42,tech:58,veterinaria:48,lavanderia:60,bar:45,ferreteria:22,supermercado:55,salon_eventos:38,escuela:52,consultorio:48},
+  los_pinos2:{comida_rapida:58,restaurante:74,cafeteria:88,panaderia:50,ropa:78,farmacia:70,papeleria:85,estetica:62,gym:68,tech:58,veterinaria:62,lavanderia:60,bar:48,ferreteria:45,supermercado:55,salon_eventos:68,escuela:70,consultorio:62},
+  olimpica_norte:{comida_rapida:48,restaurante:72,cafeteria:88,panaderia:42,ropa:68,farmacia:65,papeleria:85,estetica:55,gym:45,tech:52,veterinaria:45,lavanderia:58,bar:38,ferreteria:40,supermercado:55,salon_eventos:45,escuela:58,consultorio:55},
 };
 const denue_total={
   centro:2719,
@@ -924,7 +973,9 @@ const denue_total={
   hacienda_n:178,
   n_teresitas:260,
   el_salvador:500,
-  b_aires:842,
+  b_aires:842, bosques:520, parque_ind:180, ramos_arizpe:320,
+  plaza_fiesta:680, pedregal:390, tecnologico:410, cuauhtemoc:560,
+  olimpica_norte:450, los_pinos2:280,
 };
 
 function updateInegiZone(zid){
@@ -935,6 +986,20 @@ function updateInegiZone(zid){
   document.getElementById('i-prod').textContent=comp>=70?'🟢 Libre':comp>=40?'🟡 Media':'🔴 Alta';
   document.querySelector('.inegi-top .inegi-live').innerHTML=`<span class="live-dot"></span>DENUE · ${zid}`;
 }
+
+// ── ESTACIONAMIENTO POR ZONA (0=ninguno, 100=amplio) ──
+const parking_score = {
+  centro:10, republica:30, bellavista:25, mirasierra:55, morelos:20,
+  saltillo2000:65, ign_zaragoza:70, topochico:25, vistahermosa:60, la_madrid:45,
+  vic_guerrero:80, lourdes:35, m_hidalgo:85, san_ramon:80, la_salle:90,
+  satelite_n:75, nuevo_mir:90, las_teresitas:70, valle_flores:85, v_olimpica:80,
+  lomas_ref:90, lomas_zap:90, san_patricio:88, rancho_pena:85, nazario:92,
+  bonanza:20, virreyes:88, mision_orte:80, fed_berrueto:65, guanajuato:45,
+  universidad:55, los_pinos:40, los_gonzalez:70, lomalinda:75, roma:35,
+  hacienda_n:88, n_teresitas:82, el_salvador:78, b_aires:30,
+  bosques:72, parque_ind:45, ramos_arizpe:50, plaza_fiesta:65, pedregal:75,
+  tecnologico:55, cuauhtemoc:48, olimpica_norte:40, los_pinos2:70,
+};
 
 const zones=[
   {id:"centro",name:"Centro Histórico",lat:25.4241,lng:-100.9995,radius:600,desc:"Hub comercial de Saltillo. 2,719 negocios (DENUE). Proyecto Distrito Centro + Alameda Zaragoza (PMD 2025).",tags_pos:[],tags_neg:[],data:{trafico:100,nse:70,acceso:85,renta:{bajo:true,medio:true,alto:true}}},
@@ -982,6 +1047,15 @@ const zones=[
   {id:"n_teresitas",name:"Nuevo Teresitas/Sur",lat:25.355,lng:-101.004,radius:400,desc:"Nuevo Teresitas. 260 negocios. Sur lejano, demanda insatisfecha.",tags_pos:[],tags_neg:[],data:{trafico:10,nse:28,acceso:45,renta:{bajo:true,medio:false,alto:false}}},
   {id:"el_salvador",name:"El Salvador/T.Libertad",lat:25.394,lng:-100.964,radius:350,desc:"El Salvador y T.Libertad. 500 negocios. Zona popular muy activa.",tags_pos:[],tags_neg:[],data:{trafico:18,nse:36,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
   {id:"b_aires",name:"Buenos Aires/Sur-Pte",lat:25.3957,lng:-101.0162,radius:350,desc:"Buenos Aires y sur-poniente. 842 negocios. Gran concentración residencial.",tags_pos:[],tags_neg:[],data:{trafico:31,nse:32,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"bosques",name:"Bosques del Prado",lat:25.4512,lng:-101.0142,radius:420,desc:"Zona residencial norte-poniente. Alta densidad vehicular. Corredor Periférico.",tags_pos:[],tags_neg:[],data:{trafico:48,nse:72,acceso:80,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"parque_ind",name:"Parque Industrial Norte",lat:25.5080,lng:-101.0210,radius:500,desc:"Zona industrial con flujo diario de +40,000 trabajadores. Ideal food, loncheras, servicios.",tags_pos:[],tags_neg:[],data:{trafico:85,nse:42,acceso:90,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"ramos_arizpe",name:"Ramos Arizpe/BMW/GM",lat:25.5460,lng:-100.9380,radius:550,desc:"Municipio industrial. BMW, GM, Chrysler. 80,000+ empleos. Alta demanda de servicios.",tags_pos:[],tags_neg:[],data:{trafico:72,nse:50,acceso:85,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"plaza_fiesta",name:"Blvd. V. Carranza Norte",lat:25.4385,lng:-101.0105,radius:380,desc:"Corredor comercial de máxima visibilidad. Flujo constante. Alto NSE relativo.",tags_pos:[],tags_neg:[],data:{trafico:78,nse:62,acceso:88,renta:{bajo:true,medio:true,alto:true}}},
+  {id:"pedregal",name:"Pedregal/San Agustín Sur",lat:25.4120,lng:-101.0310,radius:400,desc:"Zona sur-poniente residencial media-alta. Crecimiento acelerado. Plazas nuevas.",tags_pos:[],tags_neg:[],data:{trafico:45,nse:68,acceso:78,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"tecnologico",name:"Zona Tec/UANE/Universitaria",lat:25.4690,lng:-100.9745,radius:380,desc:"Corredor universitario. UANE, Tec, UDEM. Alta afluencia juvenil. Ideal cafés, comida, servicios.",tags_pos:[],tags_neg:[],data:{trafico:65,nse:58,acceso:80,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"cuauhtemoc",name:"Cuauhtémoc/Blvd. Colosio",lat:25.4580,lng:-100.9660,radius:430,desc:"Corredor Colosio. Alta densidad comercial norte. Buen acceso vial. Crecimiento constante.",tags_pos:[],tags_neg:[],data:{trafico:52,nse:44,acceso:82,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"olimpica_norte",name:"Olímpica Norte/Congreso",lat:25.4200,lng:-100.9800,radius:400,desc:"Zona gobierno y corporativos. Flujo 8am-6pm. Ideal restaurantes rápidos y servicios.",tags_pos:[],tags_neg:[],data:{trafico:70,nse:58,acceso:85,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"los_pinos2",name:"Los Pinos/Arboledas Sur",lat:25.3980,lng:-101.0580,radius:380,desc:"Sur-poniente en expansión. NSE medio-alto. Fraccionamientos nuevos, demanda insatisfecha.",tags_pos:[],tags_neg:[],data:{trafico:38,nse:65,acceso:70,renta:{bajo:false,medio:true,alto:true}}},
 ];
 
 const typeWeights={
@@ -1039,6 +1113,29 @@ function scoreZone(z){
   // PMD 2025-2027 zone bonus
   const pmdB=PMD_BONUS[z.id];
   if(pmdB) s+=pmdB.pts;
+
+  // PARKING filter — penalize zones with bad parking if high parking needed
+  const parkScore = parking_score[z.id]??50;
+  if(selectedParking==='medio' && parkScore < 40) s *= 0.82;
+  if(selectedParking==='alto' && parkScore < 60) s *= 0.70;
+  if(selectedParking==='alto' && parkScore >= 80) s += 4; // bonus plazas
+
+  // NSE filter — filter out zones that don't match target NSE
+  const nseMap = {D:[0,30], 'C-':[25,45], C:[40,60], 'C+':[55,72], AB:[68,88], A:[82,100]};
+  if(selectedNSE !== 'todos'){
+    const [lo,hi] = nseMap[selectedNSE]||[0,100];
+    if(z.data.nse < lo || z.data.nse > hi) s *= 0.45;
+  }
+
+  // COMPETENCIA filter
+  const compFree = 100 - (denue_competencia[z.id]?.[selectedType]??50);
+  if(selectedComp==='baja' && compFree < 60) s *= 0.70;
+  if(selectedComp==='media' && compFree < 35) s *= 0.75;
+  if(selectedComp==='total' && compFree < 10) s *= 0.55;
+
+  // TRÁFICO mínimo filter
+  if(z.data.trafico < selectedTrafico) s *= 0.50;
+
   return Math.round(Math.min(s,100));
 }
 
@@ -1560,7 +1657,7 @@ INSTRUCCIONES:
 - Usa emojis con moderación para estructurar (📍, 📊, 🏗️, 💡).
 - No inventes datos. Si no sabes algo específico, dilo claramente.
 - Menciona los proyectos PMD relevantes cuando apliquen a la pregunta.
-`;
+
 
 POSICIONAMIENTO COMPETITIVO DE LOCAIA:
 - Competidores directos: Predik Data-Driven (GeoData Intelligence), CARTO, Esri ArcGIS
@@ -1569,12 +1666,7 @@ POSICIONAMIENTO COMPETITIVO DE LOCAIA:
 - LocaIA es 12x más barato que Predik y 100x más rápido en entrega
 - LocaIA tiene datos exclusivos de Saltillo: PMD 2025-2027, 13 parques industriales, 45 zonas DENUE
 - Cuando pregunten por precios o comparativas, menciona estas ventajas
-
-INDICADORES AVANZADOS DE LOCAIA (inspirados en geomarketing enterprise):
-- Índice de Canibalización: qué tan saturada está la zona para el giro buscado (Baja/Media/Alta)
-- Capacidad de Mercado: slots estimados disponibles para nuevos negocios del tipo
-- Score 0-100: combina tráfico, competencia, NSE y acceso ponderado por tipo de negocio
-- Filtros adicionales: NSE objetivo (Popular/Medio/Premium), Formato (Standalone/Plaza)
+`;
 
 let aiHistory = [];
 let aiTyping = false;
@@ -1621,11 +1713,21 @@ async function sendAI(){
   const typing = appendMsg('Analizando...', 'bot typing');
 
   try {
+    if(!ANTHROPIC_KEY){
+      typing.remove();
+      appendMsg('⚙️ Configura tu API key de Anthropic en el código (constante ANTHROPIC_KEY) para usar el Asesor IA.', 'bot');
+      aiTyping = false; btn.disabled = false; return;
+    }
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key': ANTHROPIC_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
       body: JSON.stringify({
-        model:'claude-sonnet-4-20250514',
+        model:'claude-sonnet-4-5-20251001',
         max_tokens: 1000,
         system: PMD_CONTEXT2,
         messages: aiHistory
@@ -1644,7 +1746,7 @@ async function sendAI(){
 
   } catch(e) {
     typing.remove();
-    appendMsg('❌ Error de conexión. Verifica tu internet e intenta de nuevo.', 'bot');
+    appendMsg(`❌ Error al contactar IA: ${e.message}. Verifica tu API key y conexión.`, 'bot');
   }
 
   aiTyping = false;
@@ -1885,12 +1987,14 @@ function openProModal(){
 function closeProModal(){
   document.getElementById('proModal').classList.remove('open');
 }
+// DEMO: Pro habilitado para evaluación
 function handleProUpgrade(){
-  // Placeholder — conectar MercadoPago aquí
   closeProModal();
+  const btn=document.getElementById('proBtn');
+  if(btn){btn.style.borderColor='rgba(34,197,94,.5)';btn.style.color='#22c55e';btn.style.background='rgba(34,197,94,.08)';btn.textContent='✦ Pro Activo';}
   const t=document.getElementById('toast');
-  t.textContent='💳 Próximamente: pago con MercadoPago';
-  t.style.background='#6d28d9';
+  t.textContent='✅ Pro activado — MercadoPago disponible próximamente';
+  t.style.background='#15803d';
   t.classList.add('show');
   setTimeout(()=>{t.classList.remove('show');t.style.background='';},3000);
 }
