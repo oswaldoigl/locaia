@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LocaIA — Encuentra tu mejor ubicación en Saltillo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #06080b;
+  --surface: #0d1017;
+  --card: #121620;
+  --border: #1c2230;
+  --accent: #f97316;
+  --accent2: #fb923c;
+  --gold: #fbbf24;
+  --text: #eceef2;
+  --muted: #5a6478;
+  --muted2: #8b95a8;
+  --green: #22c55e;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Instrument Sans',sans-serif;
+  overflow-x:hidden;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:18px 5%;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(6,8,11,0.85);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.nav-logo{
+  font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;
+  letter-spacing:-0.04em;color:var(--text);text-decoration:none;
+}
+.nav-logo em{color:var(--accent);font-style:normal;}
+.nav-links{display:flex;align-items:center;gap:32px;}
+.nav-links a{color:var(--muted2);text-decoration:none;font-size:0.88rem;transition:color .2s;}
+.nav-links a:hover{color:var(--text);}
+.nav-cta{
+  background:var(--accent);color:#000;
+  padding:9px 22px;border-radius:8px;
+  font-weight:600;font-size:0.88rem;
+  text-decoration:none;
+  transition:all .2s;
+}
+.nav-cta:hover{background:var(--accent2);transform:translateY(-1px);}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;
+  padding:120px 5% 80px;
+  position:relative;overflow:hidden;
+}
+.hero-grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(249,115,22,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(249,115,22,0.04) 1px, transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse 70% 60% at 50% 50%, black, transparent);
+}
+.hero-glow{
+  position:absolute;
+  width:600px;height:600px;
+  background:radial-gradient(circle, rgba(249,115,22,0.12) 0%, transparent 70%);
+  top:50%;left:50%;transform:translate(-50%,-60%);
+  pointer-events:none;
+}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(249,115,22,0.1);
+  border:1px solid rgba(249,115,22,0.25);
+  border-radius:40px;padding:6px 16px;
+  font-size:0.78rem;color:var(--accent2);font-weight:500;
+  margin-bottom:28px;
+  animation:fadeUp .6s ease both;
+}
+.hero-tag .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+h1{
+  font-family:'Syne',sans-serif;
+  font-weight:800;font-size:clamp(2.8rem,6vw,5rem);
+  line-height:1.05;letter-spacing:-0.04em;
+  max-width:820px;
+  animation:fadeUp .6s .1s ease both;
+}
+h1 .accent{color:var(--accent);}
+h1 .underline{
+  position:relative;display:inline-block;
+}
+h1 .underline::after{
+  content:'';position:absolute;bottom:-4px;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent),var(--gold));
+  border-radius:4px;
+}
+.hero-sub{
+  max-width:560px;color:var(--muted2);font-size:1.1rem;
+  line-height:1.7;margin:24px 0 40px;
+  animation:fadeUp .6s .2s ease both;
+}
+.hero-btns{
+  display:flex;gap:14px;flex-wrap:wrap;justify-content:center;
+  animation:fadeUp .6s .3s ease both;
+}
+.btn-primary{
+  background:var(--accent);color:#000;
+  padding:14px 32px;border-radius:10px;
+  font-weight:700;font-size:1rem;font-family:'Syne',sans-serif;
+  text-decoration:none;transition:all .2s;
+  box-shadow:0 0 32px rgba(249,115,22,0.3);
+}
+.btn-primary:hover{background:var(--accent2);transform:translateY(-2px);box-shadow:0 0 48px rgba(249,115,22,0.45);}
+.btn-ghost{
+  border:1.5px solid var(--border);color:var(--text);
+  padding:14px 32px;border-radius:10px;
+  font-weight:500;font-size:1rem;
+  text-decoration:none;transition:all .2s;
+}
+.btn-ghost:hover{border-color:var(--muted);background:rgba(255,255,255,0.03);}
+.hero-stats{
+  display:flex;gap:48px;margin-top:72px;
+  animation:fadeUp .6s .4s ease both;
+}
+.stat{text-align:center;}
+.stat .num{font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;color:var(--text);}
+.stat .num em{color:var(--accent);font-style:normal;}
+.stat .lbl{font-size:0.78rem;color:var(--muted);margin-top:3px;}
+
+/* ── PREVIEW CARD ── */
+.preview-section{
+  padding:80px 5%;
+  display:flex;justify-content:center;
+}
+.preview-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:20px;
+  overflow:hidden;
+  max-width:900px;width:100%;
+  box-shadow:0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(249,115,22,0.08);
+}
+.preview-bar{
+  background:var(--card);
+  padding:12px 18px;
+  display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid var(--border);
+}
+.preview-dot{width:10px;height:10px;border-radius:50%;}
+.preview-url{
+  flex:1;background:rgba(255,255,255,0.04);border:1px solid var(--border);
+  border-radius:6px;padding:5px 14px;font-size:0.75rem;color:var(--muted);
+  margin:0 12px;
+}
+.preview-body{
+  display:grid;grid-template-columns:240px 1fr;min-height:360px;
+}
+.preview-sidebar{
+  background:var(--card);border-right:1px solid var(--border);
+  padding:18px;display:flex;flex-direction:column;gap:14px;
+}
+.preview-row{
+  background:rgba(255,255,255,0.04);border-radius:8px;height:36px;
+  display:flex;align-items:center;padding:0 12px;gap:8px;
+}
+.preview-row .circle{width:20px;height:20px;border-radius:50%;background:var(--accent);opacity:.3;}
+.preview-row .line{flex:1;background:rgba(255,255,255,0.08);border-radius:4px;height:8px;}
+.preview-row.active{background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.2);}
+.preview-row.active .circle{opacity:1;}
+.preview-map{
+  background:linear-gradient(135deg,#0e1520,#0a1018);
+  position:relative;overflow:hidden;
+}
+.map-blob{
+  position:absolute;border-radius:50%;
+  animation:float 4s ease-in-out infinite;
+}
+@keyframes float{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.map-blob:nth-child(1){width:180px;height:180px;background:rgba(249,115,22,0.15);top:30%;left:35%;filter:blur(2px);}
+.map-blob:nth-child(2){width:120px;height:120px;background:rgba(59,130,246,0.12);top:20%;left:55%;filter:blur(2px);animation-delay:-2s;}
+.map-blob:nth-child(3){width:90px;height:90px;background:rgba(139,92,246,0.1);top:55%;left:20%;filter:blur(2px);animation-delay:-1s;}
+.score-badge{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:rgba(6,8,11,0.9);border:1px solid rgba(249,115,22,0.4);
+  border-radius:14px;padding:12px 20px;text-align:center;
+  backdrop-filter:blur(8px);
+}
+.score-badge .big{font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;color:var(--accent);}
+.score-badge .sm{font-size:0.7rem;color:var(--muted2);}
+
+/* ── HOW ── */
+.how-section{padding:100px 5%;max-width:1100px;margin:0 auto;}
+.section-tag{
+  display:inline-block;font-family:'Syne',sans-serif;
+  font-size:0.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:16px;
+}
+.section-title{
+  font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2rem,4vw,3rem);
+  letter-spacing:-.04em;line-height:1.1;margin-bottom:16px;
+}
+.section-sub{color:var(--muted2);font-size:1rem;line-height:1.7;max-width:520px;}
+.steps{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:56px;
+}
+.step{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;padding:28px;
+  position:relative;transition:border-color .2s;
+}
+.step:hover{border-color:rgba(249,115,22,0.3);}
+.step-num{
+  font-family:'Syne',sans-serif;font-weight:800;font-size:3rem;
+  color:rgba(249,115,22,0.12);position:absolute;top:20px;right:24px;
+  line-height:1;
+}
+.step-icon{font-size:1.8rem;margin-bottom:16px;}
+.step h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:8px;}
+.step p{color:var(--muted2);font-size:0.85rem;line-height:1.6;}
+
+/* ── FEATURES ── */
+.features-section{
+  padding:100px 5%;
+  background:linear-gradient(180deg,transparent,rgba(249,115,22,0.03),transparent);
+}
+.features-inner{max-width:1100px;margin:0 auto;}
+.features-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-top:56px;
+}
+.feat{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;padding:28px;display:flex;gap:18px;
+  transition:all .2s;
+}
+.feat:hover{border-color:rgba(249,115,22,0.25);transform:translateY(-2px);}
+.feat-icon{
+  width:44px;height:44px;border-radius:10px;
+  background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.2rem;flex-shrink:0;
+}
+.feat h4{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;margin-bottom:6px;}
+.feat p{color:var(--muted2);font-size:0.82rem;line-height:1.6;}
+
+/* ── PRICING ── */
+.pricing-section{padding:100px 5%;max-width:1100px;margin:0 auto;text-align:center;}
+.pricing-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:20px;
+  margin-top:56px;text-align:left;
+}
+.plan{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:18px;padding:32px;display:flex;flex-direction:column;
+  transition:all .2s;
+}
+.plan:hover{transform:translateY(-3px);}
+.plan.featured{
+  border-color:var(--accent);
+  background:linear-gradient(135deg,rgba(249,115,22,0.08),var(--surface));
+  box-shadow:0 0 40px rgba(249,115,22,0.12);
+}
+.plan-badge{
+  display:inline-block;background:var(--accent);color:#000;
+  font-size:0.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:3px 10px;border-radius:20px;margin-bottom:20px;
+  font-family:'Syne',sans-serif;
+}
+.plan-name{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--muted2);margin-bottom:12px;}
+.plan-price{
+  font-family:'Syne',sans-serif;font-weight:800;font-size:2.4rem;
+  color:var(--text);letter-spacing:-.04em;
+  display:flex;align-items:flex-end;gap:4px;margin-bottom:4px;
+}
+.plan-price sub{font-size:0.9rem;color:var(--muted2);font-weight:400;margin-bottom:4px;}
+.plan-period{font-size:0.78rem;color:var(--muted);margin-bottom:24px;}
+.plan-divider{height:1px;background:var(--border);margin-bottom:20px;}
+.plan-features{list-style:none;display:flex;flex-direction:column;gap:10px;flex:1;}
+.plan-features li{
+  font-size:0.83rem;color:var(--muted2);
+  display:flex;align-items:flex-start;gap:10px;line-height:1.4;
+}
+.plan-features li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0;}
+.plan-features li.no::before{content:'✗';color:var(--muted);}
+.plan-features li.no{color:var(--muted);}
+.plan-btn{
+  display:block;text-align:center;margin-top:24px;
+  padding:12px;border-radius:9px;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;
+  text-decoration:none;transition:all .2s;
+}
+.plan-btn.ghost{border:1.5px solid var(--border);color:var(--text);}
+.plan-btn.ghost:hover{border-color:var(--muted);}
+.plan-btn.solid{background:var(--accent);color:#000;}
+.plan-btn.solid:hover{background:var(--accent2);}
+
+/* ── CTA SECTION ── */
+.cta-section{
+  padding:100px 5%;text-align:center;
+  position:relative;overflow:hidden;
+}
+.cta-glow{
+  position:absolute;width:500px;height:300px;
+  background:radial-gradient(ellipse,rgba(249,115,22,0.1),transparent 70%);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+.cta-section h2{
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:clamp(2rem,4vw,3.2rem);letter-spacing:-.04em;margin-bottom:16px;
+}
+.cta-section p{color:var(--muted2);font-size:1rem;max-width:460px;margin:0 auto 36px;}
+
+/* ── FOOTER ── */
+footer{
+  border-top:1px solid var(--border);
+  padding:36px 5%;
+  display:flex;justify-content:space-between;align-items:center;
+  color:var(--muted);font-size:0.8rem;
+}
+.footer-logo{
+  font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;
+  color:var(--text);
+}
+.footer-logo em{color:var(--accent);font-style:normal;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .steps,.features-grid,.pricing-grid{grid-template-columns:1fr;}
+  .preview-body{grid-template-columns:1fr;}
+  .preview-sidebar{display:none;}
+  .hero-stats{gap:28px;}
+  .nav-links{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">Loca<em>IA</em></a>
+  <div class="nav-links">
+    <a href="#como">¿Cómo funciona?</a>
+    <a href="#precios">Precios</a>
+    <a href="login.html">Iniciar sesión</a>
+  </div>
+  <a href="login.html" class="nav-cta">Empezar gratis →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+
+  <div class="hero-tag">
+    <div class="dot"></div>
+    Inteligencia de ubicación para Saltillo
+  </div>
+
+  <h1>
+    Abre tu negocio en<br>
+    el lugar <span class="accent underline">correcto</span>
+  </h1>
+
+  <p class="hero-sub">
+    LocaIA analiza tráfico peatonal, competencia, nivel socioeconómico y accesibilidad para decirte exactamente dónde abrir tu local en Saltillo.
+  </p>
+
+  <div class="hero-btns">
+    <a href="login.html" class="btn-primary">Analizar mi negocio →</a>
+    <a href="#como" class="btn-ghost">Ver cómo funciona</a>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="num"><em>10</em>+</div>
+      <div class="lbl">Zonas analizadas</div>
+    </div>
+    <div class="stat">
+      <div class="num"><em>4</em></div>
+      <div class="lbl">Variables de scoring</div>
+    </div>
+    <div class="stat">
+      <div class="num"><em>100%</em></div>
+      <div class="lbl">Datos reales INEGI</div>
+    </div>
+  </div>
+</section>
+
+<!-- APP PREVIEW -->
+<section class="preview-section">
+  <div class="preview-card">
+    <div class="preview-bar">
+      <div class="preview-dot" style="background:#ef4444"></div>
+      <div class="preview-dot" style="background:#f59e0b"></div>
+      <div class="preview-dot" style="background:#22c55e"></div>
+      <div class="preview-url">locaia.vercel.app/dashboard</div>
+    </div>
+    <div class="preview-body">
+      <div class="preview-sidebar">
+        <div style="font-size:.65rem;color:#5a6478;letter-spacing:.1em;text-transform:uppercase;font-family:'Syne',sans-serif;font-weight:700;margin-bottom:4px;">Tipo de negocio</div>
+        <div class="preview-row active">
+          <div class="circle"></div>
+          <div class="line"></div>
+        </div>
+        <div class="preview-row">
+          <div class="circle" style="background:#6b7280"></div>
+          <div class="line"></div>
+        </div>
+        <div class="preview-row">
+          <div class="circle" style="background:#6b7280"></div>
+          <div class="line"></div>
+        </div>
+        <div style="font-size:.65rem;color:#5a6478;letter-spacing:.1em;text-transform:uppercase;font-family:'Syne',sans-serif;font-weight:700;margin:8px 0 4px;">Zonas top</div>
+        <div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:8px;padding:10px;font-size:.75rem;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;">🥇 Centro Histórico</div>
+          <div style="color:#fbbf24;font-weight:700;font-size:1.1rem;font-family:'Syne',sans-serif;">89 <span style="color:#5a6478;font-size:.65rem;font-weight:400">/ 100</span></div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:.75rem;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;">🥈 Col. República</div>
+          <div style="color:#f97316;font-weight:700;font-size:1rem;font-family:'Syne',sans-serif;">78 <span style="color:#5a6478;font-size:.65rem;font-weight:400">/ 100</span></div>
+        </div>
+      </div>
+      <div class="preview-map">
+        <div class="map-blob"></div>
+        <div class="map-blob"></div>
+        <div class="map-blob"></div>
+        <div class="score-badge">
+          <div class="big">89</div>
+          <div class="sm">Centro Histórico</div>
+          <div class="sm" style="color:#22c55e;font-weight:600;font-size:.72rem;margin-top:2px;">✓ Recomendado</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="como">
+  <span class="section-tag">¿Cómo funciona?</span>
+  <h2 class="section-title">3 pasos para encontrar<br>tu ubicación ideal</h2>
+  <p class="section-sub">Sin complicaciones. En menos de 2 minutos tienes tu análisis listo.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-icon">🏪</div>
+      <h3>Describe tu negocio</h3>
+      <p>Selecciona el tipo de comercio, tu presupuesto de renta y qué factores son más importantes para ti.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-icon">⚡</div>
+      <h3>LocaIA analiza Saltillo</h3>
+      <p>Cruzamos datos de tráfico, competencia, demografía INEGI y accesibilidad en tiempo real para cada zona.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-icon">📍</div>
+      <h3>Ve tu recomendación en el mapa</h3>
+      <p>Obtienes un ranking de las mejores colonias con puntuación, pros y contras específicos de cada una.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section">
+  <div class="features-inner">
+    <span class="section-tag">Funcionalidades</span>
+    <h2 class="section-title">Todo lo que necesitas para<br>tomar la decisión correcta</h2>
+
+    <div class="features-grid">
+      <div class="feat">
+        <div class="feat-icon">🗺️</div>
+        <div>
+          <h4>Mapa interactivo de Saltillo</h4>
+          <p>Visualiza todas las zonas con código de colores según su puntuación. Haz clic para ver detalles de cada área.</p>
+        </div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">📊</div>
+        <div>
+          <h4>Datos reales del INEGI</h4>
+          <p>Nivel socioeconómico, densidad poblacional y tendencias económicas de Coahuila actualizadas al 2025.</p>
+        </div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">🏪</div>
+        <div>
+          <h4>Análisis de competencia</h4>
+          <p>Descubre cuántos negocios similares al tuyo operan en cada zona y si el mercado está saturado.</p>
+        </div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">⚙️</div>
+        <div>
+          <h4>Scoring personalizable</h4>
+          <p>Ajusta qué factores importan más para tu negocio: tráfico, precio de renta, nivel socioeconómico o acceso.</p>
+        </div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">💾</div>
+        <div>
+          <h4>Guarda tus análisis</h4>
+          <p>Crea una cuenta y accede a todos tus análisis anteriores. Compara diferentes tipos de negocio y zonas.</p>
+        </div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">📈</div>
+        <div>
+          <h4>Contexto económico live</h4>
+          <p>Inflación, INPC y tendencias de precios actuales integrados directamente en tu análisis de viabilidad.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" id="precios">
+  <span class="section-tag">Precios</span>
+  <h2 class="section-title">Planes accesibles para<br>cada etapa</h2>
+  <p class="section-sub" style="margin:0 auto;">Empieza gratis. Escala cuando lo necesites.</p>
+
+  <div class="pricing-grid">
+    <!-- FREE -->
+    <div class="plan">
+      <div class="plan-name">Gratis</div>
+      <div class="plan-price">$0 <sub>MXN</sub></div>
+      <div class="plan-period">para siempre</div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li>3 análisis por mes</li>
+        <li>Mapa interactivo</li>
+        <li>5 tipos de negocio</li>
+        <li>Datos INEGI básicos</li>
+        <li class="no">Competencia Google Places</li>
+        <li class="no">Análisis guardados</li>
+        <li class="no">Reporte PDF</li>
+      </ul>
+      <a href="login.html" class="plan-btn ghost">Empezar gratis</a>
+    </div>
+
+    <!-- PRO -->
+    <div class="plan featured">
+      <div class="plan-badge">Más popular</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-price">$299 <sub>MXN</sub></div>
+      <div class="plan-period">por mes</div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li>Análisis ilimitados</li>
+        <li>Mapa interactivo</li>
+        <li>10 tipos de negocio</li>
+        <li>Datos INEGI completos</li>
+        <li>Competencia Google Places</li>
+        <li>Análisis guardados</li>
+        <li class="no">Reporte PDF</li>
+      </ul>
+      <a href="login.html" class="plan-btn solid">Empezar 14 días gratis</a>
+    </div>
+
+    <!-- BUSINESS -->
+    <div class="plan">
+      <div class="plan-name">Business</div>
+      <div class="plan-price">$799 <sub>MXN</sub></div>
+      <div class="plan-period">por mes</div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li>Todo en Pro</li>
+        <li>Reporte PDF descargable</li>
+        <li>Múltiples ciudades</li>
+        <li>API access</li>
+        <li>Soporte prioritario</li>
+        <li>Hasta 5 usuarios</li>
+        <li>Dashboard personalizado</li>
+      </ul>
+      <a href="login.html" class="plan-btn ghost">Contactar ventas</a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-glow"></div>
+  <span class="section-tag">¿Listo para empezar?</span>
+  <h2>Tu negocio merece<br>el mejor lugar</h2>
+  <p>Únete a los emprendedores de Saltillo que ya toman decisiones con datos, no con suposiciones.</p>
+  <a href="login.html" class="btn-primary">Crear cuenta gratis →</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Loca<em>IA</em></div>
+  <div>Saltillo, Coahuila · Datos INEGI 2025</div>
+  <div>© 2025 LocaIA</div>
+</footer>
+
+</body>
+</html>
