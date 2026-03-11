@@ -5,8 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LocaIA — Acceder</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://etdjlwtopaehamhlwwrd.supabase.co">
+<link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
 <style>
 :root{
   --bg:#06080b;--surface:#0d1017;--card:#121620;--border:#1c2230;
@@ -242,6 +245,7 @@ input::placeholder{color:var(--muted);}
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded',function(){
 const SUPABASE_URL = 'https://etdjlwtopaehamhlwwrd.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_OLKBJ7H2vfDMbCr0v9YnqA_yVrLfL0M';
 const { createClient } = supabase;
@@ -320,6 +324,7 @@ document.addEventListener('keydown', e => {
   const activeTab = document.getElementById('form-login').style.display !== 'none';
   if (activeTab) handleLogin(); else handleRegister();
 });
+}); // end DOMContentLoaded
 </script>
 </body>
 </html>
