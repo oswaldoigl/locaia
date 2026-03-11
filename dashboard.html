@@ -310,6 +310,48 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 .rpt-verdict{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:8px;padding:10px 14px;font-size:.78rem;line-height:1.6;margin-bottom:12px;}
 .rpt-verdict strong{color:#22c55e;}
 .rpt-footer{background:var(--surface);border-top:1px solid var(--border);padding:14px 20px;display:flex;gap:10px;justify-content:flex-end;flex-shrink:0;}
+
+/* ── LISTINGS MODAL ── */
+.listings-btn{background:linear-gradient(135deg,rgba(34,197,94,.15),rgba(16,185,129,.08));border:1px solid rgba(34,197,94,.35);color:#22c55e;border-radius:9px;padding:11px;font-size:.78rem;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;width:100%;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px;}
+.listings-btn:hover{background:linear-gradient(135deg,rgba(34,197,94,.25),rgba(16,185,129,.15));border-color:#22c55e;transform:translateY(-1px);}
+.listings-btn .lst-count{background:#22c55e;color:#000;font-size:.6rem;font-weight:800;border-radius:10px;padding:1px 7px;min-width:18px;text-align:center;}
+.lst-modal-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;max-width:680px;width:95%;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.7);overflow:hidden;}
+.lst-head{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.lst-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;display:flex;align-items:center;gap:8px;}
+.lst-subtitle{font-size:.68rem;color:var(--muted2);margin-top:2px;}
+.lst-filters{display:flex;gap:5px;padding:12px 20px;border-bottom:1px solid var(--border);flex-wrap:wrap;flex-shrink:0;}
+.lst-filter{font-size:.68rem;padding:4px 10px;border-radius:16px;border:1px solid var(--border);color:var(--muted2);cursor:pointer;background:transparent;transition:all .15s;font-family:'Instrument Sans',sans-serif;}
+.lst-filter:hover{border-color:rgba(34,197,94,.4);color:var(--text);}
+.lst-filter.active{background:rgba(34,197,94,.12);border-color:#22c55e;color:#22c55e;font-weight:600;}
+.lst-body{flex:1;overflow-y:auto;padding:14px 20px;display:flex;flex-direction:column;gap:12px;}
+.lst-body::-webkit-scrollbar{width:3px;}
+.lst-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.lst-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;transition:all .2s;cursor:pointer;animation:fadeUp .3s ease both;}
+.lst-card:hover{border-color:rgba(34,197,94,.4);transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,0,0,.3);}
+.lst-card.match{border-color:rgba(249,115,22,.35);background:rgba(249,115,22,.03);}
+.lst-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.lst-card-zone{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;}
+.lst-card-price{font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;color:#22c55e;}
+.lst-card-price small{font-weight:400;font-size:.65rem;color:var(--muted2);}
+.lst-card-addr{font-size:.72rem;color:var(--muted2);margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+.lst-card-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;}
+.lst-stat{background:rgba(0,0,0,.25);border-radius:7px;padding:5px 7px;}
+.lst-stat-val{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;}
+.lst-stat-lbl{font-size:.55rem;color:var(--muted);margin-top:1px;}
+.lst-card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;}
+.lst-tag{font-size:.6rem;padding:2px 7px;border-radius:10px;background:rgba(255,255,255,.05);color:#7b8a9e;}
+.lst-tag.feat{background:rgba(59,130,246,.08);color:#60a5fa;border:1px solid rgba(59,130,246,.15);}
+.lst-tag.suit{background:rgba(34,197,94,.08);color:#22c55e;border:1px solid rgba(34,197,94,.15);}
+.lst-tag.match-tag{background:rgba(249,115,22,.1);color:var(--accent2);border:1px solid rgba(249,115,22,.2);font-weight:600;}
+.lst-card-note{font-size:.68rem;color:var(--muted2);line-height:1.5;margin-bottom:8px;}
+.lst-card-contact{display:flex;gap:8px;align-items:center;padding-top:8px;border-top:1px solid var(--border);}
+.lst-contact-btn{font-size:.7rem;padding:6px 12px;border-radius:8px;border:1px solid rgba(34,197,94,.3);color:#22c55e;background:rgba(34,197,94,.06);cursor:pointer;transition:all .15s;font-family:'Instrument Sans',sans-serif;font-weight:500;}
+.lst-contact-btn:hover{background:rgba(34,197,94,.15);border-color:#22c55e;}
+.lst-contact-btn.map-btn{border-color:rgba(59,130,246,.3);color:#60a5fa;background:rgba(59,130,246,.06);}
+.lst-contact-btn.map-btn:hover{background:rgba(59,130,246,.15);border-color:#60a5fa;}
+.lst-empty{text-align:center;padding:40px 20px;color:var(--muted);}
+.lst-empty .lst-empty-ico{font-size:2rem;margin-bottom:8px;}
+.lst-match-badge{display:inline-flex;align-items:center;gap:4px;font-size:.58rem;font-weight:700;background:rgba(249,115,22,.12);color:var(--accent2);border:1px solid rgba(249,115,22,.25);border-radius:6px;padding:2px 7px;font-family:'Syne',sans-serif;letter-spacing:.03em;}
 </style>
 </head>
 <body>
@@ -325,6 +367,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
   <div class="logo">Loca<em>IA</em></div>
   <div class="topbar-right">
     <button class="topbar-btn" id="aiBtn" onclick="openAIModal()" style="border-color:rgba(139,92,246,.4);color:#a78bfa;">🤖 Asesor IA</button>
+    <button class="topbar-btn" id="listingsTopBtn" onclick="openAllListingsModal()" style="border-color:rgba(34,197,94,.4);color:#22c55e;display:none;">🏢 Locales</button>
     <button class="topbar-btn" id="proBtn" onclick="openProModal()" style="border-color:rgba(34,197,94,.5);color:#22c55e;font-weight:700;background:rgba(34,197,94,.08);">✦ Pro Activo</button>
     <button class="topbar-btn highlight" onclick="openAnalysesModal()">
       📊 Mis análisis
@@ -728,6 +771,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
       <button onclick="openSaveModal()" style="background:var(--card);border:1px solid var(--border);color:var(--muted2);border-radius:8px;padding:10px;font-size:.78rem;cursor:pointer;transition:all .2s;font-family:'Instrument Sans',sans-serif;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">💾 Guardar este análisis</button>
       <button id="aiBtn" onclick="runAIAnalysis()" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);border:none;color:#fff;border-radius:8px;padding:10px;font-size:.78rem;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;width:100%;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;">✨ Análisis IA — Recomendación personalizada</button>
       <div id="aiResult" style="display:none;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.25);border-radius:10px;padding:12px;font-size:.72rem;color:var(--muted2);line-height:1.7;"></div>
+      <button id="listingsBtn" class="listings-btn" onclick="openListingsModal()" style="display:none;">
+        🏢 Ver locales disponibles <span class="lst-count" id="lstCount">0</span>
+      </button>
     </div>
 
     <!-- ZONE NARRATIVE -->
@@ -3067,6 +3113,256 @@ window.showRptTab = function(btn, pageId){
   if(pageId==='rpt-contexto') setTimeout(drawContextCharts, 80);
 };
 
+// ══════════════════════════════════════════════════════════
+//  LISTINGS — Locales comerciales disponibles
+// ══════════════════════════════════════════════════════════
+let allListings = [], lstFilter = 'all', listingMarkers = L.layerGroup().addTo(map);
+
+// Zone name mapping from zone id → display name
+const zoneNames = {};
+zones.forEach(z => { zoneNames[z.id] = z.name; });
+
+async function fetchListings(zoneIds) {
+  try {
+    const { data, error } = await sb.from('listings')
+      .select('*')
+      .in('zone', zoneIds)
+      .eq('status', 'available')
+      .order('monthly_rent', { ascending: true });
+    if (error) throw error;
+    return data || [];
+  } catch (e) {
+    console.error('Error fetching listings:', e);
+    return [];
+  }
+}
+
+async function fetchAllListings() {
+  try {
+    const { data, error } = await sb.from('listings')
+      .select('*')
+      .eq('status', 'available')
+      .order('monthly_rent', { ascending: true });
+    if (error) throw error;
+    return data || [];
+  } catch (e) {
+    console.error('Error fetching all listings:', e);
+    return [];
+  }
+}
+
+// Show listings button after analysis
+async function updateListingsButton() {
+  if (!lastScored || !lastScored.length) return;
+  const topZoneIds = lastScored.slice(0, 10).map(z => z.id);
+  const listings = await fetchAllListings();
+  allListings = listings;
+  
+  // Count listings in top zones
+  const matchCount = listings.filter(l => topZoneIds.includes(l.zone)).length;
+  const totalCount = listings.length;
+  
+  const btn = document.getElementById('listingsBtn');
+  const countEl = document.getElementById('lstCount');
+  if (totalCount > 0) {
+    countEl.textContent = matchCount > 0 ? matchCount : totalCount;
+    btn.style.display = 'flex';
+  }
+}
+
+function openListingsModal() {
+  document.getElementById('listingsModal').classList.add('open');
+  renderListingsFilters();
+  renderListings();
+}
+
+function closeListingsModal() {
+  document.getElementById('listingsModal').classList.remove('open');
+  listingMarkers.clearLayers();
+}
+
+function renderListingsFilters() {
+  const filtersEl = document.getElementById('lstFilters');
+  const topZoneIds = lastScored ? lastScored.slice(0, 5).map(z => z.id) : [];
+  
+  // Get unique zones from listings
+  const listingZones = [...new Set(allListings.map(l => l.zone))];
+  
+  let html = `<button class="lst-filter ${lstFilter === 'all' ? 'active' : ''}" onclick="setLstFilter('all')">Todos (${allListings.length})</button>`;
+  
+  // "Match" filter - zones in top results
+  const matchListings = allListings.filter(l => topZoneIds.includes(l.zone));
+  if (matchListings.length > 0) {
+    html += `<button class="lst-filter ${lstFilter === 'match' ? 'active' : ''}" onclick="setLstFilter('match')" style="border-color:rgba(249,115,22,.3);color:var(--accent2)">🎯 En tus zonas top (${matchListings.length})</button>`;
+  }
+  
+  // "Suitable" filter - matching business type
+  if (selectedType) {
+    const suitListings = allListings.filter(l => l.suitable_for && l.suitable_for.includes(selectedType));
+    if (suitListings.length > 0) {
+      html += `<button class="lst-filter ${lstFilter === 'suitable' ? 'active' : ''}" onclick="setLstFilter('suitable')">✅ Ideal para ${typeLabels[selectedType]?.replace(/^.\s/, '') || selectedType} (${suitListings.length})</button>`;
+    }
+  }
+  
+  filtersEl.innerHTML = html;
+}
+
+function setLstFilter(f) {
+  lstFilter = f;
+  renderListingsFilters();
+  renderListings();
+}
+
+function renderListings() {
+  const body = document.getElementById('lstBody');
+  const topZoneIds = lastScored ? lastScored.slice(0, 5).map(z => z.id) : [];
+  
+  let filtered = [...allListings];
+  if (lstFilter === 'match') {
+    filtered = filtered.filter(l => topZoneIds.includes(l.zone));
+  } else if (lstFilter === 'suitable') {
+    filtered = filtered.filter(l => l.suitable_for && l.suitable_for.includes(selectedType));
+  }
+  
+  if (filtered.length === 0) {
+    body.innerHTML = `<div class="lst-empty"><div class="lst-empty-ico">🏗️</div>No hay locales disponibles con este filtro.<br><span style="font-size:.72rem;color:var(--muted2);margin-top:6px;display:block">Estamos agregando nuevos locales constantemente.</span></div>`;
+    return;
+  }
+  
+  // Sort: matching zones first, then by rent
+  filtered.sort((a, b) => {
+    const aMatch = topZoneIds.includes(a.zone) ? 0 : 1;
+    const bMatch = topZoneIds.includes(b.zone) ? 0 : 1;
+    if (aMatch !== bMatch) return aMatch - bMatch;
+    return (a.monthly_rent || 0) - (b.monthly_rent || 0);
+  });
+  
+  // Update subtitle
+  document.getElementById('lstSubtitle').textContent = `${filtered.length} local${filtered.length > 1 ? 'es' : ''} disponible${filtered.length > 1 ? 's' : ''} · Renta desde $${Math.min(...filtered.map(l => l.monthly_rent || 0)).toLocaleString()}/mes`;
+  
+  // Clear map markers
+  listingMarkers.clearLayers();
+  
+  body.innerHTML = filtered.map((l, i) => {
+    const isMatch = topZoneIds.includes(l.zone);
+    const isSuitable = l.suitable_for && l.suitable_for.includes(selectedType);
+    const zName = zoneNames[l.zone] || l.zone;
+    
+    // Find zone score
+    const zoneData = lastScored?.find(z => z.id === l.zone);
+    const zScore = zoneData ? zoneData.score : null;
+    
+    // Add map marker
+    if (l.lat && l.lng) {
+      const mkColor = isMatch ? '#f97316' : '#22c55e';
+      const mk = L.circleMarker([l.lat, l.lng], {
+        radius: 7, fillColor: mkColor, fillOpacity: 0.9, color: '#fff', weight: 2
+      }).bindPopup(`
+        <div class="popup-name">${zName}</div>
+        <div style="font-size:.75rem;color:#9ca3af;margin:4px 0">${l.address}</div>
+        <div style="font-size:1.1rem;font-weight:800;color:#22c55e;font-family:'Syne',sans-serif">$${(l.monthly_rent||0).toLocaleString()}/mes</div>
+        <div style="font-size:.7rem;color:#8b95a8;margin-top:4px">${l.size_m2}m² · Depósito: ${l.deposit_months} meses</div>
+      `);
+      listingMarkers.addLayer(mk);
+    }
+    
+    return `
+      <div class="lst-card ${isMatch ? 'match' : ''}" style="animation-delay:${i * .05}s" onclick="flyToListing(${l.lat},${l.lng})">
+        <div class="lst-card-top">
+          <div>
+            <div class="lst-card-zone">
+              ${zName}
+              ${isMatch ? `<span class="lst-match-badge">🎯 Zona top #${topZoneIds.indexOf(l.zone) + 1}</span>` : ''}
+            </div>
+          </div>
+          <div class="lst-card-price">$${(l.monthly_rent||0).toLocaleString()}<small>/mes</small></div>
+        </div>
+        <div class="lst-card-addr">📍 ${l.address}</div>
+        <div class="lst-card-stats">
+          <div class="lst-stat">
+            <div class="lst-stat-val">${l.size_m2}m²</div>
+            <div class="lst-stat-lbl">SUPERFICIE</div>
+          </div>
+          <div class="lst-stat">
+            <div class="lst-stat-val">${l.deposit_months} meses</div>
+            <div class="lst-stat-lbl">DEPÓSITO</div>
+          </div>
+          <div class="lst-stat">
+            <div class="lst-stat-val" style="color:${zScore ? scoreColor(zScore) : 'var(--muted2)'}">${zScore ? zScore + '/100' : '—'}</div>
+            <div class="lst-stat-lbl">SCORE ZONA</div>
+          </div>
+        </div>
+        <div class="lst-card-tags">
+          ${(l.features||[]).slice(0, 4).map(f => `<span class="lst-tag feat">${f}</span>`).join('')}
+          ${(l.features||[]).length > 4 ? `<span class="lst-tag feat">+${(l.features||[]).length - 4}</span>` : ''}
+          ${isSuitable ? `<span class="lst-tag match-tag">✅ Ideal para tu giro</span>` : ''}
+        </div>
+        ${l.notes ? `<div class="lst-card-note">${l.notes}</div>` : ''}
+        <div class="lst-card-contact">
+          <button class="lst-contact-btn" onclick="event.stopPropagation();copyContact('${l.contact_phone}','${l.contact_name}')">📞 ${l.contact_name || 'Contactar'}</button>
+          <button class="lst-contact-btn map-btn" onclick="event.stopPropagation();flyToListing(${l.lat},${l.lng})">🗺️ Ver en mapa</button>
+          ${l.suitable_for ? `<span style="margin-left:auto;font-size:.6rem;color:var(--muted)">Ideal: ${l.suitable_for.slice(0,3).map(s => typeLabels[s]?.replace(/^.\s/,'') || s).join(', ')}</span>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function flyToListing(lat, lng) {
+  if (!lat || !lng) return;
+  closeListingsModal();
+  map.flyTo([lat, lng], 17, { duration: 1 });
+  // Pulse marker
+  const pulse = L.circleMarker([lat, lng], {
+    radius: 14, fillColor: '#22c55e', fillOpacity: 0.4, color: '#22c55e', weight: 2
+  });
+  listingMarkers.addLayer(pulse);
+  setTimeout(() => { listingMarkers.removeLayer(pulse); }, 3000);
+}
+
+function copyContact(phone, name) {
+  navigator.clipboard.writeText(phone).then(() => {
+    showToast(`📞 ${name}: ${phone} copiado`);
+  }).catch(() => {
+    showToast(`📞 ${name}: ${phone}`);
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Hook into analyze() to show listings button
+const _origAnalyze = analyze;
+analyze = function() {
+  _origAnalyze();
+  updateListingsButton();
+};
+
+// Open listings modal showing ALL listings (from topbar)
+async function openAllListingsModal() {
+  if (allListings.length === 0) {
+    allListings = await fetchAllListings();
+  }
+  document.getElementById('listingsModal').classList.add('open');
+  renderListingsFilters();
+  renderListings();
+}
+
+// Init: show topbar listings button if there are listings
+(async function initListingsBtn(){
+  try {
+    const { count } = await sb.from('listings').select('*', { count: 'exact', head: true }).eq('status', 'available');
+    if (count && count > 0) {
+      const btn = document.getElementById('listingsTopBtn');
+      if (btn) { btn.style.display = 'flex'; btn.innerHTML = `🏢 Locales <span class="badge-count">${count}</span>`; }
+    }
+  } catch(e) {}
+})();
+
 </script>
 
 <!-- PRO MODAL -->
@@ -3173,6 +3469,24 @@ window.showRptTab = function(btn, pageId){
     </button>
   </div>
 </div>
+
+<!-- LISTINGS MODAL -->
+<div class="modal-overlay" id="listingsModal" onclick="if(event.target===this)closeListingsModal()">
+  <div class="lst-modal-box">
+    <div class="lst-head">
+      <div>
+        <div class="lst-title">🏢 Locales disponibles en tus zonas top</div>
+        <div class="lst-subtitle" id="lstSubtitle">Mostrando locales compatibles con tu análisis</div>
+      </div>
+      <button class="modal-close" onclick="closeListingsModal()">✕</button>
+    </div>
+    <div class="lst-filters" id="lstFilters"></div>
+    <div class="lst-body" id="lstBody">
+      <div class="lst-empty"><div class="lst-empty-ico">⏳</div>Cargando locales...</div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>const BEST_SPOTS = {"centro": [25.4241, -100.9991, "Allende & Victoria"], "republica": [25.438, -100.9892, "Blvd. V. Carranza & Norte"], "topochico": [25.4295, -100.9812, "Blvd. Venustiano Carranza"], "ant_cardenas": [25.4252, -101.0065, "Antonio Cárdenas & Periférico"], "morelos": [25.4108, -100.9438, "Morelos & Zaragoza"], "la_madrid": [25.4008, -100.9905, "La Madrid & Miravalle"], "guanajuato": [25.4418, -100.9803, "Guanajuato & Latinoam."], "lourdes": [25.392, -101.0018, "Blvd. Lourdes & 5 de Mayo"], "chamizal": [25.413, -101.0272, "Blvd. Vito Alessio Robles"], "la_salle": [25.4519, -100.9918, "Blvd. La Salle & Circuito"], "bellavista": [25.4058, -101.0055, "Olímpica & Bellavista"], "cuauhtemoc": [25.4352, -100.9941, "Cuauhtémoc & Periférico"], "san_ramon": [25.421, -100.9708, "San Ramón & Fundadores"], "plaza_fiesta": [25.4548, -100.9882, "Blvd. Fundadores & Plaza"], "valle_flores": [25.4328, -100.9582, "Valle de las Flores"], "bonanza": [25.4438, -100.9585, "Bonanza & Oceanía"], "v_olimpica": [25.4605, -100.9818, "Villa Olímpica & Periférico"], "tecnologico": [25.4478, -101.0148, "Tecnológico & Satélite"], "satelite_n": [25.459, -101.0158, "Satélite Norte & Blvd."], "saltillo2000": [25.464, -101.0278, "Saltillo 2000 & Periférico"], "col25": [25.4775, -100.9772, "Col. 25 & Blvd. Norte"], "pedregal": [25.4158, -101.0398, "Pedregal & Blvd."], "universidad": [25.4028, -100.9644, "Universidad & Tlaloc"], "bosques": [25.4578, -101.0042, "Bosques & Periférico"], "nazario": [25.4645, -100.9992, "Nazario Ortiz & Blvd."], "vistahermosa": [25.4122, -100.949, "Fundadores & V. Hermosa"], "virreyes": [25.4652, -100.9862, "Col. Virreyes & Circuito"], "san_patricio": [25.4578, -100.9562, "San Patricio & Fundadores"], "rancho_pena": [25.4735, -100.978, "Rancho de Peña & Blvd."], "mitras": [25.4478, -100.9782, "Mitras & Periférico"], "pradosSur": [25.4675, -100.9895, "Prados del Sur & Blvd."], "laFloresta": [25.4882, -101.0042, "La Floresta & Acceso Norte"], "coloniaObraPre": [25.4388, -100.9705, "Obra Previsora & Circuito"], "boulevardIsidro": [25.4308, -101.0125, "Blvd. Isidro López Sur"], "rioGrandePte": [25.4288, -101.0415, "Río Grande & Poniente"], "internacionalSur": [25.3958, -100.9758, "Periférico Internacional Sur"], "lomas_ref": [25.3512, -101.0118, "Lomas del Refugio"], "landin": [25.4008, -101.0265, "Landín & Blvd. Alessio"], "mirasierra": [25.4238, -100.9238, "Mirasierra & Fundadores"], "fraccPuertaDelNorte": [25.5008, -101.0048, "Puerta del Norte"], "parque_ind": [25.5082, -101.0202, "Parque Industrial Norte"], "ramos_arizpe": [25.5458, -100.9382, "Ramos Arizpe Centro"], "lomas_zap": [25.3917, -100.9514, "Lomas de Zapalinamé"], "nueva_mir": [25.4093, -100.9189, "Nueva Mirasierra"], "lomalinda": [25.419, -100.908, "Loma Linda"], "mision_orte": [25.4238, -100.9015, "Misión del Norte"], "fed_berrueto": [25.3853, -100.977, "Fed. Berrueto Ramírez"], "el_salvador": [25.41, -100.97, "El Salvador & Fundadores"], "b_aires": [25.405, -101.015, "Buenos Aires & Blvd."], "satelite_s": [25.4529, -101.0207, "Satélite Sur & Periférico"], "n_teresitas": [25.37, -101.02, "Nuevas Teresitas"], "las_teresitas": [25.3644, -101.0093, "Las Teresitas"], "hacienda_n": [25.3632, -101.0339, "Hacienda Norte"], "m_hidalgo": [25.3886, -100.9853, "Miguel Hidalgo & Blvd."], "zamoraSanLuis": [25.436, -101.028, "Zamora & San Luis"], "sanIsidro": [25.454, -101.038, "San Isidro & Periférico"], "anahuac": [25.413, -101.015, "Anáhuac & Blvd."], "colosioOriente": [25.449, -100.915, "Colosio Oriente"], "lomatoscana": [25.462, -101.048, "Loma Toscana & Periférico"], "zaragozaSur": [25.377, -101.0, "Zaragoza Sur"], "ejidoSan": [25.385, -100.938, "Ejido San José"], "montesCarpatos": [25.446, -100.937, "Montes Cárpatos"], "pradosVertiz": [25.441, -100.945, "Prados de Vertiz"], "haciendaElRoble": [25.372, -101.045, "Hacienda El Roble"], "queretaro": [25.427, -101.02, "Querétaro & Blvd."], "fraccLasAmericasNorte": [25.482, -100.971, "Las Américas Norte"], "cumbresElite": [25.4755, -100.958, "Cumbres Elite"], "coloniaVerde": [25.418, -100.965, "Colonia Verde"], "misionDeLas": [25.494, -101.014, "Misión de Las Flores"], "roma": [25.4469, -101.0214, "Colonia Roma"], "los_gonzalez": [25.4718, -100.9467, "Los González"], "los_pinos": [25.4624, -100.9648, "Los Pinos"], "los_pinos2": [25.398, -101.058, "Los Pinos 2"], "olimpica_norte": [25.42, -100.98, "Olímpica Norte"], "sj_cerritos": [25.435, -100.925, "San José de los Cerritos"], "ign_zaragoza": [25.4213, -100.9338, "Ignacio Zaragoza"], "vic_guerrero": [25.393, -100.9831, "Vicente Guerrero"]};
 
