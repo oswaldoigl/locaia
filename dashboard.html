@@ -81,6 +81,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 .map-wrap{flex:1;position:relative;}
 #map{width:100%;height:100%;background:#0e1117;}
 .leaflet-container{background:#0e1117!important;}
+.hm-btn{width:100%;text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--muted2);font-size:.72rem;cursor:pointer;transition:all .2s;font-family:inherit;}
+.hm-btn:hover{border-color:var(--accent);color:var(--text);}
+.hm-btn.active{background:rgba(249,115,22,.1);border-color:var(--accent);color:var(--accent);font-weight:600;}
+.heat-legend{position:absolute;bottom:80px;right:10px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:.65rem;color:var(--muted2);z-index:1000;min-width:120px;}
+.heat-legend-title{font-weight:700;color:var(--text);margin-bottom:6px;font-size:.7rem;}
+.heat-legend-row{display:flex;align-items:center;gap:6px;margin-bottom:3px;}
+.heat-legend-color{width:14px;height:10px;border-radius:2px;}
 .leaflet-popup-content-wrapper{background:var(--card)!important;border:1px solid var(--border)!important;border-radius:12px!important;box-shadow:0 8px 32px rgba(0,0,0,.5)!important;color:var(--text)!important;font-family:'Instrument Sans',sans-serif!important;}
 .leaflet-popup-tip{background:var(--card)!important;}
 .leaflet-popup-content{margin:14px 18px!important;}
@@ -703,7 +710,20 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 
     <button class="analyze-btn" onclick="analyze()">⚡ Analizar Saltillo</button>
 
-    <div id="resultsSection" style="display:none;flex-direction:column;gap:8px;">
+    <!-- HEAT MAP TOGGLE -->
+      <div id="heatmapControls" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+        <div class="slabel">🌡️ Mapa de calor</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <button class="hm-btn active" data-layer="none" onclick="setHeatLayer(this,'none')">❌ Sin mapa de calor</button>
+          <button class="hm-btn" data-layer="nse" onclick="setHeatLayer(this,'nse')">💰 Nivel socioeconómico (NSE)</button>
+          <button class="hm-btn" data-layer="competencia" onclick="setHeatLayer(this,'competencia')">🏪 Competencia del giro</button>
+          <button class="hm-btn" data-layer="trafico" onclick="setHeatLayer(this,'trafico')">🚶 Afluencia peatonal</button>
+          <button class="hm-btn" data-layer="parking" onclick="setHeatLayer(this,'parking')">🅿️ Disponibilidad estac.</button>
+          <button class="hm-btn" data-layer="score" onclick="setHeatLayer(this,'score')">⭐ Score LocaIA</button>
+        </div>
+      </div>
+
+      <div id="resultsSection" style="display:none;flex-direction:column;gap:8px;">
       <div class="results-header">Top 5 · <span id="results-type-label"></span></div>
       <div id="zoneCards"></div>
       <button onclick="openSaveModal()" style="background:var(--card);border:1px solid var(--border);color:var(--muted2);border-radius:8px;padding:10px;font-size:.78rem;cursor:pointer;transition:all .2s;font-family:'Instrument Sans',sans-serif;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">💾 Guardar este análisis</button>
@@ -711,11 +731,21 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
       <div id="aiResult" style="display:none;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.25);border-radius:10px;padding:12px;font-size:.72rem;color:var(--muted2);line-height:1.7;"></div>
     </div>
 
-    <div id="emptyState" class="empty"><div class="big">🗺️</div>Configura y presiona<br><strong>Analizar Saltillo</strong></div>
+    <!-- ZONE NARRATIVE -->
+      <div id="zoneNarrative" style="display:none;background:rgba(249,115,22,.06);border:1px solid rgba(249,115,22,.2);border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:.78rem;line-height:1.6;color:var(--text)">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;color:var(--accent);margin-bottom:6px">📍 ¿Por qué esta zona?</div>
+        <div id="narrativeText"></div>
+      </div>
+
+      <div id="emptyState" class="empty"><div class="big">🗺️</div>Configura y presiona<br><strong>Analizar Saltillo</strong></div>
   </aside>
 
   <div class="map-wrap">
-    <div id="map"></div>
+    <div id="map">
+      <div id="heatLegend" class="heat-legend" style="display:none">
+        <div class="heat-legend-title" id="heatLegendTitle">NSE</div>
+        <div id="heatLegendItems"></div>
+      </div></div>
     <div class="legend">
       <div class="legend-t">Puntuación</div>
       <div class="legend-i"><div class="ldot" style="background:#f97316"></div> Excelente 85–100</div>
@@ -1002,60 +1032,60 @@ const parking_score = {
 };
 
 const zones=[
-  {id:"centro",name:"Centro Histórico",lat:25.4241,lng:-100.9995,radius:600,desc:"Hub comercial de Saltillo. 2,719 negocios (DENUE). Proyecto Distrito Centro + Alameda Zaragoza (PMD 2025).",tags_pos:[],tags_neg:[],data:{trafico:100,nse:70,acceso:85,renta:{bajo:true,medio:true,alto:true}}},
-  {id:"republica",name:"Col. República",lat:25.4391,lng:-100.9899,radius:400,desc:"Corredor comercial norte-centro. 908 negocios. Alta densidad peatonal.",tags_pos:[],tags_neg:[],data:{trafico:33,nse:62,acceso:85,renta:{bajo:true,medio:true,alto:true}}},
-  {id:"bellavista",name:"Bellavista/Olímpica Sur",lat:25.4055,lng:-101.0063,radius:400,desc:"Zona sur-centro con alta densidad residencial. 880 negocios.",tags_pos:[],tags_neg:[],data:{trafico:32,nse:38,acceso:65,renta:{bajo:true,medio:true,alto:false}}},
-  {id:"mirasierra",name:"Mirasierra/Oriente",lat:25.4239,lng:-100.9242,radius:500,desc:"Zona oriente con crecimiento sostenido. 423 negocios. Acceso por autopista a Monterrey.",tags_pos:[],tags_neg:[],data:{trafico:16,nse:55,acceso:65,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"centro",name:"Centro Histórico",lat:25.4241,lng:-100.9995,radius:600,desc:"Hub comercial de Saltillo. 2,719 negocios (DENUE). Proyecto Distrito Centro + Alameda Zaragoza (PMD 2025).",tags_pos:[],tags_neg:[],data:{trafico:100,nse:58,acceso:85,renta:{bajo:true,medio:true,alto:true}}},
+  {id:"republica",name:"Col. República",lat:25.4391,lng:-100.9899,radius:400,desc:"Corredor comercial norte-centro. 908 negocios. Alta densidad peatonal.",tags_pos:[],tags_neg:[],data:{trafico:33,nse:55,acceso:85,renta:{bajo:true,medio:true,alto:true}}},
+  {id:"bellavista",name:"Bellavista/Olímpica Sur",lat:25.4055,lng:-101.0063,radius:400,desc:"Zona sur-centro con alta densidad residencial. 880 negocios.",tags_pos:[],tags_neg:[],data:{trafico:32,nse:36,acceso:65,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"mirasierra",name:"Mirasierra/Oriente",lat:25.4239,lng:-100.9242,radius:500,desc:"Zona oriente con crecimiento sostenido. 423 negocios. Acceso por autopista a Monterrey.",tags_pos:[],tags_neg:[],data:{trafico:16,nse:68,acceso:65,renta:{bajo:false,medio:true,alto:true}}},
   {id:"morelos",name:"Morelos/Zaragoza",lat:25.4115,lng:-100.9444,radius:400,desc:"Colonia popular densa. 715 negocios. Alto volumen y tráfico cotidiano.",tags_pos:[],tags_neg:[],data:{trafico:26,nse:35,acceso:65,renta:{bajo:true,medio:true,alto:false}}},
-  {id:"saltillo2000",name:"Saltillo 2000/Nte",lat:25.4644,lng:-101.0286,radius:450,desc:"Zona norte en expansión. 735 negocios. Conectividad a parques industriales.",tags_pos:[],tags_neg:[],data:{trafico:27,nse:60,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
-  {id:"ign_zaragoza",name:"Ignacio Zaragoza",lat:25.4213,lng:-100.9338,radius:350,desc:"Zona oriente-centro. 467 negocios. NSE medio, buen tráfico.",tags_pos:[],tags_neg:[],data:{trafico:17,nse:42,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"saltillo2000",name:"Saltillo 2000/Nte",lat:25.4644,lng:-101.0286,radius:450,desc:"Zona norte en expansión. 735 negocios. Conectividad a parques industriales.",tags_pos:[],tags_neg:[],data:{trafico:27,nse:62,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"ign_zaragoza",name:"Ignacio Zaragoza",lat:25.4213,lng:-100.9338,radius:350,desc:"Zona oriente-centro. 467 negocios. NSE medio, buen tráfico.",tags_pos:[],tags_neg:[],data:{trafico:17,nse:55,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
   {id:"topochico",name:"Topo Chico/Provivienda",lat:25.43,lng:-100.983,radius:400,desc:"Gran zona residencial popular. 1,466 negocios. Buen volumen comercial.",tags_pos:[],tags_neg:[],data:{trafico:54,nse:38,acceso:85,renta:{bajo:true,medio:true,alto:false}}},
-  {id:"vistahermosa",name:"Vista Hermosa/Fund.",lat:25.4125,lng:-100.9496,radius:400,desc:"Vista Hermosa y Fundadores. 778 negocios. NSE medio, bien conectado.",tags_pos:[],tags_neg:[],data:{trafico:29,nse:50,acceso:65,renta:{bajo:true,medio:true,alto:true}}},
-  {id:"la_madrid",name:"La Madrid/Miravalle",lat:25.4005,lng:-100.9913,radius:400,desc:"Zona sur con alta concentración residencial. 1,150 negocios.",tags_pos:[],tags_neg:[],data:{trafico:42,nse:35,acceso:65,renta:{bajo:true,medio:true,alto:false}}},
-  {id:"vic_guerrero",name:"Vicente Guerrero/Sur",lat:25.393,lng:-100.9831,radius:350,desc:"Colonia popular sur. 486 negocios. Mercado de proximidad y lealtad local.",tags_pos:[],tags_neg:[],data:{trafico:18,nse:30,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
-  {id:"lourdes",name:"Lourdes/Poniente Sur",lat:25.3917,lng:-101.0027,radius:350,desc:"Zona sur-poniente. 1,146 negocios. Buena masa crítica residencial.",tags_pos:[],tags_neg:[],data:{trafico:42,nse:32,acceso:65,renta:{bajo:true,medio:true,alto:false}}},
-  {id:"m_hidalgo",name:"Miguel Hidalgo/Gonzalez",lat:25.3886,lng:-100.9853,radius:350,desc:"Miguel Hidalgo y González. 435 negocios. Mercado de proximidad sur.",tags_pos:[],tags_neg:[],data:{trafico:16,nse:32,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
-  {id:"san_ramon",name:"San Ramón/Cumbres",lat:25.4215,lng:-100.9716,radius:350,desc:"San Ramón y Cumbres. 941 negocios. NSE medio-alto.",tags_pos:[],tags_neg:[],data:{trafico:35,nse:55,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
-  {id:"la_salle",name:"La Salle/Latinoam.",lat:25.4524,lng:-100.9924,radius:350,desc:"La Salle y Latinoamericana. 615 negocios. NSE alto, alto poder adquisitivo.",tags_pos:[],tags_neg:[],data:{trafico:23,nse:68,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
-  {id:"satelite_n",name:"Satélite Norte",lat:25.4593,lng:-101.0164,radius:350,desc:"Satélite Norte. 711 negocios. En crecimiento ligada al nearshoring.",tags_pos:[],tags_neg:[],data:{trafico:26,nse:62,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
-  {id:"nuevo_mir",name:"Nuevo Mirasierra",lat:25.4093,lng:-100.9189,radius:400,desc:"Nuevo Mirasierra. 473 negocios. Zona oriente emergente.",tags_pos:[],tags_neg:[],data:{trafico:17,nse:48,acceso:65,renta:{bajo:true,medio:true,alto:true}}},
+  {id:"vistahermosa",name:"Vista Hermosa/Fund.",lat:25.4125,lng:-100.9496,radius:400,desc:"Vista Hermosa y Fundadores. 778 negocios. NSE medio, bien conectado.",tags_pos:[],tags_neg:[],data:{trafico:29,nse:45,acceso:65,renta:{bajo:true,medio:true,alto:true}}},
+  {id:"la_madrid",name:"La Madrid/Miravalle",lat:25.4005,lng:-100.9913,radius:400,desc:"Zona sur con alta concentración residencial. 1,150 negocios.",tags_pos:[],tags_neg:[],data:{trafico:42,nse:55,acceso:65,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"vic_guerrero",name:"Vicente Guerrero/Sur",lat:25.393,lng:-100.9831,radius:350,desc:"Colonia popular sur. 486 negocios. Mercado de proximidad y lealtad local.",tags_pos:[],tags_neg:[],data:{trafico:18,nse:42,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"lourdes",name:"Lourdes/Poniente Sur",lat:25.3917,lng:-101.0027,radius:350,desc:"Zona sur-poniente. 1,146 negocios. Buena masa crítica residencial.",tags_pos:[],tags_neg:[],data:{trafico:42,nse:38,acceso:65,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"m_hidalgo",name:"Miguel Hidalgo/Gonzalez",lat:25.3886,lng:-100.9853,radius:350,desc:"Miguel Hidalgo y González. 435 negocios. Mercado de proximidad sur.",tags_pos:[],tags_neg:[],data:{trafico:16,nse:86,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"san_ramon",name:"San Ramón/Cumbres",lat:25.4215,lng:-100.9716,radius:350,desc:"San Ramón y Cumbres. 941 negocios. NSE medio-alto.",tags_pos:[],tags_neg:[],data:{trafico:35,nse:85,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"la_salle",name:"La Salle/Latinoam.",lat:25.4524,lng:-100.9924,radius:350,desc:"La Salle y Latinoamericana. 615 negocios. NSE alto, alto poder adquisitivo.",tags_pos:[],tags_neg:[],data:{trafico:23,nse:88,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"satelite_n",name:"Satélite Norte",lat:25.4593,lng:-101.0164,radius:350,desc:"Satélite Norte. 711 negocios. En crecimiento ligada al nearshoring.",tags_pos:[],tags_neg:[],data:{trafico:26,nse:78,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"nuevo_mir",name:"Nuevo Mirasierra",lat:25.4093,lng:-100.9189,radius:400,desc:"Nuevo Mirasierra. 473 negocios. Zona oriente emergente.",tags_pos:[],tags_neg:[],data:{trafico:17,nse:75,acceso:65,renta:{bajo:true,medio:true,alto:true}}},
   {id:"las_teresitas",name:"Las Teresitas/Sur",lat:25.3644,lng:-101.0093,radius:450,desc:"Las Teresitas sur. 618 negocios. NSE bajo, mercado de alto volumen.",tags_pos:[],tags_neg:[],data:{trafico:23,nse:28,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
-  {id:"valle_flores",name:"Valle de las Flores",lat:25.433,lng:-100.9588,radius:350,desc:"Valle de las Flores. 797 negocios. Residencial nueva con poca competencia.",tags_pos:[],tags_neg:[],data:{trafico:29,nse:52,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"valle_flores",name:"Valle de las Flores",lat:25.433,lng:-100.9588,radius:350,desc:"Valle de las Flores. 797 negocios. Residencial nueva con poca competencia.",tags_pos:[],tags_neg:[],data:{trafico:29,nse:82,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
   {id:"ant_cardenas",name:"Antonio Cárdenas",lat:25.4248,lng:-101.0079,radius:300,desc:"Antonio Cárdenas. 1,541 negocios. Una de las zonas de mayor potencial.",tags_pos:[],tags_neg:[],data:{trafico:57,nse:45,acceso:85,renta:{bajo:true,medio:true,alto:true}}},
   {id:"chamizal",name:"Chamizal/Guayulera",lat:25.4134,lng:-101.028,radius:350,desc:"Chamizal y Guayulera. 1,014 negocios. Beneficia modernización Blvd. Vito Alessio (PMD).",tags_pos:[],tags_neg:[],data:{trafico:37,nse:34,acceso:65,renta:{bajo:true,medio:true,alto:false}}},
   {id:"col25",name:"Col. 25/Norte Lejano",lat:25.4778,lng:-100.978,radius:400,desc:"Col. 25 y alrededores. 637 negocios. Zona norte con espacio de crecimiento.",tags_pos:[],tags_neg:[],data:{trafico:23,nse:55,acceso:65,renta:{bajo:false,medio:true,alto:true}}},
   {id:"sj_cerritos",name:"San José/Misión Cerritos",lat:25.435,lng:-100.925,radius:500,desc:"San José y Misión Cerritos. 633 negocios. Paso inferior Blvd. Fundadores en construcción (PMD).",tags_pos:[],tags_neg:[],data:{trafico:23,nse:55,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
   {id:"satelite_s",name:"Satélite Sur",lat:25.4529,lng:-101.0207,radius:350,desc:"Satélite Sur. 262 negocios. NSE alto, baja competencia.",tags_pos:[],tags_neg:[],data:{trafico:10,nse:62,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
   {id:"landin",name:"Col. Landín/La Minita",lat:25.4009,lng:-101.027,radius:350,desc:"Landín y La Minita. 709 negocios. Zona poniente con bulevar en modernización.",tags_pos:[],tags_neg:[],data:{trafico:26,nse:34,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
-  {id:"v_olimpica",name:"Villa Olímpica",lat:25.4609,lng:-100.9823,radius:350,desc:"Villa Olímpica. 895 negocios. Zona norte-oriente activa.",tags_pos:[],tags_neg:[],data:{trafico:33,nse:55,acceso:65,renta:{bajo:false,medio:true,alto:true}}},
-  {id:"lomas_ref",name:"Lomas del Refugio",lat:25.351,lng:-101.0123,radius:400,desc:"Lomas del Refugio. 318 negocios. Zona sur lejana con mercado captivo.",tags_pos:[],tags_neg:[],data:{trafico:12,nse:28,acceso:45,renta:{bajo:true,medio:false,alto:false}}},
-  {id:"lomas_zap",name:"Lomas de Zapalinamé",lat:25.3917,lng:-100.9514,radius:350,desc:"Lomas de Zapalinamé. 618 negocios. Zona sur con demanda desatendida.",tags_pos:[],tags_neg:[],data:{trafico:23,nse:40,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
-  {id:"san_patricio",name:"San Patricio",lat:25.4581,lng:-100.9568,radius:350,desc:"San Patricio. 572 negocios. NSE alto al norte.",tags_pos:[],tags_neg:[],data:{trafico:21,nse:70,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
-  {id:"rancho_pena",name:"Rancho de Peña",lat:25.4739,lng:-100.9787,radius:350,desc:"Rancho de Peña. 300 negocios. NSE alto, zona norte residencial.",tags_pos:[],tags_neg:[],data:{trafico:11,nse:68,acceso:65,renta:{bajo:false,medio:true,alto:true}}},
-  {id:"nazario",name:"Nazario/Villa Olímpica",lat:25.4649,lng:-100.9999,radius:350,desc:"Nazario Ortiz Garza. 527 negocios. Zona norte consolidada.",tags_pos:[],tags_neg:[],data:{trafico:19,nse:50,acceso:65,renta:{bajo:false,medio:true,alto:true}}},
-  {id:"bonanza",name:"Bonanza/Oceanía",lat:25.444,lng:-100.959,radius:400,desc:"Bonanza y Oceanía. 1,046 negocios. Zona oriente activa con buen crecimiento.",tags_pos:[],tags_neg:[],data:{trafico:38,nse:48,acceso:85,renta:{bajo:true,medio:true,alto:true}}},
+  {id:"v_olimpica",name:"Villa Olímpica",lat:25.4609,lng:-100.9823,radius:350,desc:"Villa Olímpica. 895 negocios. Zona norte-oriente activa.",tags_pos:[],tags_neg:[],data:{trafico:33,nse:72,acceso:65,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"lomas_ref",name:"Lomas del Refugio",lat:25.351,lng:-101.0123,radius:400,desc:"Lomas del Refugio. 318 negocios. Zona sur lejana con mercado captivo.",tags_pos:[],tags_neg:[],data:{trafico:12,nse:92,acceso:45,renta:{bajo:true,medio:false,alto:false}}},
+  {id:"lomas_zap",name:"Lomas de Zapalinamé",lat:25.3917,lng:-100.9514,radius:350,desc:"Lomas de Zapalinamé. 618 negocios. Zona sur con demanda desatendida.",tags_pos:[],tags_neg:[],data:{trafico:23,nse:90,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"san_patricio",name:"San Patricio",lat:25.4581,lng:-100.9568,radius:350,desc:"San Patricio. 572 negocios. NSE alto al norte.",tags_pos:[],tags_neg:[],data:{trafico:21,nse:90,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"rancho_pena",name:"Rancho de Peña",lat:25.4739,lng:-100.9787,radius:350,desc:"Rancho de Peña. 300 negocios. NSE alto, zona norte residencial.",tags_pos:[],tags_neg:[],data:{trafico:11,nse:87,acceso:65,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"nazario",name:"Nazario/Villa Olímpica",lat:25.4649,lng:-100.9999,radius:350,desc:"Nazario Ortiz Garza. 527 negocios. Zona norte consolidada.",tags_pos:[],tags_neg:[],data:{trafico:19,nse:85,acceso:65,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"bonanza",name:"Bonanza/Oceanía",lat:25.444,lng:-100.959,radius:400,desc:"Bonanza y Oceanía. 1,046 negocios. Zona oriente activa con buen crecimiento.",tags_pos:[],tags_neg:[],data:{trafico:38,nse:28,acceso:85,renta:{bajo:true,medio:true,alto:true}}},
   {id:"virreyes",name:"Col. Virreyes",lat:25.4655,lng:-100.987,radius:350,desc:"Col. Virreyes. 443 negocios. NSE muy alto, máximo poder adquisitivo.",tags_pos:[],tags_neg:[],data:{trafico:16,nse:72,acceso:85,renta:{bajo:false,medio:false,alto:true}}},
-  {id:"mision_orte",name:"Misión Cerritos/Oriente",lat:25.4238,lng:-100.9015,radius:400,desc:"Misión Cerritos oriente. 337 negocios. Baja competencia y crecimiento constante.",tags_pos:[],tags_neg:[],data:{trafico:12,nse:50,acceso:65,renta:{bajo:false,medio:true,alto:true}}},
-  {id:"fed_berrueto",name:"F. Berrueto/Sur-Pte",lat:25.3853,lng:-100.977,radius:350,desc:"F. Berrueto y aledañas. 470 negocios. Zona sur-poniente consolidada.",tags_pos:[],tags_neg:[],data:{trafico:17,nse:32,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
-  {id:"guanajuato",name:"Guanajuato/Latinoam.",lat:25.442,lng:-100.981,radius:350,desc:"Guanajuato y Latinoam. 927 negocios. Zona céntrica con buena conectividad.",tags_pos:[],tags_neg:[],data:{trafico:34,nse:55,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
-  {id:"universidad",name:"Universidad/T.Libertad",lat:25.403,lng:-100.965,radius:350,desc:"Universidad Pueblo y T.Libertad. 832 negocios. Demanda estudiantil activa.",tags_pos:[],tags_neg:[],data:{trafico:31,nse:42,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
-  {id:"los_pinos",name:"Los Pinos/Norte",lat:25.4624,lng:-100.9648,radius:300,desc:"Los Pinos norte. 775 negocios. Zona norte con nearshoring cercano.",tags_pos:[],tags_neg:[],data:{trafico:29,nse:58,acceso:65,renta:{bajo:false,medio:true,alto:true}}},
-  {id:"los_gonzalez",name:"Los González/NE",lat:25.4718,lng:-100.9467,radius:350,desc:"Los González noreste. 231 negocios. NSE alto, poca competencia.",tags_pos:[],tags_neg:[],data:{trafico:8,nse:62,acceso:45,renta:{bajo:false,medio:true,alto:true}}},
-  {id:"lomalinda",name:"Loma Linda/Oriente",lat:25.419,lng:-100.908,radius:400,desc:"Loma Linda oriente. 444 negocios. Zona oriente con espacio de crecimiento.",tags_pos:[],tags_neg:[],data:{trafico:16,nse:50,acceso:65,renta:{bajo:true,medio:true,alto:true}}},
-  {id:"roma",name:"Roma/Poniente",lat:25.4469,lng:-101.0214,radius:300,desc:"Roma y poniente norte. 839 negocios. Zona mixta industrial-residencial.",tags_pos:[],tags_neg:[],data:{trafico:31,nse:52,acceso:65,renta:{bajo:false,medio:true,alto:true}}},
-  {id:"hacienda_n",name:"Hacienda Narro/Sur",lat:25.3632,lng:-101.0339,radius:400,desc:"Hacienda Narro y sur lejano. 178 negocios. Mercado captivo con poca oferta.",tags_pos:[],tags_neg:[],data:{trafico:7,nse:28,acceso:45,renta:{bajo:true,medio:false,alto:false}}},
-  {id:"n_teresitas",name:"Nuevo Teresitas/Sur",lat:25.355,lng:-101.004,radius:400,desc:"Nuevo Teresitas. 260 negocios. Sur lejano, demanda insatisfecha.",tags_pos:[],tags_neg:[],data:{trafico:10,nse:28,acceso:45,renta:{bajo:true,medio:false,alto:false}}},
-  {id:"el_salvador",name:"El Salvador/T.Libertad",lat:25.394,lng:-100.964,radius:350,desc:"El Salvador y T.Libertad. 500 negocios. Zona popular muy activa.",tags_pos:[],tags_neg:[],data:{trafico:18,nse:36,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
-  {id:"b_aires",name:"Buenos Aires/Sur-Pte",lat:25.3957,lng:-101.0162,radius:350,desc:"Buenos Aires y sur-poniente. 842 negocios. Gran concentración residencial.",tags_pos:[],tags_neg:[],data:{trafico:31,nse:32,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
-  {id:"bosques",name:"Bosques del Prado",lat:25.4512,lng:-101.0142,radius:420,desc:"Zona residencial norte-poniente. Alta densidad vehicular. Corredor Periférico.",tags_pos:[],tags_neg:[],data:{trafico:48,nse:72,acceso:80,renta:{bajo:false,medio:true,alto:true}}},
-  {id:"parque_ind",name:"Parque Industrial Norte",lat:25.5080,lng:-101.0210,radius:500,desc:"Zona industrial con flujo diario de +40,000 trabajadores. Ideal food, loncheras, servicios.",tags_pos:[],tags_neg:[],data:{trafico:85,nse:42,acceso:90,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"mision_orte",name:"Misión Cerritos/Oriente",lat:25.4238,lng:-100.9015,radius:400,desc:"Misión Cerritos oriente. 337 negocios. Baja competencia y crecimiento constante.",tags_pos:[],tags_neg:[],data:{trafico:12,nse:60,acceso:65,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"fed_berrueto",name:"F. Berrueto/Sur-Pte",lat:25.3853,lng:-100.977,radius:350,desc:"F. Berrueto y aledañas. 470 negocios. Zona sur-poniente consolidada.",tags_pos:[],tags_neg:[],data:{trafico:17,nse:50,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"guanajuato",name:"Guanajuato/Latinoam.",lat:25.442,lng:-100.981,radius:350,desc:"Guanajuato y Latinoam. 927 negocios. Zona céntrica con buena conectividad.",tags_pos:[],tags_neg:[],data:{trafico:34,nse:40,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"universidad",name:"Universidad/T.Libertad",lat:25.403,lng:-100.965,radius:350,desc:"Universidad Pueblo y T.Libertad. 832 negocios. Demanda estudiantil activa.",tags_pos:[],tags_neg:[],data:{trafico:31,nse:44,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"los_pinos",name:"Los Pinos/Norte",lat:25.4624,lng:-100.9648,radius:300,desc:"Los Pinos norte. 775 negocios. Zona norte con nearshoring cercano.",tags_pos:[],tags_neg:[],data:{trafico:29,nse:38,acceso:65,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"los_gonzalez",name:"Los González/NE",lat:25.4718,lng:-100.9467,radius:350,desc:"Los González noreste. 231 negocios. NSE alto, poca competencia.",tags_pos:[],tags_neg:[],data:{trafico:8,nse:55,acceso:45,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"lomalinda",name:"Loma Linda/Oriente",lat:25.419,lng:-100.908,radius:400,desc:"Loma Linda oriente. 444 negocios. Zona oriente con espacio de crecimiento.",tags_pos:[],tags_neg:[],data:{trafico:16,nse:48,acceso:65,renta:{bajo:true,medio:true,alto:true}}},
+  {id:"roma",name:"Roma/Poniente",lat:25.4469,lng:-101.0214,radius:300,desc:"Roma y poniente norte. 839 negocios. Zona mixta industrial-residencial.",tags_pos:[],tags_neg:[],data:{trafico:31,nse:35,acceso:65,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"hacienda_n",name:"Hacienda Narro/Sur",lat:25.3632,lng:-101.0339,radius:400,desc:"Hacienda Narro y sur lejano. 178 negocios. Mercado captivo con poca oferta.",tags_pos:[],tags_neg:[],data:{trafico:7,nse:78,acceso:45,renta:{bajo:true,medio:false,alto:false}}},
+  {id:"n_teresitas",name:"Nuevo Teresitas/Sur",lat:25.355,lng:-101.004,radius:400,desc:"Nuevo Teresitas. 260 negocios. Sur lejano, demanda insatisfecha.",tags_pos:[],tags_neg:[],data:{trafico:10,nse:26,acceso:45,renta:{bajo:true,medio:false,alto:false}}},
+  {id:"el_salvador",name:"El Salvador/T.Libertad",lat:25.394,lng:-100.964,radius:350,desc:"El Salvador y T.Libertad. 500 negocios. Zona popular muy activa.",tags_pos:[],tags_neg:[],data:{trafico:18,nse:32,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"b_aires",name:"Buenos Aires/Sur-Pte",lat:25.3957,lng:-101.0162,radius:350,desc:"Buenos Aires y sur-poniente. 842 negocios. Gran concentración residencial.",tags_pos:[],tags_neg:[],data:{trafico:31,nse:30,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"bosques",name:"Bosques del Prado",lat:25.4512,lng:-101.0142,radius:420,desc:"Zona residencial norte-poniente. Alta densidad vehicular. Corredor Periférico.",tags_pos:[],tags_neg:[],data:{trafico:48,nse:74,acceso:80,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"parque_ind",name:"Parque Industrial Norte",lat:25.5080,lng:-101.0210,radius:500,desc:"Zona industrial con flujo diario de +40,000 trabajadores. Ideal food, loncheras, servicios.",tags_pos:[],tags_neg:[],data:{trafico:85,nse:40,acceso:90,renta:{bajo:true,medio:true,alto:false}}},
   {id:"ramos_arizpe",name:"Ramos Arizpe/BMW/GM",lat:25.5460,lng:-100.9380,radius:550,desc:"Municipio industrial. BMW, GM, Chrysler. 80,000+ empleos. Alta demanda de servicios.",tags_pos:[],tags_neg:[],data:{trafico:72,nse:50,acceso:85,renta:{bajo:true,medio:true,alto:false}}},
-  {id:"plaza_fiesta",name:"Blvd. V. Carranza Norte",lat:25.4385,lng:-101.0105,radius:380,desc:"Corredor comercial de máxima visibilidad. Flujo constante. Alto NSE relativo.",tags_pos:[],tags_neg:[],data:{trafico:78,nse:62,acceso:88,renta:{bajo:true,medio:true,alto:true}}},
-  {id:"pedregal",name:"Pedregal/San Agustín Sur",lat:25.4120,lng:-101.0310,radius:400,desc:"Zona sur-poniente residencial media-alta. Crecimiento acelerado. Plazas nuevas.",tags_pos:[],tags_neg:[],data:{trafico:45,nse:68,acceso:78,renta:{bajo:false,medio:true,alto:true}}},
-  {id:"tecnologico",name:"Zona Tec/UANE/Universitaria",lat:25.4690,lng:-100.9745,radius:380,desc:"Corredor universitario. UANE, Tec, UDEM. Alta afluencia juvenil. Ideal cafés, comida, servicios.",tags_pos:[],tags_neg:[],data:{trafico:65,nse:58,acceso:80,renta:{bajo:true,medio:true,alto:false}}},
-  {id:"cuauhtemoc",name:"Cuauhtémoc/Blvd. Colosio",lat:25.4580,lng:-100.9660,radius:430,desc:"Corredor Colosio. Alta densidad comercial norte. Buen acceso vial. Crecimiento constante.",tags_pos:[],tags_neg:[],data:{trafico:52,nse:44,acceso:82,renta:{bajo:true,medio:true,alto:false}}},
-  {id:"olimpica_norte",name:"Olímpica Norte/Congreso",lat:25.4200,lng:-100.9800,radius:400,desc:"Zona gobierno y corporativos. Flujo 8am-6pm. Ideal restaurantes rápidos y servicios.",tags_pos:[],tags_neg:[],data:{trafico:70,nse:58,acceso:85,renta:{bajo:true,medio:true,alto:false}}},
-  {id:"los_pinos2",name:"Los Pinos/Arboledas Sur",lat:25.3980,lng:-101.0580,radius:380,desc:"Sur-poniente en expansión. NSE medio-alto. Fraccionamientos nuevos, demanda insatisfecha.",tags_pos:[],tags_neg:[],data:{trafico:38,nse:65,acceso:70,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"plaza_fiesta",name:"Blvd. V. Carranza Norte",lat:25.4385,lng:-101.0105,radius:380,desc:"Corredor comercial de máxima visibilidad. Flujo constante. Alto NSE relativo.",tags_pos:[],tags_neg:[],data:{trafico:78,nse:65,acceso:88,renta:{bajo:true,medio:true,alto:true}}},
+  {id:"pedregal",name:"Pedregal/San Agustín Sur",lat:25.4120,lng:-101.0310,radius:400,desc:"Zona sur-poniente residencial media-alta. Crecimiento acelerado. Plazas nuevas.",tags_pos:[],tags_neg:[],data:{trafico:45,nse:70,acceso:78,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"tecnologico",name:"Zona Tec/UANE/Universitaria",lat:25.4690,lng:-100.9745,radius:380,desc:"Corredor universitario. UANE, Tec, UDEM. Alta afluencia juvenil. Ideal cafés, comida, servicios.",tags_pos:[],tags_neg:[],data:{trafico:65,nse:62,acceso:80,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"cuauhtemoc",name:"Cuauhtémoc/Blvd. Colosio",lat:25.4580,lng:-100.9660,radius:430,desc:"Corredor Colosio. Alta densidad comercial norte. Buen acceso vial. Crecimiento constante.",tags_pos:[],tags_neg:[],data:{trafico:52,nse:48,acceso:82,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"olimpica_norte",name:"Olímpica Norte/Congreso",lat:25.4200,lng:-100.9800,radius:400,desc:"Zona gobierno y corporativos. Flujo 8am-6pm. Ideal restaurantes rápidos y servicios.",tags_pos:[],tags_neg:[],data:{trafico:70,nse:60,acceso:85,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"los_pinos2",name:"Los Pinos/Arboledas Sur",lat:25.3980,lng:-101.0580,radius:380,desc:"Sur-poniente en expansión. NSE medio-alto. Fraccionamientos nuevos, demanda insatisfecha.",tags_pos:[],tags_neg:[],data:{trafico:38,nse:68,acceso:70,renta:{bajo:false,medio:true,alto:true}}},
 ];
 
 const typeWeights={
@@ -1250,12 +1280,20 @@ function analyze(){
   const rs=document.getElementById('resultsSection');
   rs.style.display='flex';rs.style.flexDirection='column';rs.style.gap='8px';
   document.getElementById('emptyState').style.display='none';
+  // Generate narrative for top zone
+  generateNarrative(lastScored[0], lastScored);
+  // Re-render heat map if active
+  if(heatLayer!=='none') renderHeatMap();
 }
 
-document.getElementById('typeGrid').querySelectorAll('.type-btn').forEach(btn=>{
+// TYPE BUTTONS
+const typeGrid = document.getElementById('typeGrid');
+if(typeGrid) typeGrid.querySelectorAll('.type-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
     document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');selectedType=btn.dataset.type;if(analyzed)analyze();
+    btn.classList.add('active');
+    selectedType=btn.dataset.type;
+    if(analyzed) analyze();
   });
 });
 document.getElementById('budgetGroup').querySelectorAll('.budget-opt').forEach(opt=>{
@@ -1997,6 +2035,160 @@ function handleProUpgrade(){
   t.style.background='#15803d';
   t.classList.add('show');
   setTimeout(()=>{t.classList.remove('show');t.style.background='';},3000);
+}
+
+// ════════════════════════════════════════════════════════
+// HEAT MAP ENGINE
+// ════════════════════════════════════════════════════════
+let heatLayer = 'none';
+let heatLayerGroup = null;
+
+const heatConfig = {
+  nse: {
+    title:'Nivel Socioeconómico (NSE)',
+    getValue: z => z.data.nse,
+    stops: [{v:0,c:'#1e293b'},{v:30,c:'#7c3aed'},{v:50,c:'#2563eb'},{v:65,c:'#059669'},{v:80,c:'#d97706'},{v:90,c:'#dc2626'}],
+    labels:[{c:'#dc2626',l:'A/AB (90+)'},{c:'#d97706',l:'C+ (80-90)'},{c:'#059669',l:'C (65-80)'},{c:'#2563eb',l:'C- (50-65)'},{c:'#7c3aed',l:'D (30-50)'},{c:'#1e293b',l:'E (<30)'}]
+  },
+  competencia: {
+    title:'Competencia del giro',
+    getValue: z => denue_competencia[z.id]?.[selectedType] ?? 50,
+    stops: [{v:0,c:'#052e16'},{v:30,c:'#15803d'},{v:60,c:'#ca8a04'},{v:80,c:'#c2410c'},{v:95,c:'#991b1b'}],
+    labels:[{c:'#991b1b',l:'Saturado (95+)'},{c:'#c2410c',l:'Alta (80-95)'},{c:'#ca8a04',l:'Media (60-80)'},{c:'#15803d',l:'Baja (30-60)'},{c:'#052e16',l:'Sin comp (<30)'}]
+  },
+  trafico: {
+    title:'Afluencia peatonal',
+    getValue: z => z.data.trafico,
+    stops: [{v:0,c:'#1e293b'},{v:25,c:'#1d4ed8'},{v:50,c:'#0891b2'},{v:70,c:'#16a34a'},{v:90,c:'#f97316'}],
+    labels:[{c:'#f97316',l:'Muy alto (90+)'},{c:'#16a34a',l:'Alto (70-90)'},{c:'#0891b2',l:'Medio (50-70)'},{c:'#1d4ed8',l:'Bajo (25-50)'},{c:'#1e293b',l:'Nulo (<25)'}]
+  },
+  parking: {
+    title:'Disponibilidad de estacionamiento',
+    getValue: z => parking_score[z.id] ?? 50,
+    stops: [{v:0,c:'#991b1b'},{v:30,c:'#c2410c'},{v:50,c:'#ca8a04'},{v:70,c:'#15803d'},{v:90,c:'#052e16'}],
+    labels:[{c:'#052e16',l:'Amplio (90+)'},{c:'#15803d',l:'Bueno (70-90)'},{c:'#ca8a04',l:'Regular (50-70)'},{c:'#c2410c',l:'Poco (30-50)'},{c:'#991b1b',l:'Nulo (<30)'}]
+  },
+  score: {
+    title:'Score LocaIA',
+    getValue: z => z.score || scoreZone(z),
+    stops: [{v:0,c:'#1e293b'},{v:40,c:'#7c3aed'},{v:60,c:'#2563eb'},{v:75,c:'#059669'},{v:88,c:'#f97316'}],
+    labels:[{c:'#f97316',l:'Excelente (88+)'},{c:'#059669',l:'Bueno (75-88)'},{c:'#2563eb',l:'Medio (60-75)'},{c:'#7c3aed',l:'Bajo (40-60)'},{c:'#1e293b',l:'Nulo (<40)'}]
+  }
+};
+
+function interpolateColor(value, stops){
+  if(value<=stops[0].v) return stops[0].c;
+  if(value>=stops[stops.length-1].v) return stops[stops.length-1].c;
+  for(let i=1;i<stops.length;i++){
+    if(value<=stops[i].v){
+      const t=(value-stops[i-1].v)/(stops[i].v-stops[i-1].v);
+      const c1=hexToRgb(stops[i-1].c), c2=hexToRgb(stops[i].c);
+      const r=Math.round(c1.r+(c2.r-c1.r)*t);
+      const g=Math.round(c1.g+(c2.g-c1.g)*t);
+      const b=Math.round(c1.b+(c2.b-c1.b)*t);
+      return `rgb(${r},${g},${b})`;
+    }
+  }
+  return stops[stops.length-1].c;
+}
+
+function hexToRgb(hex){
+  const r=/^rgb/.test(hex);
+  if(r){ const m=hex.match(/\d+/g); return{r:+m[0],g:+m[1],b:+m[2]}; }
+  const h=hex.replace('#','');
+  return{r:parseInt(h.slice(0,2),16),g:parseInt(h.slice(2,4),16),b:parseInt(h.slice(4,6),16)};
+}
+
+function setHeatLayer(btn, layer){
+  document.querySelectorAll('.hm-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  heatLayer = layer;
+  renderHeatMap();
+}
+
+function renderHeatMap(){
+  if(heatLayerGroup){ map.removeLayer(heatLayerGroup); heatLayerGroup=null; }
+  const legend=document.getElementById('heatLegend');
+  if(heatLayer==='none'){ legend.style.display='none'; return; }
+  
+  const cfg=heatConfig[heatLayer];
+  if(!cfg) return;
+  
+  legend.style.display='block';
+  document.getElementById('heatLegendTitle').textContent=cfg.title;
+  document.getElementById('heatLegendItems').innerHTML=cfg.labels.map(l=>
+    `<div class="heat-legend-row"><div class="heat-legend-color" style="background:${l.c}"></div><span>${l.l}</span></div>`
+  ).join('');
+  
+  heatLayerGroup=L.layerGroup();
+  zones.forEach(z=>{
+    const val=cfg.getValue(z);
+    const color=interpolateColor(val, cfg.stops);
+    const deg=z.radius||400;
+    // Create a rectangle approx around zone center
+    const latDelta=deg/111320;
+    const lngDelta=deg/(111320*Math.cos(z.lat*Math.PI/180));
+    const bounds=[[z.lat-latDelta,z.lng-lngDelta],[z.lat+latDelta,z.lng+lngDelta]];
+    const rect=L.rectangle(bounds,{
+      color:'transparent', fillColor:color, fillOpacity:0.55, weight:0
+    });
+    rect.bindTooltip(`<strong>${z.name}</strong><br>${cfg.title}: <b>${Math.round(val)}</b>`,{direction:'top'});
+    heatLayerGroup.addLayer(rect);
+  });
+  heatLayerGroup.addTo(map);
+  // Make sure zones are on top
+  circleLayer.bringToFront();
+}
+
+// ════════════════════════════════════════════════════════
+// ZONE NARRATIVE GENERATOR
+// ════════════════════════════════════════════════════════
+function generateNarrative(topZone, allZones){
+  if(!topZone) return;
+  const z = topZone;
+  const runner = allZones[1];
+  const gap = z.score - (runner?.score||0);
+  const comp = denue_competencia[z.id]?.[selectedType] ?? 50;
+  const freeComp = 100 - comp;
+  const nseL = nseLabel(z.data.nse);
+  const parkVal = parking_score[z.id]??50;
+  const parkDesc = parkVal>=70?'amplio estacionamiento':parkVal>=45?'estacionamiento moderado':'poco estacionamiento';
+  const typeL = typeLabels[selectedType]||selectedType;
+  const pmd = PMD_BONUS[z.id];
+  
+  let parts=[];
+  
+  // Opening
+  parts.push(`<strong>${z.name}</strong> es la zona más recomendada para ${typeL} con un score de <strong>${z.score}/100</strong>${gap>10?`, <strong>${gap} puntos</strong> por encima de ${runner?.name||'la segunda opción'}`:''}. `);
+  
+  // Traffic
+  if(z.data.trafico >= 70) parts.push(`Tiene <strong>afluencia peatonal muy alta</strong> (${z.data.trafico}/100), lo que garantiza exposición constante a clientes potenciales. `);
+  else if(z.data.trafico >= 45) parts.push(`Su <strong>afluencia peatonal es sólida</strong> (${z.data.trafico}/100), con buen flujo de personas durante la semana. `);
+  else parts.push(`El tráfico peatonal es moderado (${z.data.trafico}/100), compensado por otros factores. `);
+  
+  // NSE
+  if(z.data.nse >= 75) parts.push(`El perfil socioeconómico de la zona es <strong>alto (NSE ${nseL})</strong> — clientes con mayor ticket promedio y disposición a gastar. `);
+  else if(z.data.nse >= 55) parts.push(`El perfil es <strong>clase media-alta (NSE ${nseL})</strong>, compatible con la mayoría de formatos comerciales. `);
+  else parts.push(`El NSE es popular (${nseL}), ideal para negocios de alto volumen y precios accesibles. `);
+  
+  // Competition
+  if(freeComp >= 70) parts.push(`Hay <strong>poca competencia directa</strong> para este giro en la zona — ventana de oportunidad abierta. `);
+  else if(freeComp >= 40) parts.push(`La competencia es <strong>moderada</strong>, con espacio para un operador bien posicionado. `);
+  else parts.push(`⚠️ La zona tiene <strong>alta competencia</strong> para ${typeL}. Considera diferenciarte claramente. `);
+  
+  // Parking
+  if(selectedParking==='alto' && parkVal>=70) parts.push(`Cuenta con <strong>${parkDesc}</strong>, requisito clave para tu operación. `);
+  else if(selectedParking==='alto' && parkVal<60) parts.push(`⚠️ Nota: el <strong>estacionamiento es limitado</strong> (${parkVal}/100) — considera esto en tu modelo. `);
+  
+  // PMD
+  if(pmd) parts.push(`🏗️ El PMD 2025-2027 incluye <strong>${pmd.motivo}</strong>, lo que impulsará el valor de la zona. `);
+  
+  // DENUE
+  const total = denue_total[z.id];
+  if(total) parts.push(`DENUE registra <strong>${total.toLocaleString()} negocios</strong> en la zona, indicador de actividad económica establecida.`);
+  
+  document.getElementById('narrativeText').innerHTML = parts.join('');
+  document.getElementById('zoneNarrative').style.display='block';
 }
 
 </script>
