@@ -281,6 +281,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 
 <div class="topbar">
   <div class="logo">Loca<em>IA</em></div>
+    <div style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:6px;padding:3px 9px;font-size:.65rem;color:#4ade80;font-weight:600;display:flex;align-items:center;gap:4px;">⚡ vs. $3,500/mo — mismo análisis</div>
   <div class="topbar-right">
     <button class="topbar-btn" id="aiBtn" onclick="openAIModal()" style="border-color:rgba(139,92,246,.4);color:#a78bfa;">🤖 Asesor IA</button>
     <button class="topbar-btn" onclick="openProModal()" style="border-color:rgba(249,115,22,.5);color:var(--accent);font-weight:600;">✦ Pro $299</button>
@@ -587,6 +588,25 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
         <div class="budget-opt active" data-budget="bajo">Bajo<small>$5–15k</small></div>
         <div class="budget-opt" data-budget="medio">Medio<small>$15–35k</small></div>
         <div class="budget-opt" data-budget="alto">Alto<small>$35k+</small></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="slabel">Nivel socioeconómico objetivo</div>
+      <div class="budget-row" id="nseGroup">
+        <div class="budget-opt active" data-nse="todos">Todos</div>
+        <div class="budget-opt" data-nse="popular">Popular<small>C-/D</small></div>
+        <div class="budget-opt" data-nse="medio">Medio<small>C/C+</small></div>
+        <div class="budget-opt" data-nse="premium">Premium<small>A/B</small></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="slabel">Formato de local</div>
+      <div class="budget-row" id="formatoGroup">
+        <div class="budget-opt active" data-formato="todos">Todos</div>
+        <div class="budget-opt" data-formato="standalone">🏪 Standalone</div>
+        <div class="budget-opt" data-formato="plaza">🏬 Plaza/Mall</div>
       </div>
     </div>
 
@@ -993,7 +1013,7 @@ const typeLabels={
   escuela:'📐 Escuela/Kinder',consultorio:'🩺 Consultorio',
 };
 
-let selectedType='comida_rapida',selectedBudget='bajo',analyzed=false,lastScored=[];
+let selectedType='comida_rapida',selectedBudget='bajo',selectedNSE='todos',selectedFormato='todos',analyzed=false,lastScored=[];
 
 function scoreZone(z){
   const tw=typeWeights[selectedType]||typeWeights.comida_rapida;
@@ -1007,6 +1027,13 @@ function scoreZone(z){
   w = applyProModifiers(w);
   let s=z.data.trafico*w.trafico+competenciaReal*w.competencia+z.data.nse*w.nse+z.data.acceso*w.acceso;
   if(!z.data.renta[selectedBudget])s*=.50;
+  // NSE filter
+  if(selectedNSE==='popular' && z.data.nse > 55) s *= 0.6;
+  if(selectedNSE==='medio' && (z.data.nse < 40 || z.data.nse > 80)) s *= 0.65;
+  if(selectedNSE==='premium' && z.data.nse < 65) s *= 0.55;
+  // Formato filter: plazas penalize zones with lower acceso/commercial density
+  if(selectedFormato==='plaza' && z.data.trafico < 50) s *= 0.70;
+  if(selectedFormato==='standalone' && z.data.trafico < 30) s *= 0.80;
   // PRO presencia premium: penalize low-NSE zones
   if(proPresencia==='premium' && z.data.nse < 45) s *= 0.75;
   // PMD 2025-2027 zone bonus
@@ -1014,6 +1041,41 @@ function scoreZone(z){
   if(pmdB) s+=pmdB.pts;
   return Math.round(Math.min(s,100));
 }
+
+// Canibalization: how saturated is the zone for this type? (0=libre, 100=saturado)
+function canibalIndex(z){
+  const comp = denue_competencia[z.id]?.[selectedType] ?? 50;
+  // HIGH competencia score means MANY similar businesses = HIGH canibalization
+  // Invert: competencia measures "libre" (free space), so saturation = 100 - comp
+  const saturation = 100 - comp;
+  return Math.round(saturation);
+}
+
+// Market capacity: estimated available slots for this type
+function marketCapacity(z){
+  const total = denue_total[z.id] || 200;
+  const comp = denue_competencia[z.id]?.[selectedType] ?? 50;
+  const freeRatio = comp / 100; // how much market space is free
+  // NSE affects demand threshold
+  const nse = z.data.nse;
+  const trafico = z.data.trafico;
+  // Heuristic: bigger zone + more traffic + higher NSE = more capacity
+  const demandScore = (trafico * 0.4 + nse * 0.6) / 100;
+  const slots = Math.round((total / 80) * freeRatio * demandScore * 3);
+  return Math.max(0, Math.min(slots, 15));
+}
+
+function nseLabel(n){ return n>=80?'AB':n>=65?'C+':n>=48?'C':n>=30?'C-':'D'; }
+function nseColor(n){ return n>=80?'#f59e0b':n>=65?'#3b82f6':n>=48?'#10b981':n>=30?'#8b5cf6':'#6b7280'; }
+function satLevel(comp){ 
+  // comp = % of market already occupied by competition (0=free, 100=saturated)
+  const free = 100 - comp;
+  if(free >= 70) return {label:'Mercado disponible', color:'#22c55e', icon:'🟢'};
+  if(free >= 40) return {label:'Competencia moderada', color:'#f59e0b', icon:'🟡'};
+  return {label:'Mercado saturado', color:'#ef4444', icon:'🔴'};
+}
+function totalNegocios(zid){ return denue_total[zid]||0; }
+
 function scoreColor(s){return s>=85?'#f97316':s>=70?'#3b82f6':'#8b5cf6';}
 
 function analyze(){
@@ -1027,22 +1089,62 @@ function analyze(){
     const color=scoreColor(z.score);
     const c=L.circle([z.lat,z.lng],{radius:z.radius,color,fillColor:color,fillOpacity:.22,weight:2,opacity:.8});
     const rank=i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`;
-    const pmdTag=PMD_BONUS[z.id]?`<div style="font-size:.68rem;color:#818cf8;margin-top:4px">🏗️ ${PMD_BONUS[z.id].motivo}</div>`:"";c.bindPopup(`<div class="popup-name">${rank} ${z.name}</div><div class="popup-score">${z.score}<span style="font-size:.65rem;color:#5a6478;font-weight:400"> / 100</span></div><div class="popup-sub">Para ${typeLabels[selectedType]}</div><div class="popup-desc">${z.desc}</div>${pmdTag}`);
+    const pmdTag=PMD_BONUS[z.id]?`<div style="font-size:.68rem;color:#818cf8;margin-top:4px">🏗️ ${PMD_BONUS[z.id].motivo}</div>`:"";const zCanil=canibalIndex(z);const zCap=marketCapacity(z);const zCaniColor=zCanil>70?'#ef4444':zCanil>40?'#f97316':'#22c55e';const zCaniLabel=zCanil>70?'Alta':zCanil>40?'Media':'Baja';c.bindPopup(`<div class="popup-name">${rank} ${z.name}</div><div class="popup-score">${z.score}<span style="font-size:.65rem;color:#5a6478;font-weight:400"> / 100</span></div><div class="popup-sub">Para ${typeLabels[selectedType]}</div><div style="display:flex;gap:5px;margin:5px 0;flex-wrap:wrap;"><span style="font-size:.62rem;padding:2px 7px;border-radius:8px;border:1px solid ${zCaniColor}44;color:${zCaniColor};">⚡ Canil. ${zCaniLabel}</span><span style="font-size:.62rem;padding:2px 7px;border-radius:8px;border:1px solid #3b82f644;color:#60a5fa;">📊 ${zCap===0?'Saturado':'+'+zCap+' slots'}</span></div><div class="popup-desc">${z.desc}</div>${pmdTag}`);
     c.on('mouseover',function(){this.openPopup();});
     circleLayer.addLayer(c);
   });
 
   document.getElementById('results-type-label').textContent=typeLabels[selectedType].replace(/^.\s/,'');
+  // Market capacity summary
+  const topScore = lastScored[0]?.score||0;
+  const highZones = lastScored.filter(z=>z.score>=75).length;
+  const midZones = lastScored.filter(z=>z.score>=55 && z.score<75).length;
+  const capEl = document.getElementById('market-capacity');
+  if(capEl){ capEl.innerHTML=`<span style="color:var(--green);font-weight:700">${highZones}</span> zonas óptimas · <span style="color:#f59e0b;font-weight:700">${midZones}</span> con potencial · Score máx <span style="color:var(--accent);font-weight:700">${topScore}/100</span>`; capEl.style.display='flex'; }
   const cards=document.getElementById('zoneCards');
   cards.innerHTML='';
-  lastScored.slice(0,5).forEach((z,i)=>{
+  lastScored.forEach((z,i)=>{
     const rank=i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}.`;
     const card=document.createElement('div');
     card.className='zone-card'+(i===0?' top-zone':'');
     card.style.animationDelay=(i*.07)+'s';
     const color=scoreColor(z.score);
     const pmdBadge=PMD_BONUS[z.id]?`<span class="tag" style="background:rgba(129,140,248,.1);border-color:rgba(129,140,248,.3);color:#818cf8">🏗️ Proyecto PMD</span>`:'';
-    card.innerHTML=`<div class="zh"><div class="zname">${rank} ${z.name}</div><div class="zscore${i===0?' gold':''}">${z.score}</div></div><div class="ztags">${z.tags_pos.map(t=>`<span class="tag pos">✓ ${t}</span>`).join('')}${z.tags_neg.map(t=>`<span class="tag neg">✗ ${t}</span>`).join('')}${pmdBadge}</div><div class="zbar"><div class="zfill" style="width:0%;background:${color}" data-w="${z.score}"></div></div><div class="zdesc">${z.desc}</div>`;
+    const comp = denue_competencia[z.id]?.[selectedType]??50;
+    const sat = satLevel(comp);
+    const nse = z.data.nse;
+    const nlabel = nseLabel(nse);
+    const ncolor = nseColor(nse);
+    const totalNeg = totalNegocios(z.id);
+    const freeSpace = 100 - comp;
+    card.innerHTML=`
+      <div class="zh"><div class="zname">${rank} ${z.name}</div><div class="zscore${i===0?' gold':''}">${z.score}</div></div>
+      <div class="ztags">
+        <span class="tag" style="background:rgba(${nse>=65?'59,130,246':'139,92,246'},.1);color:${ncolor};border:1px solid ${ncolor}33">NSE ${nlabel}</span>
+        <span class="tag" style="background:${sat.color}18;color:${sat.color};border:1px solid ${sat.color}33">${sat.icon} ${sat.label}</span>
+        ${PMD_BONUS[z.id]?`<span class="tag" style="background:rgba(129,140,248,.1);border-color:rgba(129,140,248,.3);color:#818cf8">🏗️ PMD 2025</span>`:''}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin:8px 0;">
+        <div style="background:var(--surface);border-radius:6px;padding:5px 6px;border:1px solid var(--border)">
+          <div style="font-size:.58rem;color:var(--muted);margin-bottom:2px">TRÁFICO</div>
+          <div style="height:3px;background:var(--border);border-radius:2px"><div style="height:3px;width:${z.data.trafico}%;background:#f97316;border-radius:2px"></div></div>
+          <div style="font-size:.68rem;color:var(--text);margin-top:2px;font-weight:600">${z.data.trafico}/100</div>
+        </div>
+        <div style="background:var(--surface);border-radius:6px;padding:5px 6px;border:1px solid var(--border)">
+          <div style="font-size:.58rem;color:var(--muted);margin-bottom:2px">ESP. LIBRE</div>
+          <div style="height:3px;background:var(--border);border-radius:2px"><div style="height:3px;width:${freeSpace}%;background:#22c55e;border-radius:2px"></div></div>
+          <div style="font-size:.68rem;color:var(--text);margin-top:2px;font-weight:600">${freeSpace}/100</div>
+        </div>
+        <div style="background:var(--surface);border-radius:6px;padding:5px 6px;border:1px solid var(--border)">
+          <div style="font-size:.58rem;color:var(--muted);margin-bottom:2px">NSE</div>
+          <div style="height:3px;background:var(--border);border-radius:2px"><div style="height:3px;width:${nse}%;background:${ncolor};border-radius:2px"></div></div>
+          <div style="font-size:.68rem;color:var(--text);margin-top:2px;font-weight:600">${nlabel}</div>
+        </div>
+      </div>
+      <div class="zbar"><div class="zfill" style="width:0%;background:${color}" data-w="${z.score}"></div></div>
+      <div class="zdesc" style="margin-top:6px">${z.desc}</div>
+      <div style="font-size:.62rem;color:var(--muted);margin-top:5px">📊 ${totalNeg.toLocaleString()} negocios en zona</div>
+    `;
     card.onclick=()=>{map.setView([z.lat,z.lng],15);};
     cards.appendChild(card);
     setTimeout(()=>{const b=card.querySelector('.zfill');b.style.width=b.dataset.w+'%';},50+i*60);
@@ -1061,8 +1163,20 @@ document.getElementById('typeGrid').querySelectorAll('.type-btn').forEach(btn=>{
 });
 document.getElementById('budgetGroup').querySelectorAll('.budget-opt').forEach(opt=>{
   opt.addEventListener('click',()=>{
-    document.querySelectorAll('.budget-opt').forEach(o=>o.classList.remove('active'));
+    document.querySelectorAll('#budgetGroup .budget-opt').forEach(o=>o.classList.remove('active'));
     opt.classList.add('active');selectedBudget=opt.dataset.budget;if(analyzed)analyze();
+  });
+});
+document.getElementById('nseGroup').querySelectorAll('.budget-opt').forEach(opt=>{
+  opt.addEventListener('click',()=>{
+    document.querySelectorAll('#nseGroup .budget-opt').forEach(o=>o.classList.remove('active'));
+    opt.classList.add('active');selectedNSE=opt.dataset.nse;if(analyzed)analyze();
+  });
+});
+document.getElementById('formatoGroup').querySelectorAll('.budget-opt').forEach(opt=>{
+  opt.addEventListener('click',()=>{
+    document.querySelectorAll('#formatoGroup .budget-opt').forEach(o=>o.classList.remove('active'));
+    opt.classList.add('active');selectedFormato=opt.dataset.formato;if(analyzed)analyze();
   });
 });
 
@@ -1336,7 +1450,7 @@ Sé directo, específico y usa datos concretos. Máximo 200 palabras.`;
 // ASESOR IA — con PMD Saltillo 2025-2027 como contexto
 // ══════════════════════════════════════════════════════════
 
-const PMD_CONTEXT2 = `Eres el Asesor IA de LocaIA, la plataforma de inteligencia comercial para Saltillo. Tienes conocimiento profundo de:
+const PMD_CONTEXT2 = `Eres el Asesor IA de LocaIA, la plataforma de inteligencia comercial líder en Saltillo. LocaIA ofrece análisis instantáneos por $299-799 MXN/mes, vs plataformas enterprise como GeoData Intelligence (Predik) que cobran $3,500-5,000 MXN/mes y tardan 45 días en entregar resultados. LocaIA es 10x más económico, instantáneo, self-service y con IA conversacional. Tienes conocimiento profundo de:
 
 SALTILLO — DATOS GENERALES (PMD 2025-2027 + DENUE Feb 2026):
 - Población 2024: 961,895 habitantes (CONAPO). ZM ~1.1M. Crecimiento ~20k hab/año.
@@ -1447,6 +1561,20 @@ INSTRUCCIONES:
 - No inventes datos. Si no sabes algo específico, dilo claramente.
 - Menciona los proyectos PMD relevantes cuando apliquen a la pregunta.
 `;
+
+POSICIONAMIENTO COMPETITIVO DE LOCAIA:
+- Competidores directos: Predik Data-Driven (GeoData Intelligence), CARTO, Esri ArcGIS
+- Predik cobra $25,000-40,000 MXN de implementación + $3,500-5,000 MXN/mes con contrato anual
+- LocaIA Pro: $299/mes sin contrato, sin implementación, resultados INSTANTÁNEOS vs 45 días de Predik
+- LocaIA es 12x más barato que Predik y 100x más rápido en entrega
+- LocaIA tiene datos exclusivos de Saltillo: PMD 2025-2027, 13 parques industriales, 45 zonas DENUE
+- Cuando pregunten por precios o comparativas, menciona estas ventajas
+
+INDICADORES AVANZADOS DE LOCAIA (inspirados en geomarketing enterprise):
+- Índice de Canibalización: qué tan saturada está la zona para el giro buscado (Baja/Media/Alta)
+- Capacidad de Mercado: slots estimados disponibles para nuevos negocios del tipo
+- Score 0-100: combina tráfico, competencia, NSE y acceso ponderado por tipo de negocio
+- Filtros adicionales: NSE objetivo (Popular/Medio/Premium), Formato (Standalone/Plaza)
 
 let aiHistory = [];
 let aiTyping = false;
@@ -1787,11 +1915,15 @@ function handleProUpgrade(){
         <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;margin-bottom:2px;">Pro</div>
         <div style="font-size:1.6rem;font-weight:800;font-family:'Syne',sans-serif;color:var(--accent);">$299<span style="font-size:.8rem;font-weight:400;color:var(--muted2)"> MXN/mes</span></div>
         <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px;font-size:.82rem;color:#c5cad4;">
-          <div>✓ Análisis ilimitados</div>
-          <div>✓ Perfil de negocio avanzado (ticket, presencia, tipo cliente)</div>
-          <div>✓ Recomendación IA personalizada por zona</div>
-          <div>✓ Descarga PDF de reportes</div>
+          <div>✓ Análisis ilimitados + PDF ejecutivo</div>
+          <div>✓ Índice de canibalización por zona</div>
+          <div>✓ Capacidad de mercado estimada</div>
+          <div>✓ Perfil de negocio avanzado (NSE, ticket, formato)</div>
+          <div>✓ Recomendación IA personalizada</div>
           <div>✓ Hasta 3 usuarios</div>
+        </div>
+        <div style="margin-top:10px;padding:8px 10px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:8px;font-size:.72rem;color:#4ade80;">
+          💡 vs plataformas enterprise ($25k–40k setup + $3.5k–5k/mes): LocaIA Pro cuesta <b>12x menos</b>, sin contrato, resultados instantáneos
         </div>
       </div>
       <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;">
@@ -1805,10 +1937,33 @@ function handleProUpgrade(){
         </div>
       </div>
     </div>
-    <button onclick="handleProUpgrade()" style="width:100%;background:var(--accent);color:#000;border:none;border-radius:12px;padding:15px;font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;cursor:pointer;transition:all .2s;letter-spacing:.01em;">
+    <!-- VS comparison bar -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:16px;">
+      <div style="font-size:.7rem;color:var(--muted);margin-bottom:8px;font-weight:600;letter-spacing:.05em">COMPARACIÓN CON PLATAFORMAS ENTERPRISE</div>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center;font-size:.75rem;">
+        <div style="text-align:center;padding:8px;background:rgba(249,115,22,.08);border-radius:8px;border:1px solid rgba(249,115,22,.2)">
+          <div style="font-weight:800;color:var(--accent);font-family:'Syne',sans-serif">LocaIA Pro</div>
+          <div style="color:#22c55e;font-weight:700;font-size:1rem;margin:3px 0">$299/mo</div>
+          <div style="color:var(--muted);font-size:.63rem">Resultados instantáneos</div>
+        </div>
+        <div style="color:var(--muted);font-size:.65rem;text-align:center">vs</div>
+        <div style="text-align:center;padding:8px;background:rgba(107,114,128,.08);border-radius:8px;border:1px solid rgba(107,114,128,.15)">
+          <div style="font-weight:700;color:var(--muted2);font-size:.8rem">GeoData / Predik</div>
+          <div style="color:#ef4444;font-weight:700;font-size:1rem;margin:3px 0">$3,500-5,000/mo</div>
+          <div style="color:var(--muted);font-size:.63rem">Entrega: 45 días</div>
+        </div>
+      </div>
+      <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+        <span style="background:rgba(34,197,94,.1);color:#22c55e;padding:2px 8px;border-radius:10px;font-size:.65rem;font-weight:600">⚡ Instantáneo (no 45 días)</span>
+        <span style="background:rgba(34,197,94,.1);color:#22c55e;padding:2px 8px;border-radius:10px;font-size:.65rem;font-weight:600">💰 10x más económico</span>
+        <span style="background:rgba(34,197,94,.1);color:#22c55e;padding:2px 8px;border-radius:10px;font-size:.65rem;font-weight:600">🤖 IA conversacional</span>
+        <span style="background:rgba(34,197,94,.1);color:#22c55e;padding:2px 8px;border-radius:10px;font-size:.65rem;font-weight:600">📍 Saltillo-específico</span>
+      </div>
+    </div>
+    <button onclick="handleProUpgrade()" style="width:100%;background:linear-gradient(135deg,#f97316,#ea580c);color:#000;border:none;border-radius:12px;padding:15px;font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;cursor:pointer;transition:all .2s;letter-spacing:.01em;">
       Actualizar a Pro — $299/mes →
     </button>
-    <p style="text-align:center;font-size:.72rem;color:var(--muted);margin-top:12px;">Pago seguro · Cancela cuando quieras · Sin contratos</p>
+    <p style="text-align:center;font-size:.72rem;color:var(--muted);margin-top:12px;">Sin contrato anual · Sin cuota de implementación $35,000 · Cancela cuando quieras</p>
   </div>
 </div>
 
