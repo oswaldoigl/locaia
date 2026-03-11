@@ -6,9 +6,9 @@
 <title>LocaIA — Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
 <style>
 :root{
   --bg:#06080b;--surface:#0d1017;--card:#121620;--border:#1c2230;
@@ -273,6 +273,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 </style>
 </head>
 <body>
+<!-- Loading screen: visible immediately, hidden once JS is ready -->
+<div id="app-loader" style="position:fixed;inset:0;z-index:9999;background:#06080b;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
+  <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;letter-spacing:-.04em;color:#eceef2;">Loca<span style="color:#f97316">IA</span></div>
+  <div style="width:40px;height:40px;border:3px solid #1c2230;border-top-color:#f97316;border-radius:50%;animation:spin .7s linear infinite;"></div>
+  <div style="font-size:.8rem;color:#5a6478;font-family:'Instrument Sans',sans-serif;">Cargando dashboard...</div>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 
 <div class="topbar">
   <div class="logo">Loca<em>IA</em></div>
@@ -734,6 +741,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
 const SUPABASE_URL = 'https://etdjlwtopaehamhlwwrd.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_OLKBJ7H2vfDMbCr0v9YnqA_yVrLfL0M';
 const { createClient } = supabase;
@@ -742,6 +750,7 @@ const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentUser=null, allAnalyses=[], activeFilter='all';
 
 sb.auth.getSession().then(({data})=>{
+  document.getElementById('app-loader').style.display='none';
   if(!data.session){window.location.href='login.html';return;}
   currentUser=data.session.user;
   const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
@@ -757,7 +766,7 @@ async function handleLogout(){await sb.auth.signOut();window.location.href='logi
 (async()=>{
   try{
     const token='baed5fab-59c2-955f-2db1-431bf6de0047';
-    const r=await fetch(`https://www.inegi.org.mx/app/api/indicadores/desarrolladores/jsonxml/INDICATOR/702095,702094,702097,702100/es/0700/false/BIE/2.0/${token}?type=json`);
+    const r=await fetch(`https://www.inegi.org.mx/app/api/indicadores/desarrolladores/jsonxml/INDICATOR/702095,702094,702097,702100/es/0700/false/BIE/2.0/${token}?type=json`,{signal:AbortSignal.timeout(5000)});
     if(!r.ok)throw new Error();
     const d=await r.json();
     const get=id=>{const s=d.Series?.find(s=>s.INDICADOR===String(id));return s?parseFloat(s.OBSERVATIONS.at(-1).OBS_VALUE):null;};
@@ -1565,6 +1574,7 @@ function cpTab(btn,panelId){
   btn.classList.add('active');
   document.getElementById(panelId).classList.add('active');
 }
+}); // end DOMContentLoaded
 </script>
 </body>
 </html>
