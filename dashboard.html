@@ -147,6 +147,23 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 .toast.show{transform:translateX(-50%) translateY(0);}
 
 
+
+/* ── PRO SECTION ── */
+.pro-section{background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(249,115,22,.05));border:1px solid rgba(124,58,237,.3);border-radius:12px;padding:14px;position:relative;overflow:hidden;}
+.pro-section::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#7c3aed,#f97316);}
+.pro-badge{display:inline-flex;align-items:center;gap:5px;font-size:.65rem;font-weight:700;font-family:'Syne',sans-serif;letter-spacing:.05em;text-transform:uppercase;color:#a78bfa;margin-bottom:10px;}
+.pro-badge-icon{background:linear-gradient(135deg,#7c3aed,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:.8rem;}
+.pro-row{margin-bottom:12px;}
+.pro-row:last-child{margin-bottom:0;}
+.pro-label{font-size:.72rem;color:var(--muted);margin-bottom:7px;font-weight:500;}
+.pro-chips{display:flex;gap:6px;flex-wrap:wrap;}
+.pro-chip{font-size:.72rem;padding:6px 11px;border-radius:8px;border:1px solid var(--border);color:var(--muted2);cursor:pointer;background:var(--card);transition:all .18s;line-height:1.2;text-align:center;}
+.pro-chip:hover{border-color:rgba(124,58,237,.5);color:var(--text);}
+.pro-chip.active{background:rgba(124,58,237,.15);border-color:#7c3aed;color:#c4b5fd;font-weight:600;}
+.pro-chip.active-orange{background:rgba(249,115,22,.12);border-color:var(--accent2);color:var(--accent2);font-weight:600;}
+.pro-influence{margin-top:8px;padding:8px 10px;background:rgba(124,58,237,.06);border-radius:8px;font-size:.69rem;color:#a78bfa;line-height:1.5;display:none;}
+.pro-influence.show{display:block;}
+
 /* ── AI ADVISOR MODAL ── */
 .ai-modal-box{background:var(--surface);border:1px solid rgba(139,92,246,.3);border-radius:16px;max-width:680px;width:100%;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.7);}
 .ai-modal-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
@@ -569,6 +586,47 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
       </div>
     </div>
 
+
+    <!-- PRO: Perfil avanzado de negocio -->
+    <div class="pro-section">
+      <div class="pro-badge"><span class="pro-badge-icon">✦</span> Pro · Perfil de negocio</div>
+
+      <div class="pro-row">
+        <div class="pro-label">¿Cómo te descubren tus clientes?</div>
+        <div class="pro-chips" id="discoveryGroup">
+          <div class="pro-chip active" data-val="impulso" onclick="setProChip('discoveryGroup',this)" style="flex:1">
+            👁️ <strong>Impulso</strong><br><span style="font-size:.63rem;color:var(--muted)">Te ven y entran</span>
+          </div>
+          <div class="pro-chip" data-val="destino" onclick="setProChip('discoveryGroup',this)" style="flex:1">
+            🧭 <strong>Destino</strong><br><span style="font-size:.63rem;color:var(--muted)">Ya te conocen y van</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pro-row">
+        <div class="pro-label">Ticket promedio por cliente</div>
+        <div class="pro-chips" id="ticketGroup">
+          <div class="pro-chip active" data-val="bajo" onclick="setProChip('ticketGroup',this)">Bajo<br><span style="font-size:.63rem;color:var(--muted)">$20–120</span></div>
+          <div class="pro-chip" data-val="medio" onclick="setProChip('ticketGroup',this)">Medio<br><span style="font-size:.63rem;color:var(--muted)">$120–400</span></div>
+          <div class="pro-chip" data-val="alto" onclick="setProChip('ticketGroup',this)">Alto<br><span style="font-size:.63rem;color:var(--muted)">$400+</span></div>
+        </div>
+      </div>
+
+      <div class="pro-row">
+        <div class="pro-label">Tipo de presencia que buscas</div>
+        <div class="pro-chips" id="presenciaGroup">
+          <div class="pro-chip active" data-val="funcional" onclick="setProChip('presenciaGroup',this)" style="flex:1">
+            🔧 <strong>Funcional</strong><br><span style="font-size:.63rem;color:var(--muted)">Práctico, accesible</span>
+          </div>
+          <div class="pro-chip" data-val="premium" onclick="setProChip('presenciaGroup',this)" style="flex:1">
+            ✨ <strong>Premium</strong><br><span style="font-size:.63rem;color:var(--muted)">Imagen, exclusividad</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pro-influence" id="proInfluence"></div>
+    </div>
+
     <button class="analyze-btn" onclick="analyze()">⚡ Analizar Saltillo</button>
 
     <div id="resultsSection" style="display:none;flex-direction:column;gap:8px;">
@@ -898,9 +956,14 @@ function scoreZone(z){
   const uw={trafico:+document.getElementById('w1').value/100,competencia:+document.getElementById('w2').value/100,nse:+document.getElementById('w3').value/100,acceso:+document.getElementById('w4').value/100};
   const tot=uw.trafico+uw.competencia+uw.nse+uw.acceso;
   const un={trafico:uw.trafico/tot,competencia:uw.competencia/tot,nse:uw.nse/tot,acceso:uw.acceso/tot};
-  const w={trafico:tw.trafico*.80+un.trafico*.20,competencia:tw.competencia*.80+un.competencia*.20,nse:tw.nse*.80+un.nse*.20,acceso:tw.acceso*.80+un.acceso*.20};
+  // Base weights: 80% tipo de negocio + 20% preferencias usuario
+  let w={trafico:tw.trafico*.80+un.trafico*.20,competencia:tw.competencia*.80+un.competencia*.20,nse:tw.nse*.80+un.nse*.20,acceso:tw.acceso*.80+un.acceso*.20};
+  // PRO: apply discovery/ticket/presencia modifiers
+  w = applyProModifiers(w);
   let s=z.data.trafico*w.trafico+competenciaReal*w.competencia+z.data.nse*w.nse+z.data.acceso*w.acceso;
   if(!z.data.renta[selectedBudget])s*=.50;
+  // PRO presencia premium: penalize low-NSE zones
+  if(proPresencia==='premium' && z.data.nse < 45) s *= 0.75;
   // PMD 2025-2027 zone bonus
   const pmdB=PMD_BONUS[z.id];
   if(pmdB) s+=pmdB.pts;
@@ -1432,6 +1495,63 @@ const PMD_BONUS = {
   republica:   { pts: 4, motivo: '🏛️ Desbordamiento del proyecto Alameda/Centro (PMD 2025)' },
   ant_cardenas:{ pts: 3, motivo: '🏗️ Conectividad mejorada por modernización de vialidades (PMD)' },
 };
+
+// ── PRO STATE ──────────────────────────────────────────────────────────────
+let proDiscovery = 'impulso';
+let proTicket    = 'bajo';
+let proPresencia = 'funcional';
+
+function setProChip(groupId, el){
+  document.getElementById(groupId).querySelectorAll('.pro-chip').forEach(c=>{
+    c.classList.remove('active','active-orange');
+  });
+  el.classList.add('active');
+  if(groupId==='discoveryGroup') proDiscovery=el.dataset.val;
+  if(groupId==='ticketGroup')    proTicket=el.dataset.val;
+  if(groupId==='presenciaGroup') proPresencia=el.dataset.val;
+  updateProInfluence();
+  if(analyzed) analyze();
+}
+
+function updateProInfluence(){
+  const msgs = [];
+  if(proDiscovery==='impulso')
+    msgs.push('👁️ <b>Impulso:</b> el tráfico peatonal pesa +40% más. Visibilidad es clave.');
+  else
+    msgs.push('🧭 <b>Destino:</b> la competencia y el NSE pesan más. Ubicación exacta importa menos.');
+  if(proTicket==='alto')
+    msgs.push('💰 <b>Ticket alto:</b> NSE pesa +50%. Zonas con mayor poder adquisitivo obtienen ventaja.');
+  else if(proTicket==='bajo')
+    msgs.push('🔁 <b>Ticket bajo:</b> el volumen es todo. Tráfico peatonal +30% más relevante.');
+  if(proPresencia==='premium')
+    msgs.push('✨ <b>Premium:</b> zonas con NSE bajo (<45) reciben penalización. Imagen y entorno importan.');
+  const inf = document.getElementById('proInfluence');
+  inf.innerHTML = msgs.join('<br>');
+  inf.classList.add('show');
+}
+
+// Apply Pro multipliers to weights
+function applyProModifiers(w){
+  let t=w.trafico, c=w.competencia, n=w.nse, a=w.acceso;
+
+  // Discovery type
+  if(proDiscovery==='impulso'){ t*=1.40; c*=0.80; }
+  else { t*=0.65; c*=1.30; n*=1.10; }
+
+  // Ticket
+  if(proTicket==='alto'){ n*=1.50; t*=0.80; }
+  else if(proTicket==='bajo'){ t*=1.30; n*=0.60; }
+
+  // Presencia
+  if(proPresencia==='premium'){ n*=1.20; }
+
+  // Re-normalize to sum 1
+  const sum = t+c+n+a;
+  return { trafico:t/sum, competencia:c/sum, nse:n/sum, acceso:a/sum };
+}
+
+// ── INIT PRO INFLUENCE on load ─────────────────────────────────────────────
+setTimeout(updateProInfluence, 300);
 
 function toggleCityChip(){
   const body=document.getElementById('cityBody');
