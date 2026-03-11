@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LocaIA — Encuentra tu mejor ubicación en Saltillo</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -433,11 +435,9 @@ footer{
           <div style="color:#f97316;font-weight:700;font-size:1rem;font-family:'Syne',sans-serif;">78 <span style="color:#5a6478;font-size:.65rem;font-weight:400">/ 100</span></div>
         </div>
       </div>
-      <div class="preview-map">
-        <div class="map-blob"></div>
-        <div class="map-blob"></div>
-        <div class="map-blob"></div>
-        <div class="score-badge">
+      <div class="preview-map" style="position:relative;">
+        <div id="hero-map" style="width:100%;height:100%;min-height:360px;"></div>
+        <div class="score-badge" style="z-index:500;">
           <div class="big">89</div>
           <div class="sm">Centro Histórico</div>
           <div class="sm" style="color:#22c55e;font-weight:600;font-size:.72rem;margin-top:2px;">✓ Recomendado</div>
@@ -608,5 +608,34 @@ footer{
   <div>© 2025 LocaIA</div>
 </footer>
 
+<script>
+// Hero map preview
+const heroMap = L.map('hero-map', {
+  center: [25.4231, -101.0035], zoom: 13,
+  zoomControl: false, attributionControl: false,
+  dragging: false, scrollWheelZoom: false, doubleClickZoom: false
+});
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  subdomains: 'abcd', maxZoom: 19
+}).addTo(heroMap);
+
+const zones = [
+  {lat:25.4231,lng:-101.0035,score:89,name:"Centro Histórico"},
+  {lat:25.4580,lng:-100.9850,score:82,name:"Zona Valle"},
+  {lat:25.4300,lng:-101.0200,score:78,name:"Col. República"},
+  {lat:25.4480,lng:-101.0180,score:74,name:"Contry"},
+  {lat:25.4680,lng:-101.0050,score:76,name:"La Fama"},
+  {lat:25.3950,lng:-101.0500,score:68,name:"Zona Tec"},
+  {lat:25.4420,lng:-101.0400,score:65,name:"Las Palmas"},
+  {lat:25.4180,lng:-101.0380,score:72,name:"Himno Nacional"},
+];
+const color = s => s>=85?'#f97316':s>=70?'#3b82f6':'#8b5cf6';
+zones.forEach(z => {
+  L.circle([z.lat,z.lng],{
+    radius:500, color:color(z.score), fillColor:color(z.score),
+    fillOpacity:.2, weight:2, opacity:.7
+  }).addTo(heroMap).bindTooltip(`${z.name}: ${z.score}`, {permanent:false});
+});
+</script>
 </body>
 </html>

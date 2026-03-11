@@ -372,58 +372,59 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{sub
 // ── ZONES ─────────────────────────────────────────────────
 const zones = [
   {id:"centro",name:"Centro Histórico",lat:25.4231,lng:-101.0035,radius:550,
-   data:{trafico:90,competencia:45,nse:60,acceso:70,renta:{bajo:false,medio:true,alto:true}},
-   tags_pos:["Alto tráfico","Turismo"],tags_neg:["Mucha competencia","Poco parking"],
-   desc:"Altísimo flujo peatonal, ideal para locales con visibilidad directa."},
+   data:{trafico:95,competencia:30,nse:62,acceso:55,renta:{bajo:false,medio:true,alto:true}},
+   tags_pos:["Máximo tráfico","Turismo","Visibilidad"],tags_neg:["Alta competencia","Sin parking"],
+   desc:"Altísimo flujo peatonal. Ideal para negocios de alto volumen y visibilidad."},
   {id:"valle",name:"Zona Valle",lat:25.4580,lng:-100.9850,radius:600,
-   data:{trafico:75,competencia:60,nse:85,acceso:80,renta:{bajo:false,medio:false,alto:true}},
-   tags_pos:["NSE alto","Familias"],tags_neg:["Renta elevada"],
-   desc:"Residencial premium. Excelente para cafeterías y moda."},
+   data:{trafico:60,competencia:75,nse:95,acceso:85,renta:{bajo:false,medio:false,alto:true}},
+   tags_pos:["NSE muy alto","Familias","Premium"],tags_neg:["Requiere coche","Renta alta"],
+   desc:"Residencial premium. Perfecto para negocios de lujo, moda y restaurantes gourmet."},
   {id:"republica",name:"Col. República",lat:25.4300,lng:-101.0200,radius:480,
-   data:{trafico:80,competencia:55,nse:65,acceso:75,renta:{bajo:false,medio:true,alto:true}},
-   tags_pos:["Comercial","Tráfico vehicular"],tags_neg:["Saturada de farmacias"],
-   desc:"Corredor muy comercial con buena afluencia diaria."},
+   data:{trafico:82,competencia:45,nse:60,acceso:78,renta:{bajo:false,medio:true,alto:true}},
+   tags_pos:["Corredor comercial","Tráfico vehicular","NSE medio"],tags_neg:["Mucha farmacia"],
+   desc:"Corredor muy activo. Excelente para servicios, comida rápida y conveniencia."},
   {id:"tecnologico",name:"Zona Tecnológico",lat:25.3950,lng:-101.0500,radius:520,
-   data:{trafico:70,competencia:65,nse:55,acceso:60,renta:{bajo:true,medio:true,alto:false}},
-   tags_pos:["Universitarios","Bajo costo"],tags_neg:["NSE medio-bajo"],
-   desc:"Cerca de campus. Perfecto para cafeterías y comida rápida."},
+   data:{trafico:72,competencia:60,nse:42,acceso:55,renta:{bajo:true,medio:true,alto:false}},
+   tags_pos:["Universitarios","Renta baja","Potencial"],tags_neg:["NSE bajo","Estacional"],
+   desc:"Zona universitaria. Ideal para cafeterías económicas y comida rápida accesible."},
   {id:"palmas",name:"Las Palmas",lat:25.4420,lng:-101.0400,radius:500,
-   data:{trafico:65,competencia:70,nse:70,acceso:65,renta:{bajo:true,medio:true,alto:false}},
-   tags_pos:["Crecimiento","Familiar"],tags_neg:["Lejos del centro"],
-   desc:"Zona en expansión. Buen momento para entrar."},
+   data:{trafico:50,competencia:80,nse:72,acceso:65,renta:{bajo:true,medio:true,alto:false}},
+   tags_pos:["Crecimiento","NSE medio-alto","Poca competencia"],tags_neg:["Tráfico bajo"],
+   desc:"Zona en expansión. Buena oportunidad para negocios especializados con clientela fija."},
   {id:"pedregal",name:"Villas del Pedregal",lat:25.4050,lng:-100.9600,radius:460,
-   data:{trafico:60,competencia:72,nse:60,acceso:55,renta:{bajo:true,medio:true,alto:false}},
-   tags_pos:["Renta baja"],tags_neg:["NSE bajo-medio"],
-   desc:"Zona emergente con poca oferta. Renta accesible."},
+   data:{trafico:40,competencia:85,nse:48,acceso:45,renta:{bajo:true,medio:true,alto:false}},
+   tags_pos:["Renta muy baja","Sin competencia"],tags_neg:["NSE bajo","Lejos de todo"],
+   desc:"Zona emergente. Riesgo alto pero renta mínima. Bueno para delivery o dark kitchen."},
   {id:"contry",name:"Contry / Las Américas",lat:25.4480,lng:-101.0180,radius:480,
-   data:{trafico:72,competencia:58,nse:78,acceso:72,renta:{bajo:false,medio:true,alto:true}},
-   tags_pos:["NSE alto","Transitable"],tags_neg:["Competencia establecida"],
-   desc:"Mezcla residencial-comercial. Buena apuesta para restaurantes."},
-  {id:"himno",name:"Himno Nacional",lat:25.4180,lng:-101.0380,radius:430,
-   data:{trafico:85,competencia:50,nse:62,acceso:68,renta:{bajo:false,medio:true,alto:true}},
-   tags_pos:["Muy transitada","Visibilidad"],tags_neg:["Estacionamiento limitado"],
-   desc:"Avenida de alto tráfico. Excelente para acceso desde calle."},
+   data:{trafico:70,competencia:55,nse:80,acceso:75,renta:{bajo:false,medio:true,alto:true}},
+   tags_pos:["NSE alto","Residencial-comercial","Parking"],tags_neg:["Competencia media"],
+   desc:"Mezcla residencial y comercial con buen poder adquisitivo. Ideal para restaurantes."},
+  {id:"himno",name:"Av. Himno Nacional",lat:25.4180,lng:-101.0380,radius:430,
+   data:{trafico:88,competencia:40,nse:58,acceso:62,renta:{bajo:false,medio:true,alto:true}},
+   tags_pos:["Muy transitada","Visibilidad máxima","Boulevard"],tags_neg:["Poco parking"],
+   desc:"Avenida principal de alto tráfico. Perfecta para locales con frente a calle."},
   {id:"pinos",name:"Col. Los Pinos",lat:25.4350,lng:-100.9750,radius:420,
-   data:{trafico:55,competencia:78,nse:72,acceso:60,renta:{bajo:true,medio:true,alto:false}},
-   tags_pos:["NSE medio-alto"],tags_neg:["Baja afluencia"],
-   desc:"Tranquila. Ideal para servicios especializados o delivery."},
+   data:{trafico:42,competencia:82,nse:74,acceso:58,renta:{bajo:true,medio:true,alto:false}},
+   tags_pos:["NSE medio-alto","Tranquila"],tags_neg:["Muy baja afluencia","Competencia alta"],
+   desc:"Colonia tranquila. Funciona para servicios especializados o negocios por cita."},
   {id:"fama",name:"La Fama / Blvd. Fundadores",lat:25.4680,lng:-101.0050,radius:500,
-   data:{trafico:78,competencia:55,nse:75,acceso:82,renta:{bajo:false,medio:true,alto:true}},
-   tags_pos:["Fácil acceso","NSE alto"],tags_neg:["Requiere visibilidad"],
-   desc:"Corredor moderno sobre Blvd. Fundadores. Ideal para cafeterías premium."}
+   data:{trafico:75,competencia:65,nse:78,acceso:90,renta:{bajo:false,medio:true,alto:true}},
+   tags_pos:["Blvd. moderno","Fácil acceso","Estacionamiento"],tags_neg:["Lejos del centro"],
+   desc:"Corredor moderno sobre Blvd. Fundadores. Ideal para cafeterías premium y franquicias."}
 ];
 
+// Pesos MUY diferenciados por tipo — cada negocio tiene perfil distinto
 const typeWeights = {
-  comida_rapida:{trafico:.40,competencia:.25,nse:.15,acceso:.20},
-  restaurante:  {trafico:.30,competencia:.25,nse:.30,acceso:.15},
-  cafeteria:    {trafico:.35,competencia:.25,nse:.25,acceso:.15},
-  panaderia:    {trafico:.35,competencia:.30,nse:.20,acceso:.15},
-  ropa:         {trafico:.30,competencia:.20,nse:.35,acceso:.15},
-  farmacia:     {trafico:.35,competencia:.30,nse:.20,acceso:.15},
-  papeleria:    {trafico:.30,competencia:.30,nse:.20,acceso:.20},
-  estetica:     {trafico:.25,competencia:.30,nse:.25,acceso:.20},
-  gym:          {trafico:.20,competencia:.30,nse:.30,acceso:.20},
-  tech:         {trafico:.25,competencia:.25,nse:.30,acceso:.20}
+  comida_rapida: { trafico:.55, competencia:.20, nse:.10, acceso:.15 }, // necesita tráfico masivo
+  restaurante:   { trafico:.20, competencia:.20, nse:.45, acceso:.15 }, // necesita NSE alto
+  cafeteria:     { trafico:.30, competencia:.25, nse:.30, acceso:.15 }, // balance
+  panaderia:     { trafico:.45, competencia:.35, nse:.10, acceso:.10 }, // tráfico + poca competencia
+  ropa:          { trafico:.15, competencia:.15, nse:.55, acceso:.15 }, // NSE es todo
+  farmacia:      { trafico:.40, competencia:.45, nse:.05, acceso:.10 }, // tráfico y monopolio zona
+  papeleria:     { trafico:.35, competencia:.40, nse:.10, acceso:.15 }, // cerca escuelas, poca comp.
+  estetica:      { trafico:.20, competencia:.40, nse:.20, acceso:.20 }, // fidelidad, poca comp.
+  gym:           { trafico:.10, competencia:.35, nse:.35, acceso:.20 }, // NSE + exclusividad
+  tech:          { trafico:.15, competencia:.20, nse:.45, acceso:.20 }  // NSE alto, cerca corporativos
 };
 
 let selectedType='comida_rapida',selectedBudget='bajo',circles=[],analyzed=false,lastScored=[];
