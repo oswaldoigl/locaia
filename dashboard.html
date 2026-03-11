@@ -749,15 +749,28 @@ const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentUser=null, allAnalyses=[], activeFilter='all';
 
+// ── AUTH INSTANTÁNEO: lee localStorage sin red ──
+(function fastAuth(){
+  try{
+    const key=Object.keys(localStorage).find(k=>k.startsWith('sb-')&&k.endsWith('-auth-token'));
+    if(!key){window.location.href='login.html';return;}
+    const session=JSON.parse(localStorage.getItem(key));
+    if(!session?.access_token){window.location.href='login.html';return;}
+    const exp=session.expires_at||session.user?.exp;
+    if(exp&&(exp*1000)<Date.now()){window.location.href='login.html';return;}
+    currentUser=session.user;
+    const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
+    const initials=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    document.getElementById('user-name').textContent=name;
+    document.getElementById('user-avatar').textContent=initials;
+    document.getElementById('app-loader').style.display='none';
+    loadAnalyses();
+  }catch(e){window.location.href='login.html';}
+})();
+
+// ── Validación en 2do plano (renueva token si expiró) ──
 sb.auth.getSession().then(({data})=>{
-  document.getElementById('app-loader').style.display='none';
-  if(!data.session){window.location.href='login.html';return;}
-  currentUser=data.session.user;
-  const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
-  const initials=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  document.getElementById('user-name').textContent=name;
-  document.getElementById('user-avatar').textContent=initials;
-  loadAnalyses();
+  if(!data.session){window.location.href='login.html';}
 });
 
 async function handleLogout(){await sb.auth.signOut();window.location.href='login.html';}
