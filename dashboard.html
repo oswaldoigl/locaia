@@ -178,6 +178,19 @@ input[type=range]::-webkit-slider-thumb{
   transition:transform .3s ease;pointer-events:none;
 }
 .toast.show{transform:translateX(-50%) translateY(0);}
+
+/* HISTORY */
+.history-section{border-top:1px solid var(--border);padding-top:16px;}
+.history-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.history-toggle{background:none;border:none;color:var(--muted);font-size:.72rem;cursor:pointer;font-family:'Instrument Sans',sans-serif;transition:color .2s;}
+.history-toggle:hover{color:var(--text);}
+.hist-card{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:11px 13px;cursor:pointer;transition:all .2s;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;animation:fadeUp .25s ease both;}
+.hist-card:hover{border-color:var(--accent);}
+.hist-type{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;}
+.hist-meta{font-size:.67rem;color:var(--muted);margin-top:2px;}
+.hist-score{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--accent);}
+.hist-zone{font-size:.65rem;color:var(--muted2);margin-top:1px;}
+.hist-empty{font-size:.78rem;color:var(--muted);text-align:center;padding:16px 0;}
 </style>
 </head>
 <body>
@@ -208,20 +221,20 @@ input[type=range]::-webkit-slider-thumb{
       </div>
       <div class="inegi-row">
         <div class="inegi-item">
-          <div class="inegi-val" id="i-inpc">115.67</div>
-          <div class="inegi-lbl">INPC General</div>
+          <div class="inegi-val" id="i-inpc">—</div>
+          <div class="inegi-lbl">Negocios<br>en la zona</div>
         </div>
         <div class="inegi-item">
           <div class="inegi-val down" id="i-var">▼ -0.93%</div>
-          <div class="inegi-lbl">Var. mensual</div>
+          <div class="inegi-lbl">Inflación<br>mensual</div>
         </div>
         <div class="inegi-item">
-          <div class="inegi-val" id="i-sub">97.82</div>
-          <div class="inegi-lbl">INPC Subyacente</div>
+          <div class="inegi-val" id="i-sub">—</div>
+          <div class="inegi-lbl">Competencia<br>libre</div>
         </div>
         <div class="inegi-item">
-          <div class="inegi-val up" id="i-prod">145.05</div>
-          <div class="inegi-lbl">Índ. Productor</div>
+          <div class="inegi-val" id="i-prod">—</div>
+          <div class="inegi-lbl">Saturación<br>del giro</div>
         </div>
       </div>
       <div class="inegi-note" id="inegi-note">
@@ -295,6 +308,17 @@ input[type=range]::-webkit-slider-thumb{
       Configura y presiona<br><strong>Analizar Saltillo</strong>
     </div>
 
+    <!-- HISTORIAL -->
+    <div class="history-section" id="historySection" style="display:none;">
+      <div class="history-header">
+        <div class="slabel" style="margin:0;">Mis análisis guardados</div>
+        <button class="history-toggle" onclick="loadHistory()">↻ Actualizar</button>
+      </div>
+      <div id="historyCards">
+        <div class="hist-empty">Cargando...</div>
+      </div>
+    </div>
+
   </aside>
 
   <!-- MAP -->
@@ -331,6 +355,9 @@ sb.auth.getSession().then(({ data }) => {
   const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
   document.getElementById('user-name').textContent = name;
   document.getElementById('user-avatar').textContent = initials;
+  // Mostrar historial al cargar
+  document.getElementById('historySection').style.display = 'block';
+  loadHistory();
 });
 
 async function handleLogout() {
@@ -369,80 +396,125 @@ const INEGI_DATA = {
 const map = L.map('map',{center:[25.4231,-101.0035],zoom:13,zoomControl:true,attributionControl:false});
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(map);
 
-// ── ZONES ─────────────────────────────────────────────────
+// ── COMPETENCIA REAL — FUENTE: DENUE INEGI Feb 2026 ──────────────────────
+// Score 0-100: 100 = zona libre (poca competencia), 0 = zona saturada
+const denue_competencia = {
+  centro:      {comida_rapida:0,  restaurante:0,  cafeteria:0,  panaderia:40, ropa:0,  farmacia:0,  papeleria:36, estetica:0,  gym:0,   tech:0  },
+  republica:   {comida_rapida:81, restaurante:85, cafeteria:75, panaderia:84, ropa:98, farmacia:85, papeleria:90, estetica:79, gym:100, tech:88 },
+  valle:       {comida_rapida:97, restaurante:97, cafeteria:98, panaderia:98, ropa:98, farmacia:95, papeleria:100,estetica:100,gym:100, tech:100},
+  tecnologico: {comida_rapida:87, restaurante:93, cafeteria:82, panaderia:66, ropa:80, farmacia:87, papeleria:65, estetica:85, gym:50,  tech:62 },
+  palmas:      {comida_rapida:99, restaurante:100,cafeteria:98, panaderia:98, ropa:99, farmacia:100,papeleria:100,estetica:99, gym:100, tech:100},
+  contry:      {comida_rapida:91, restaurante:91, cafeteria:78, panaderia:79, ropa:89, farmacia:97, papeleria:80, estetica:86, gym:100, tech:75 },
+  himno:       {comida_rapida:38, restaurante:89, cafeteria:16, panaderia:0,  ropa:30, farmacia:51, papeleria:0,  estetica:17, gym:50,  tech:50 },
+  fama:        {comida_rapida:61, restaurante:81, cafeteria:44, panaderia:41, ropa:58, farmacia:69, papeleria:51, estetica:49, gym:0,   tech:38 },
+  pedregal:    {comida_rapida:57, restaurante:88, cafeteria:56, panaderia:28, ropa:60, farmacia:77, papeleria:54, estetica:47, gym:100, tech:75 },
+  pinos:       {comida_rapida:82, restaurante:99, cafeteria:67, panaderia:64, ropa:79, farmacia:69, papeleria:71, estetica:72, gym:100, tech:88 },
+};
+
+// Total de negocios reales por zona (DENUE Feb 2026)
+const denue_total = {
+  centro:4615, republica:728, valle:59, tecnologico:493,
+  palmas:21, contry:540, himno:2016, fama:1443, pedregal:1387, pinos:580
+};
+
+function updateInegiZone(zoneId) {
+  const total = denue_total[zoneId] || 0;
+  const comp  = denue_competencia[zoneId]?.[selectedType] ?? 50;
+  document.getElementById('i-inpc').textContent = total.toLocaleString();
+  document.getElementById('i-sub').textContent  = comp + '/100';
+  document.getElementById('i-prod').textContent = comp >= 70 ? '🟢 Libre' : comp >= 40 ? '🟡 Media' : '🔴 Alta';
+  document.querySelector('.inegi-top .inegi-live').innerHTML =
+    `<span class="live-dot"></span>DENUE · ${zoneId}`;
+}
+
 const zones = [
-  {id:"centro",name:"Centro Histórico",lat:25.4231,lng:-101.0035,radius:550,
-   data:{trafico:95,competencia:30,nse:62,acceso:55,renta:{bajo:false,medio:true,alto:true}},
-   tags_pos:["Máximo tráfico","Turismo","Visibilidad"],tags_neg:["Alta competencia","Sin parking"],
-   desc:"Altísimo flujo peatonal. Ideal para negocios de alto volumen y visibilidad."},
-  {id:"valle",name:"Zona Valle",lat:25.4580,lng:-100.9850,radius:600,
-   data:{trafico:60,competencia:75,nse:95,acceso:85,renta:{bajo:false,medio:false,alto:true}},
-   tags_pos:["NSE muy alto","Familias","Premium"],tags_neg:["Requiere coche","Renta alta"],
-   desc:"Residencial premium. Perfecto para negocios de lujo, moda y restaurantes gourmet."},
-  {id:"republica",name:"Col. República",lat:25.4300,lng:-101.0200,radius:480,
-   data:{trafico:82,competencia:45,nse:60,acceso:78,renta:{bajo:false,medio:true,alto:true}},
-   tags_pos:["Corredor comercial","Tráfico vehicular","NSE medio"],tags_neg:["Mucha farmacia"],
-   desc:"Corredor muy activo. Excelente para servicios, comida rápida y conveniencia."},
-  {id:"tecnologico",name:"Zona Tecnológico",lat:25.3950,lng:-101.0500,radius:520,
-   data:{trafico:72,competencia:60,nse:42,acceso:55,renta:{bajo:true,medio:true,alto:false}},
-   tags_pos:["Universitarios","Renta baja","Potencial"],tags_neg:["NSE bajo","Estacional"],
-   desc:"Zona universitaria. Ideal para cafeterías económicas y comida rápida accesible."},
-  {id:"palmas",name:"Las Palmas",lat:25.4420,lng:-101.0400,radius:500,
-   data:{trafico:50,competencia:80,nse:72,acceso:65,renta:{bajo:true,medio:true,alto:false}},
-   tags_pos:["Crecimiento","NSE medio-alto","Poca competencia"],tags_neg:["Tráfico bajo"],
-   desc:"Zona en expansión. Buena oportunidad para negocios especializados con clientela fija."},
-  {id:"pedregal",name:"Villas del Pedregal",lat:25.4050,lng:-100.9600,radius:460,
-   data:{trafico:40,competencia:85,nse:48,acceso:45,renta:{bajo:true,medio:true,alto:false}},
-   tags_pos:["Renta muy baja","Sin competencia"],tags_neg:["NSE bajo","Lejos de todo"],
-   desc:"Zona emergente. Riesgo alto pero renta mínima. Bueno para delivery o dark kitchen."},
-  {id:"contry",name:"Contry / Las Américas",lat:25.4480,lng:-101.0180,radius:480,
-   data:{trafico:70,competencia:55,nse:80,acceso:75,renta:{bajo:false,medio:true,alto:true}},
-   tags_pos:["NSE alto","Residencial-comercial","Parking"],tags_neg:["Competencia media"],
-   desc:"Mezcla residencial y comercial con buen poder adquisitivo. Ideal para restaurantes."},
-  {id:"himno",name:"Av. Himno Nacional",lat:25.4180,lng:-101.0380,radius:430,
-   data:{trafico:88,competencia:40,nse:58,acceso:62,renta:{bajo:false,medio:true,alto:true}},
-   tags_pos:["Muy transitada","Visibilidad máxima","Boulevard"],tags_neg:["Poco parking"],
-   desc:"Avenida principal de alto tráfico. Perfecta para locales con frente a calle."},
-  {id:"pinos",name:"Col. Los Pinos",lat:25.4350,lng:-100.9750,radius:420,
-   data:{trafico:42,competencia:82,nse:74,acceso:58,renta:{bajo:true,medio:true,alto:false}},
-   tags_pos:["NSE medio-alto","Tranquila"],tags_neg:["Muy baja afluencia","Competencia alta"],
-   desc:"Colonia tranquila. Funciona para servicios especializados o negocios por cita."},
-  {id:"fama",name:"La Fama / Blvd. Fundadores",lat:25.4680,lng:-101.0050,radius:500,
-   data:{trafico:75,competencia:65,nse:78,acceso:90,renta:{bajo:false,medio:true,alto:true}},
-   tags_pos:["Blvd. moderno","Fácil acceso","Estacionamiento"],tags_neg:["Lejos del centro"],
-   desc:"Corredor moderno sobre Blvd. Fundadores. Ideal para cafeterías premium y franquicias."}
+  {id:"centro",    name:"Centro Histórico",        lat:25.4244, lng:-100.9995, radius:600,
+   data:{trafico:97, nse:52, acceso:48, renta:{bajo:false,medio:true,alto:true}},
+   tags_pos:["Tráfico máximo","4,615 negocios DENUE"], tags_neg:["Muy saturado","Sin parking"],
+   desc:"El punto más transitado de Saltillo. 4,615 negocios reales según DENUE 2026."},
+
+  {id:"valle",     name:"Zona Valle",              lat:25.4516, lng:-100.9741, radius:550,
+   data:{trafico:45, nse:97, acceso:82, renta:{bajo:false,medio:false,alto:true}},
+   tags_pos:["NSE altísimo","Solo 59 negocios DENUE"], tags_neg:["Requiere auto","Renta muy alta"],
+   desc:"La zona más exclusiva. Apenas 59 negocios registrados en DENUE — casi virgen."},
+
+  {id:"republica", name:"Col. República",          lat:25.4391, lng:-100.9901, radius:480,
+   data:{trafico:83, nse:58, acceso:78, renta:{bajo:false,medio:true,alto:true}},
+   tags_pos:["Gran corredor","728 negocios activos"], tags_neg:["NSE medio"],
+   desc:"Eje comercial muy activo. 728 negocios reales en DENUE con buena diversidad."},
+
+  {id:"tecnologico",name:"Zona Tecnológico",       lat:25.4549, lng:-101.016,  radius:520,
+   data:{trafico:74, nse:35, acceso:52, renta:{bajo:true,medio:true,alto:false}},
+   tags_pos:["Universitarios","493 negocios","Renta baja"], tags_neg:["NSE bajo","Estacional"],
+   desc:"493 negocios activos. Alta densidad estudiantil, precios accesibles."},
+
+  {id:"palmas",    name:"Las Palmas",              lat:25.4091, lng:-100.9653, radius:500,
+   data:{trafico:38, nse:68, acceso:62, renta:{bajo:true,medio:true,alto:false}},
+   tags_pos:["Solo 21 negocios DENUE","Sin competencia"], tags_neg:["Tráfico muy bajo"],
+   desc:"La zona más libre de Saltillo. DENUE registra apenas 21 negocios. Oportunidad única."},
+
+  {id:"pedregal",  name:"Col. Morelos / Zaragoza", lat:25.4098, lng:-100.9701, radius:480,
+   data:{trafico:68, nse:38, acceso:45, renta:{bajo:true,medio:false,alto:false}},
+   tags_pos:["Renta mínima","1,387 negocios activos"], tags_neg:["NSE bajo","Lejos del centro"],
+   desc:"Zona popular muy activa. 1,387 negocios en DENUE. Mercado de volumen."},
+
+  {id:"contry",   name:"Contry / Las Américas",    lat:25.4306, lng:-100.9688, radius:480,
+   data:{trafico:68, nse:82, acceso:75, renta:{bajo:false,medio:true,alto:true}},
+   tags_pos:["NSE alto","540 negocios","Sin farmacias"], tags_neg:["Competencia media"],
+   desc:"540 negocios activos. Excelente NSE y casi sin farmacias según DENUE."},
+
+  {id:"himno",    name:"Mirasierra / Bellavista",   lat:25.413,  lng:-100.9554, radius:480,
+   data:{trafico:85, nse:55, acceso:58, renta:{bajo:false,medio:true,alto:true}},
+   tags_pos:["Alto tráfico","2,016 negocios activos"], tags_neg:["Saturado ropa/panadería"],
+   desc:"2,016 negocios activos en DENUE. Zona muy comercial y transitada."},
+
+  {id:"fama",     name:"Saltillo 2000 / Lourdes",   lat:25.427,  lng:-100.9918, radius:500,
+   data:{trafico:72, nse:72, acceso:85, renta:{bajo:false,medio:true,alto:true}},
+   tags_pos:["Buen acceso","NSE medio-alto","1,443 negocios"], tags_neg:["Gym saturado"],
+   desc:"1,443 negocios registrados. NSE medio-alto y excelente accesibilidad."},
+
+  {id:"pinos",    name:"La Madrid / Las Teresitas", lat:25.3864, lng:-100.9983, radius:450,
+   data:{trafico:42, nse:65, acceso:55, renta:{bajo:true,medio:true,alto:false}},
+   tags_pos:["NSE medio","580 negocios","1 solo restaurante DENUE"], tags_neg:["Tráfico bajo"],
+   desc:"580 negocios. Solo 1 restaurante en DENUE — oportunidad enorme para ese giro."}
 ];
 
-// Pesos MUY diferenciados por tipo — cada negocio tiene perfil distinto
 const typeWeights = {
-  comida_rapida: { trafico:.55, competencia:.20, nse:.10, acceso:.15 }, // necesita tráfico masivo
-  restaurante:   { trafico:.20, competencia:.20, nse:.45, acceso:.15 }, // necesita NSE alto
-  cafeteria:     { trafico:.30, competencia:.25, nse:.30, acceso:.15 }, // balance
-  panaderia:     { trafico:.45, competencia:.35, nse:.10, acceso:.10 }, // tráfico + poca competencia
-  ropa:          { trafico:.15, competencia:.15, nse:.55, acceso:.15 }, // NSE es todo
-  farmacia:      { trafico:.40, competencia:.45, nse:.05, acceso:.10 }, // tráfico y monopolio zona
-  papeleria:     { trafico:.35, competencia:.40, nse:.10, acceso:.15 }, // cerca escuelas, poca comp.
-  estetica:      { trafico:.20, competencia:.40, nse:.20, acceso:.20 }, // fidelidad, poca comp.
-  gym:           { trafico:.10, competencia:.35, nse:.35, acceso:.20 }, // NSE + exclusividad
-  tech:          { trafico:.15, competencia:.20, nse:.45, acceso:.20 }  // NSE alto, cerca corporativos
+  comida_rapida: { trafico:.60, competencia:.15, nse:.08, acceso:.17 },
+  restaurante:   { trafico:.15, competencia:.18, nse:.52, acceso:.15 },
+  cafeteria:     { trafico:.28, competencia:.22, nse:.35, acceso:.15 },
+  panaderia:     { trafico:.50, competencia:.32, nse:.08, acceso:.10 },
+  ropa:          { trafico:.10, competencia:.12, nse:.65, acceso:.13 },
+  farmacia:      { trafico:.38, competencia:.52, nse:.04, acceso:.06 },
+  papeleria:     { trafico:.33, competencia:.48, nse:.08, acceso:.11 },
+  estetica:      { trafico:.15, competencia:.55, nse:.15, acceso:.15 },
+  gym:           { trafico:.08, competencia:.30, nse:.45, acceso:.17 },
+  tech:          { trafico:.10, competencia:.18, nse:.55, acceso:.17 }
 };
 
 let selectedType='comida_rapida',selectedBudget='bajo',circles=[],analyzed=false,lastScored=[];
 
 function scoreZone(z){
-  const tw=typeWeights[selectedType]||typeWeights.comida_rapida;
-  const uw={
-    trafico:+document.getElementById('w1').value/100,
-    competencia:+document.getElementById('w2').value/100,
-    nse:+document.getElementById('w3').value/100,
-    acceso:+document.getElementById('w4').value/100
+  const tw = typeWeights[selectedType] || typeWeights.comida_rapida;
+  const competenciaReal = denue_competencia[z.id]?.[selectedType] ?? 50;
+  const uw = {
+    trafico:     +document.getElementById('w1').value / 100,
+    competencia: +document.getElementById('w2').value / 100,
+    nse:         +document.getElementById('w3').value / 100,
+    acceso:      +document.getElementById('w4').value / 100
   };
-  const tot=uw.trafico+uw.competencia+uw.nse+uw.acceso;
-  const un={trafico:uw.trafico/tot,competencia:uw.competencia/tot,nse:uw.nse/tot,acceso:uw.acceso/tot};
-  const w={trafico:(tw.trafico+un.trafico)/2,competencia:(tw.competencia+un.competencia)/2,nse:(tw.nse+un.nse)/2,acceso:(tw.acceso+un.acceso)/2};
-  let s=z.data.trafico*w.trafico+z.data.competencia*w.competencia+z.data.nse*w.nse+z.data.acceso*w.acceso;
-  if(!z.data.renta[selectedBudget]) s*=.6;
-  return Math.round(s);
+  const tot = uw.trafico+uw.competencia+uw.nse+uw.acceso;
+  const un  = {trafico:uw.trafico/tot,competencia:uw.competencia/tot,nse:uw.nse/tot,acceso:uw.acceso/tot};
+  const w   = {
+    trafico:     tw.trafico     *.80 + un.trafico     *.20,
+    competencia: tw.competencia *.80 + un.competencia *.20,
+    nse:         tw.nse         *.80 + un.nse         *.20,
+    acceso:      tw.acceso      *.80 + un.acceso      *.20
+  };
+  let s = z.data.trafico*w.trafico + competenciaReal*w.competencia
+        + z.data.nse*w.nse + z.data.acceso*w.acceso;
+  if(!z.data.renta[selectedBudget]) s *= .50;
+  return Math.round(Math.min(s, 100));
 }
 function scoreColor(s){if(s>=85)return'#f97316';if(s>=70)return'#3b82f6';return'#8b5cf6';}
 
@@ -451,6 +523,8 @@ function analyze(){
   circles.forEach(c=>map.removeLayer(c));
   circles=[];
   lastScored=zones.map(z=>({...z,score:scoreZone(z)})).sort((a,b)=>b.score-a.score);
+  // Actualizar panel INEGI con datos de la zona #1
+  if(lastScored[0]) updateInegiZone(lastScored[0].id);
 
   lastScored.forEach((z,i)=>{
     const color=scoreColor(z.score);
@@ -498,21 +572,106 @@ function analyze(){
 }
 
 // ── SAVE TO SUPABASE ──────────────────────────────────────
+const typeLabels = {
+  comida_rapida:'🍔 Comida rápida', restaurante:'🍽️ Restaurante',
+  cafeteria:'☕ Cafetería', panaderia:'🥐 Panadería', ropa:'👗 Ropa',
+  farmacia:'💊 Farmacia', papeleria:'📚 Papelería', estetica:'✂️ Estética',
+  gym:'🏋️ Gym', tech:'📱 Tecnología'
+};
+
 async function saveAnalysis(){
-  if(!currentUser||!lastScored.length) return;
-  const payload={
-    user_id: currentUser.id,
-    type: selectedType,
-    budget: selectedBudget,
-    top_zone: lastScored[0]?.name,
+  if(!currentUser || !lastScored.length) return;
+  const btn = event.target;
+  btn.textContent = '💾 Guardando...';
+  btn.disabled = true;
+
+  const { error } = await sb.from('analyses').insert({
+    user_id:   currentUser.id,
+    type:      selectedType,
+    budget:    selectedBudget,
+    top_zone:  lastScored[0]?.name,
     top_score: lastScored[0]?.score,
-    results: lastScored.slice(0,5).map(z=>({name:z.name,score:z.score})),
-    created_at: new Date().toISOString()
-  };
-  await sb.from('analyses').insert(payload);
+    results:   lastScored.slice(0,5).map(z=>({name:z.name,score:z.score}))
+  });
+
+  btn.textContent = error ? '❌ Error al guardar' : '✅ Guardado';
+  setTimeout(()=>{ btn.textContent='💾 Guardar este análisis'; btn.disabled=false; }, 2500);
+
+  if(!error) {
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 2800);
+    loadHistory(); // refrescar lista
+  }
+}
+
+// ── LOAD HISTORY ──────────────────────────────────────────
+async function loadHistory(){
+  if(!currentUser) return;
+  const container = document.getElementById('historyCards');
+  container.innerHTML = '<div class="hist-empty">Cargando...</div>';
+
+  const { data, error } = await sb
+    .from('analyses')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false })
+    .limit(10);
+
+  if(error || !data?.length) {
+    container.innerHTML = '<div class="hist-empty">Sin análisis guardados aún.<br>Analiza y guarda tu primera búsqueda.</div>';
+    return;
+  }
+
+  container.innerHTML = '';
+  data.forEach((a, i) => {
+    const fecha = new Date(a.created_at).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'2-digit'});
+    const label = typeLabels[a.type] || a.type;
+    const budget = a.budget === 'bajo' ? '$5–15k' : a.budget === 'medio' ? '$15–35k' : '$35k+';
+
+    const card = document.createElement('div');
+    card.className = 'hist-card';
+    card.style.animationDelay = (i * .05) + 's';
+    card.innerHTML = `
+      <div>
+        <div class="hist-type">${label}</div>
+        <div class="hist-meta">Renta ${budget} · ${fecha}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="hist-score">${a.top_score}</div>
+        <div class="hist-zone">${a.top_zone}</div>
+      </div>
+    `;
+    // Al hacer click, cargar ese análisis en el mapa
+    card.onclick = () => replayAnalysis(a);
+    container.appendChild(card);
+  });
+}
+
+// Revive un análisis guardado en el mapa
+function replayAnalysis(a){
+  circles.forEach(c=>map.removeLayer(c));
+  circles=[];
+  const scored = (a.results||[]).map((r,i)=>{
+    const z = zones.find(z=>z.name===r.name);
+    if(!z) return null;
+    const color = r.score>=85?'#f97316':r.score>=70?'#3b82f6':'#8b5cf6';
+    const c = L.circle([z.lat,z.lng],{radius:z.radius,color,fillColor:color,fillOpacity:.18,weight:2,opacity:.75}).addTo(map);
+    const rank = i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`;
+    c.bindPopup(`<div class="popup-name">${rank} ${z.name}</div><div class="popup-score">${r.score}<span style="font-size:.65rem;color:#5a6478"> / 100</span></div><div class="popup-desc">${z.desc}</div>`);
+    c.on('mouseover',function(){this.openPopup();});
+    circles.push(c);
+    return {...z, score:r.score};
+  }).filter(Boolean);
+
+  if(scored[0]) map.setView([scored[0].lat, scored[0].lng], 14);
+
+  // Mostrar toast
   const t=document.getElementById('toast');
+  t.style.background='#3b82f6';
+  t.textContent=`📂 Mostrando: ${typeLabels[a.type]||a.type}`;
   t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2800);
+  setTimeout(()=>{ t.classList.remove('show'); t.style.background=''; t.textContent='✅ Análisis guardado'; },2500);
 }
 
 // ── UI EVENTS ─────────────────────────────────────────────
