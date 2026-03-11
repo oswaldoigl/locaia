@@ -81,9 +81,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 .map-wrap{flex:1;position:relative;}
 #map{width:100%;height:100%;background:#0e1117;}
 .leaflet-container{background:#0e1117!important;}
-.hm-btn{width:100%;text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--muted2);font-size:.72rem;cursor:pointer;transition:all .2s;font-family:inherit;}
-.hm-btn:hover{border-color:var(--accent);color:var(--text);}
-.hm-btn.active{background:rgba(249,115,22,.1);border-color:var(--accent);color:var(--accent);font-weight:600;}
+.hm-btn{background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:5px 12px;color:rgba(255,255,255,.55);font-size:.72rem;cursor:pointer;transition:all .18s;font-family:inherit;white-space:nowrap;}
+.hm-btn:hover{border-color:rgba(249,115,22,.5);color:rgba(249,115,22,.9);}
+.hm-btn.active{background:rgba(249,115,22,.2);border-color:var(--accent);color:var(--accent);font-weight:700;}
 .heat-legend{position:absolute;bottom:80px;right:10px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:.65rem;color:var(--muted2);z-index:1000;min-width:120px;}
 .heat-legend-title{font-weight:700;color:var(--text);margin-bottom:6px;font-size:.7rem;}
 .heat-legend-row{display:flex;align-items:center;gap:6px;margin-bottom:3px;}
@@ -317,7 +317,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 
 <div class="topbar">
   <div class="logo">Loca<em>IA</em></div>
-    <div style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:6px;padding:3px 9px;font-size:.65rem;color:#4ade80;font-weight:600;display:flex;align-items:center;gap:4px;">⚡ vs. $3,500/mo — mismo análisis</div>
   <div class="topbar-right">
     <button class="topbar-btn" id="aiBtn" onclick="openAIModal()" style="border-color:rgba(139,92,246,.4);color:#a78bfa;">🤖 Asesor IA</button>
     <button class="topbar-btn" id="proBtn" onclick="openProModal()" style="border-color:rgba(34,197,94,.5);color:#22c55e;font-weight:700;background:rgba(34,197,94,.08);">✦ Pro Activo</button>
@@ -667,32 +666,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
       </div>
     </div>
 
-    <div>
-      <div class="slabel">Nivel socioeconómico objetivo</div>
-      <div class="budget-row" id="nseGroup">
-        <div class="budget-opt active" data-nse="todos">Todos</div>
-        <div class="budget-opt" data-nse="popular">Popular<small>C-/D</small></div>
-        <div class="budget-opt" data-nse="medio">Medio<small>C/C+</small></div>
-        <div class="budget-opt" data-nse="premium">Premium<small>A/B</small></div>
-      </div>
-    </div>
 
-    <div>
-      <div class="slabel">Formato de local</div>
-      <div class="budget-row" id="formatoGroup">
-        <div class="budget-opt active" data-formato="todos">Todos</div>
-        <div class="budget-opt" data-formato="standalone">🏪 Standalone</div>
-        <div class="budget-opt" data-formato="plaza">🏬 Plaza/Mall</div>
-      </div>
-    </div>
-
-    <div>
-      <div class="slabel">Prioridades</div>
-        <div class="sl-row"><label>Poca competencia <span id="v2">60%</span></label><input type="range" id="w2" min="0" max="100" value="60" oninput="document.getElementById('v2').textContent=this.value+'%'"></div>
-        <div class="sl-row"><label>Nivel socioeconómico <span id="v3">50%</span></label><input type="range" id="w3" min="0" max="100" value="50" oninput="document.getElementById('v3').textContent=this.value+'%'"></div>
-        <div class="sl-row"><label>Acceso / Parking <span id="v4">55%</span></label><input type="range" id="w4" min="0" max="100" value="55" oninput="document.getElementById('v4').textContent=this.value+'%'"></div>
-      </div>
-    </div>
 
 
     <!-- PRO: Perfil avanzado de negocio -->
@@ -737,19 +711,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 
     <button class="analyze-btn" onclick="analyze()">⚡ Analizar Saltillo</button>
 
-    <!-- HEAT MAP TOGGLE -->
-      <div id="heatmapControls" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
-        <div class="slabel">🌡️ Mapa de calor</div>
-        <div style="display:flex;flex-direction:column;gap:4px">
-          <button class="hm-btn active" data-layer="none" onclick="setHeatLayer(this,'none')">❌ Sin mapa de calor</button>
-          <button class="hm-btn" data-layer="nse" onclick="setHeatLayer(this,'nse')">💰 Nivel socioeconómico (NSE)</button>
-          <button class="hm-btn" data-layer="competencia" onclick="setHeatLayer(this,'competencia')">🏪 Competencia del giro</button>
-          <button class="hm-btn" data-layer="trafico" onclick="setHeatLayer(this,'trafico')">🚶 Afluencia peatonal</button>
-          <button class="hm-btn" data-layer="parking" onclick="setHeatLayer(this,'parking')">🅿️ Disponibilidad estac.</button>
-          <button class="hm-btn" data-layer="score" onclick="setHeatLayer(this,'score')">⭐ Score LocaIA</button>
-        </div>
-      </div>
-
       <div id="resultsSection" style="display:none;flex-direction:column;gap:8px;">
       <div class="results-header">Top 5 · <span id="results-type-label"></span></div>
       <div id="zoneCards"></div>
@@ -768,6 +729,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
   </aside>
 
   <div class="map-wrap">
+    <!-- FLOATING HEAT MAP BAR -->
+    <div id="heatmapControls" style="position:absolute;bottom:28px;left:50%;transform:translateX(-50%);z-index:1000;display:flex;gap:6px;background:rgba(10,12,18,.88);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.1);border-radius:40px;padding:7px 10px;box-shadow:0 4px 20px rgba(0,0,0,.6);">
+      <button class="hm-btn active" data-layer="none" onclick="setHeatLayer(this,'none')" title="Sin mapa de calor">📍</button>
+      <button class="hm-btn" data-layer="nse" onclick="setHeatLayer(this,'nse')" title="NSE — Nivel socioeconómico">💰 NSE</button>
+      <button class="hm-btn" data-layer="competencia" onclick="setHeatLayer(this,'competencia')" title="Competencia del giro">🏪 Competencia</button>
+      <button class="hm-btn" data-layer="trafico" onclick="setHeatLayer(this,'trafico')" title="Afluencia peatonal">🚶 Tráfico</button>
+      <button class="hm-btn" data-layer="parking" onclick="setHeatLayer(this,'parking')" title="Estacionamiento">🅿️ Parking</button>
+      <button class="hm-btn" data-layer="score" onclick="setHeatLayer(this,'score')" title="Score LocaIA">⭐ Score</button>
+    </div>
     <div id="map">
       <div id="heatLegend" class="heat-legend" style="display:none">
         <div class="heat-legend-title" id="heatLegendTitle">NSE</div>
@@ -1146,7 +1116,7 @@ const typeLabels={
 };
 
 let selectedType='comida_rapida',selectedBudget='bajo',analyzed=false,lastScored=[];
-let selectedParking='poco',selectedNSE='todos',selectedComp='todos',selectedTrafico=0;
+let selectedParking='poco',selectedNSE='todos',selectedComp='todos',selectedTrafico=0,selectedFormato='todos';
 
 function scoreZone(z){
   const tw=typeWeights[selectedType]||typeWeights.comida_rapida;
@@ -1309,8 +1279,13 @@ function analyze(){
   document.getElementById('emptyState').style.display='none';
   // Generate narrative for top zone
   generateNarrative(lastScored[0], lastScored);
-  // Re-render heat map if active
-  if(heatLayer!=='none') renderHeatMap();
+  // Auto-show competencia heatmap after first analysis
+  if(heatLayer==='none' && analyzed){
+    const compBtn = document.querySelector('.hm-btn[data-layer="competencia"]');
+    if(compBtn) setHeatLayer(compBtn,'competencia');
+  } else if(heatLayer!=='none'){
+    renderHeatMap();
+  }
 }
 
 // ── FILTER LISTENERS ──────────────────────────────────────
@@ -1322,6 +1297,7 @@ if(typeGrid) typeGrid.querySelectorAll('.type-btn').forEach(btn=>{
     btn.classList.add('active');
     selectedType = btn.dataset.type;
     if(analyzed) analyze();
+    else if(heatLayer==='competencia') renderHeatMap(); // update competencia layer even without analysis
   });
 });
 
@@ -1676,7 +1652,7 @@ Sé directo, específico y usa datos concretos. Máximo 200 palabras.`;
 // ASESOR IA — con PMD Saltillo 2025-2027 como contexto
 // ══════════════════════════════════════════════════════════
 
-const PMD_CONTEXT2 = `Eres el Asesor IA de LocaIA, la plataforma de inteligencia comercial líder en Saltillo. LocaIA ofrece análisis instantáneos por $299-799 MXN/mes, vs plataformas enterprise como GeoData Intelligence (Predik) que cobran $3,500-5,000 MXN/mes y tardan 45 días en entregar resultados. LocaIA es 10x más económico, instantáneo, self-service y con IA conversacional. Tienes conocimiento profundo de:
+const PMD_CONTEXT2 = `Eres el Asesor IA de LocaIA, la plataforma de inteligencia comercial para Saltillo. Ofreces análisis instantáneos, datos DENUE Feb 2026, y contexto PMD 2025-2027. Eres conciso, útil y basas TODO en datos reales. Tienes conocimiento profundo de:
 
 SALTILLO — DATOS GENERALES (PMD 2025-2027 + DENUE Feb 2026):
 - Población 2024: 961,895 habitantes (CONAPO). ZM ~1.1M. Crecimiento ~20k hab/año.
@@ -1788,13 +1764,10 @@ INSTRUCCIONES:
 - Menciona los proyectos PMD relevantes cuando apliquen a la pregunta.
 
 
-POSICIONAMIENTO COMPETITIVO DE LOCAIA:
-- Competidores directos: Predik Data-Driven (GeoData Intelligence), CARTO, Esri ArcGIS
-- Predik cobra $25,000-40,000 MXN de implementación + $3,500-5,000 MXN/mes con contrato anual
-- LocaIA Pro: $299/mes sin contrato, sin implementación, resultados INSTANTÁNEOS vs 45 días de Predik
-- LocaIA es 12x más barato que Predik y 100x más rápido en entrega
-- LocaIA tiene datos exclusivos de Saltillo: PMD 2025-2027, 13 parques industriales, 45 zonas DENUE
-- Cuando pregunten por precios o comparativas, menciona estas ventajas
+PROPUESTA DE VALOR:
+- LocaIA Pro: $299/mes, sin contrato, resultados instantáneos
+- Datos exclusivos de Saltillo: PMD 2025-2027, 13 parques industriales, 54 zonas DENUE Feb 2026
+- Si preguntan por precios, menciona que Pro es $299/mes y Business $799/mes
 `;
 
 let aiHistory = [];
@@ -2449,36 +2422,7 @@ function buildResumenPage(top5){
 
     <!-- RANKING TABLE -->
     <div class="rpt-section-title" style="margin-top:16px">Ranking completo top 5</div>
-    <table style="width:100%;border-collapse:collapse;font-size:.75rem">
-      <thead>
-        <tr style="color:var(--muted2);font-size:.65rem;text-transform:uppercase">
-          <th style="padding:6px 8px;text-align:left">#</th>
-          <th style="padding:6px 8px;text-align:left">Zona</th>
-          <th style="padding:6px 8px;text-align:center">Score</th>
-          <th style="padding:6px 8px;text-align:center">NSE</th>
-          <th style="padding:6px 8px;text-align:center">Tráfico</th>
-          <th style="padding:6px 8px;text-align:center">Competencia</th>
-          <th style="padding:6px 8px;text-align:center">Parking</th>
-          <th style="padding:6px 8px;text-align:center">Negocios</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${top5.map((z,i)=>{
-          const sc=z.score, comp=denue_competencia[z.id]?.[selectedType]??50, pk=parking_score[z.id]??50;
-          const scColor=sc>=80?'#22c55e':sc>=60?'#f97316':'#ef4444';
-          return `<tr style="border-top:1px solid var(--border);${i===0?'background:rgba(249,115,22,.05)':''}">
-            <td style="padding:8px;color:var(--muted2);font-weight:700">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1+'.'}</td>
-            <td style="padding:8px;font-weight:${i===0?'700':'400'};color:${i===0?'var(--text)':'var(--muted2)'}">${z.name}</td>
-            <td style="padding:8px;text-align:center"><span style="color:${scColor};font-weight:800">${sc}</span></td>
-            <td style="padding:8px;text-align:center"><span style="color:${nseColor(z.data.nse)}">${nseLabel(z.data.nse)}</span></td>
-            <td style="padding:8px;text-align:center">${z.data.trafico}</td>
-            <td style="padding:8px;text-align:center">${100-comp}% libre</td>
-            <td style="padding:8px;text-align:center">${pk>=70?'🟢':pk>=45?'🟡':'🔴'} ${pk}</td>
-            <td style="padding:8px;text-align:center">${(denue_total[z.id]||0).toLocaleString()}</td>
-          </tr>`;
-        }).join('')}
-      </tbody>
-    </table>
+    
 
     <div class="rpt-ref">
       📚 <strong>Fuentes:</strong>
@@ -2883,13 +2827,10 @@ window.showRptTab = function(btn, pageId){
         </div>
         <div style="color:var(--muted);font-size:.65rem;text-align:center">vs</div>
         <div style="text-align:center;padding:8px;background:rgba(107,114,128,.08);border-radius:8px;border:1px solid rgba(107,114,128,.15)">
-          <div style="font-weight:700;color:var(--muted2);font-size:.8rem">GeoData / Predik</div>
-          <div style="color:#ef4444;font-weight:700;font-size:1rem;margin:3px 0">$3,500-5,000/mo</div>
-          <div style="color:var(--muted);font-size:.63rem">Entrega: 45 días</div>
         </div>
       </div>
       <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
-        <span style="background:rgba(34,197,94,.1);color:#22c55e;padding:2px 8px;border-radius:10px;font-size:.65rem;font-weight:600">⚡ Instantáneo (no 45 días)</span>
+        <span style="background:rgba(34,197,94,.1);color:#22c55e;padding:2px 8px;border-radius:10px;font-size:.65rem;font-weight:600">⚡ Resultados instantáneos</span>
         <span style="background:rgba(34,197,94,.1);color:#22c55e;padding:2px 8px;border-radius:10px;font-size:.65rem;font-weight:600">💰 10x más económico</span>
         <span style="background:rgba(34,197,94,.1);color:#22c55e;padding:2px 8px;border-radius:10px;font-size:.65rem;font-weight:600">🤖 IA conversacional</span>
         <span style="background:rgba(34,197,94,.1);color:#22c55e;padding:2px 8px;border-radius:10px;font-size:.65rem;font-weight:600">📍 Saltillo-específico</span>
