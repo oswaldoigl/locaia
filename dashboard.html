@@ -18,56 +18,24 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
-
-/* TOPBAR */
-.topbar{
-  height:56px;flex-shrink:0;
-  background:rgba(6,8,11,0.95);backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 20px;z-index:200;
-}
+.topbar{height:56px;flex-shrink:0;background:rgba(6,8,11,0.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:200;}
 .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.25rem;letter-spacing:-.04em;}
 .logo em{color:var(--accent);font-style:normal;}
-.topbar-right{display:flex;align-items:center;gap:12px;}
-.user-chip{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:8px;padding:7px 12px;
-  font-size:.8rem;color:var(--muted2);
-  display:flex;align-items:center;gap:8px;
-}
-.user-avatar{
-  width:24px;height:24px;border-radius:50%;
-  background:linear-gradient(135deg,var(--accent),#f59e0b);
-  display:flex;align-items:center;justify-content:center;
-  font-size:.7rem;font-weight:700;color:#000;font-family:'Syne',sans-serif;
-}
-.logout-btn{
-  background:none;border:1px solid var(--border);color:var(--muted);
-  padding:7px 14px;border-radius:8px;font-size:.78rem;cursor:pointer;transition:all .2s;
-}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.user-chip{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:.8rem;color:var(--muted2);display:flex;align-items:center;gap:8px;}
+.user-avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#f59e0b);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#000;font-family:'Syne',sans-serif;}
+.topbar-btn{background:var(--card);border:1px solid var(--border);color:var(--muted2);padding:7px 14px;border-radius:8px;font-size:.78rem;cursor:pointer;transition:all .2s;font-family:'Instrument Sans',sans-serif;display:flex;align-items:center;gap:6px;}
+.topbar-btn:hover{border-color:var(--accent);color:var(--text);}
+.topbar-btn.highlight{border-color:rgba(249,115,22,.4);color:var(--accent2);}
+.badge-count{background:var(--accent);color:#000;font-size:.6rem;font-weight:700;font-family:'Syne',sans-serif;border-radius:10px;padding:1px 6px;min-width:18px;text-align:center;}
+.logout-btn{background:none;border:1px solid var(--border);color:var(--muted);padding:7px 14px;border-radius:8px;font-size:.78rem;cursor:pointer;transition:all .2s;}
 .logout-btn:hover{border-color:var(--muted);color:var(--text);}
-
-/* MAIN */
 .main{display:flex;flex:1;overflow:hidden;}
-
-/* SIDEBAR */
-.sidebar{
-  width:320px;flex-shrink:0;
-  background:var(--surface);border-right:1px solid var(--border);
-  overflow-y:auto;padding:20px;
-  display:flex;flex-direction:column;gap:20px;
-}
+.sidebar{width:320px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:18px;}
 .sidebar::-webkit-scrollbar{width:3px;}
 .sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
-
 .slabel{font-family:'Syne',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
-
-/* INEGI CHIP */
-.inegi-chip{
-  background:linear-gradient(135deg,rgba(249,115,22,.07),rgba(251,191,36,.04));
-  border:1px solid rgba(249,115,22,.2);border-radius:10px;padding:12px;
-}
+.inegi-chip{background:linear-gradient(135deg,rgba(249,115,22,.07),rgba(251,191,36,.04));border:1px solid rgba(249,115,22,.2);border-radius:10px;padding:12px;}
 .inegi-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
 .inegi-badge{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-family:'Syne',sans-serif;border:1px solid rgba(249,115,22,.3);padding:2px 7px;border-radius:4px;}
 .inegi-live{font-size:.65rem;color:var(--muted2);display:flex;align-items:center;gap:4px;}
@@ -80,55 +48,24 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
 .inegi-val.down{color:var(--red);}
 .inegi-lbl{font-size:.6rem;color:var(--muted);margin-top:2px;line-height:1.3;}
 .inegi-note{margin-top:8px;font-size:.67rem;color:#b45309;background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.15);border-radius:6px;padding:6px 8px;line-height:1.4;}
-
-/* TYPE GRID */
 .type-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
-.type-btn{
-  background:var(--card);border:1.5px solid var(--border);border-radius:9px;
-  padding:10px 8px;cursor:pointer;transition:all .18s;text-align:center;
-  color:var(--text);font-family:'Instrument Sans',sans-serif;font-size:.75rem;
-}
+.type-btn{background:var(--card);border:1.5px solid var(--border);border-radius:9px;padding:10px 8px;cursor:pointer;transition:all .18s;text-align:center;color:var(--text);font-family:'Instrument Sans',sans-serif;font-size:.75rem;}
 .type-btn .ico{font-size:1.2rem;display:block;margin-bottom:4px;}
 .type-btn:hover{border-color:var(--accent);background:rgba(249,115,22,.06);}
 .type-btn.active{border-color:var(--accent);background:rgba(249,115,22,.12);color:var(--accent2);font-weight:500;}
-
-/* BUDGET */
 .budget-row{display:flex;gap:6px;}
-.budget-opt{
-  flex:1;background:var(--card);border:1.5px solid var(--border);border-radius:8px;
-  padding:8px 4px;text-align:center;font-size:.75rem;cursor:pointer;transition:all .18s;color:var(--muted2);
-}
+.budget-opt{flex:1;background:var(--card);border:1.5px solid var(--border);border-radius:8px;padding:8px 4px;text-align:center;font-size:.75rem;cursor:pointer;transition:all .18s;color:var(--muted2);}
 .budget-opt small{display:block;font-size:.62rem;opacity:.7;margin-top:2px;}
 .budget-opt.active{border-color:var(--accent);color:var(--accent);background:rgba(249,115,22,.08);font-weight:600;}
-
-/* SLIDERS */
 .slider-group{display:flex;flex-direction:column;gap:12px;}
 .sl-row label{display:flex;justify-content:space-between;font-size:.78rem;color:#b0b8c8;margin-bottom:6px;}
 .sl-row label span{color:var(--accent);font-weight:600;}
-input[type=range]{
-  -webkit-appearance:none;width:100%;height:3px;
-  background:var(--border);border-radius:3px;outline:none;
-}
-input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none;width:14px;height:14px;
-  background:var(--accent);border-radius:50%;cursor:pointer;
-  box-shadow:0 0 0 3px rgba(249,115,22,.2);
-}
-
-/* CTA BTN */
-.analyze-btn{
-  background:var(--accent);color:#000;border:none;border-radius:9px;
-  padding:13px;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;
-  cursor:pointer;width:100%;transition:all .2s;
-}
+input[type=range]{-webkit-appearance:none;width:100%;height:3px;background:var(--border);border-radius:3px;outline:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:var(--accent);border-radius:50%;cursor:pointer;box-shadow:0 0 0 3px rgba(249,115,22,.2);}
+.analyze-btn{background:var(--accent);color:#000;border:none;border-radius:9px;padding:13px;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;width:100%;transition:all .2s;}
 .analyze-btn:hover{background:var(--accent2);}
-
-/* RESULTS */
 .results-header{font-family:'Syne',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding-top:16px;border-top:1px solid var(--border);}
-.zone-card{
-  background:var(--card);border:1.5px solid var(--border);border-radius:11px;padding:13px;
-  cursor:pointer;transition:all .2s;animation:fadeUp .3s ease both;
-}
+.zone-card{background:var(--card);border:1.5px solid var(--border);border-radius:11px;padding:13px;cursor:pointer;transition:all .2s;animation:fadeUp .3s ease both;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .zone-card:hover{border-color:var(--accent);transform:translateY(-1px);}
 .zone-card.top-zone{border-color:var(--gold);background:rgba(251,191,36,.04);}
@@ -143,8 +80,6 @@ input[type=range]::-webkit-slider-thumb{
 .zbar{background:rgba(255,255,255,.05);border-radius:3px;height:4px;overflow:hidden;margin-bottom:4px;}
 .zfill{height:100%;border-radius:3px;transition:width .7s ease;}
 .zdesc{font-size:.67rem;color:var(--muted2);line-height:1.4;}
-
-/* MAP */
 .map-wrap{flex:1;position:relative;}
 #map{width:100%;height:100%;background:#0e1117;}
 .leaflet-container{background:#0e1117!important;}
@@ -155,50 +90,156 @@ input[type=range]::-webkit-slider-thumb{
 .popup-score{color:var(--accent);font-weight:800;font-size:1.6rem;font-family:'Syne',sans-serif;}
 .popup-sub{font-size:.68rem;color:var(--muted2);}
 .popup-desc{font-size:.78rem;color:#9ca3af;margin-top:5px;line-height:1.5;}
-
-/* LEGEND */
-.legend{
-  position:absolute;bottom:24px;right:14px;z-index:500;
-  background:rgba(13,16,23,.92);border:1px solid var(--border);
-  border-radius:10px;padding:11px 14px;font-size:.68rem;backdrop-filter:blur(8px);pointer-events:none;
-}
+.legend{position:absolute;bottom:24px;right:14px;z-index:500;background:rgba(13,16,23,.92);border:1px solid var(--border);border-radius:10px;padding:11px 14px;font-size:.68rem;backdrop-filter:blur(8px);pointer-events:none;}
 .legend-t{font-family:'Syne',sans-serif;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px;font-size:.58rem;}
 .legend-i{display:flex;align-items:center;gap:7px;margin-bottom:3px;color:#8b95a8;}
 .ldot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
-
-/* EMPTY */
 .empty{text-align:center;padding:28px 12px;color:var(--muted);font-size:.82rem;line-height:1.6;}
 .empty .big{font-size:1.8rem;margin-bottom:8px;}
 
-/* SAVE TOAST */
-.toast{
-  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);
-  background:var(--green);color:#000;font-weight:700;font-family:'Syne',sans-serif;
-  padding:12px 24px;border-radius:10px;font-size:.85rem;z-index:9999;
-  transition:transform .3s ease;pointer-events:none;
-}
+/* CITY PROFILE CHIP */
+.city-chip{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.city-chip-head{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;cursor:pointer;transition:background .2s;}
+.city-chip-head:hover{background:rgba(255,255,255,.03);}
+.city-chip-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;display:flex;align-items:center;gap:6px;}
+.city-chip-toggle{font-size:.65rem;color:var(--muted);}
+.city-chip-body{display:none;}
+.city-chip-body.open{display:block;}
+/* TABS */
+.cp-tabs{display:flex;gap:2px;padding:8px 10px 0;background:rgba(0,0,0,.2);}
+.cp-tab{font-size:.6rem;font-family:'Syne',sans-serif;font-weight:700;padding:4px 8px;border-radius:6px 6px 0 0;cursor:pointer;color:var(--muted);border:none;background:transparent;transition:all .15s;}
+.cp-tab.active{background:var(--card);color:var(--accent);}
+.cp-panels{padding:10px 12px 12px;}
+.cp-panel{display:none;}
+.cp-panel.active{display:block;}
+/* STATS */
+.city-stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px;}
+.city-stats-grid.three{grid-template-columns:1fr 1fr 1fr;}
+.city-stat{background:rgba(0,0,0,.25);border-radius:7px;padding:7px 8px;}
+.city-stat-val{font-family:'Syne',sans-serif;font-weight:800;font-size:.88rem;color:var(--text);}
+.city-stat-lbl{font-size:.58rem;color:var(--muted);margin-top:2px;line-height:1.3;}
+/* TAGS */
+.city-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;}
+.city-tag{font-size:.6rem;padding:2px 7px;border-radius:10px;background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.2);}
+.city-tag.blue{background:rgba(59,130,246,.1);color:#60a5fa;border-color:rgba(59,130,246,.2);}
+.city-tag.orange{background:rgba(249,115,22,.1);color:var(--accent2);border-color:rgba(249,115,22,.2);}
+.city-tag.purple{background:rgba(139,92,246,.1);color:#a78bfa;border-color:rgba(139,92,246,.2);}
+/* SECTION LABEL */
+.cp-label{font-size:.6rem;font-family:'Syne',sans-serif;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin:8px 0 4px;}
+/* MINI LIST */
+.cp-list{font-size:.63rem;color:var(--muted2);line-height:1.7;}
+.cp-list span{color:var(--text);font-weight:600;}
+/* DIST TABLE */
+.cp-dist{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:8px;}
+.cp-dist-col{background:rgba(0,0,0,.2);border-radius:6px;padding:6px;}
+.cp-dist-head{font-size:.58rem;font-family:'Syne',sans-serif;font-weight:700;color:var(--accent2);margin-bottom:4px;}
+.cp-dist-row{font-size:.6rem;color:var(--muted2);display:flex;justify-content:space-between;}
+.cp-dist-row span{color:var(--text);font-weight:600;}
+/* RANKINGS */
+.cp-ranks{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px;}
+.cp-rank{background:rgba(0,0,0,.25);border-radius:7px;padding:7px 9px;border-left:3px solid var(--accent);}
+.cp-rank.blue{border-color:var(--blue);}
+.cp-rank.green{border-color:var(--green);}
+.cp-rank.purple{border-color:#8b5cf6;}
+.cp-rank-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--text);}
+.cp-rank-lbl{font-size:.58rem;color:var(--muted);line-height:1.3;margin-top:2px;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--green);color:#000;font-weight:700;font-family:'Syne',sans-serif;padding:12px 24px;border-radius:10px;font-size:.85rem;z-index:9999;transition:transform .3s ease;pointer-events:none;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 
-/* HISTORY */
-.history-section{border-top:1px solid var(--border);padding-top:16px;}
-.history-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
-.history-toggle{background:none;border:none;color:var(--muted);font-size:.72rem;cursor:pointer;font-family:'Instrument Sans',sans-serif;transition:color .2s;}
-.history-toggle:hover{color:var(--text);}
-.hist-card{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:11px 13px;cursor:pointer;transition:all .2s;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;animation:fadeUp .25s ease both;}
-.hist-card:hover{border-color:var(--accent);}
-.hist-type{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;}
-.hist-meta{font-size:.67rem;color:var(--muted);margin-top:2px;}
-.hist-score{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--accent);}
-.hist-zone{font-size:.65rem;color:var(--muted2);margin-top:1px;}
-.hist-empty{font-size:.78rem;color:var(--muted);text-align:center;padding:16px 0;}
+/* ── MODALS ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(6px);z-index:1000;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;max-width:900px;width:100%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.6);}
+.modal-head{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.modal-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;}
+.modal-close{background:none;border:1px solid var(--border);color:var(--muted);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.modal-close:hover{border-color:var(--red);color:var(--red);}
+.modal-body{overflow-y:auto;flex:1;padding:24px;}
+.modal-body::-webkit-scrollbar{width:4px;}
+.modal-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+
+/* SAVE */
+.save-modal .modal-box{max-width:480px;}
+.save-preview{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px;}
+.save-preview-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.save-preview-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;}
+.save-preview-score{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;}
+.save-preview-meta{font-size:.72rem;color:var(--muted2);}
+.save-zones{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
+.save-zone-row{display:flex;justify-content:space-between;font-size:.78rem;}
+.name-input-wrap{margin-bottom:16px;}
+.name-label{font-size:.72rem;color:var(--muted2);margin-bottom:6px;display:block;font-family:'Syne',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.08em;}
+.name-input{width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:9px;padding:11px 14px;color:var(--text);font-size:.9rem;font-family:'Instrument Sans',sans-serif;outline:none;transition:border-color .2s;}
+.name-input:focus{border-color:var(--accent);}
+.name-input::placeholder{color:var(--muted);}
+.save-confirm-btn{width:100%;background:var(--accent);color:#000;border:none;border-radius:9px;padding:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;transition:all .2s;}
+.save-confirm-btn:hover{background:var(--accent2);}
+
+/* ANALYSES */
+.analyses-filters{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.filter-chip{background:var(--card);border:1px solid var(--border);color:var(--muted2);padding:5px 12px;border-radius:20px;font-size:.75rem;cursor:pointer;transition:all .2s;}
+.filter-chip.active{border-color:var(--accent);color:var(--accent);background:rgba(249,115,22,.08);}
+.analyses-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;}
+.analysis-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:16px;cursor:default;transition:border-color .2s;position:relative;animation:fadeUp .25s ease both;}
+.analysis-card:hover{border-color:rgba(249,115,22,.3);}
+.ac-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.ac-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.86rem;line-height:1.3;max-width:170px;}
+.ac-score{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;}
+.ac-type{font-size:.68rem;color:var(--accent2);margin-bottom:4px;font-weight:600;}
+.ac-meta{font-size:.65rem;color:var(--muted);margin-bottom:10px;}
+.ac-zones{display:flex;flex-direction:column;gap:4px;}
+.ac-zone-row{display:flex;justify-content:space-between;font-size:.72rem;}
+.ac-zone-name{color:var(--muted2);}
+.ac-zone-score{font-family:'Syne',sans-serif;font-weight:600;}
+.ac-bar{background:rgba(255,255,255,.05);border-radius:2px;height:3px;overflow:hidden;margin-top:2px;}
+.ac-bar-fill{height:100%;border-radius:2px;background:var(--accent);}
+.ac-footer{display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);}
+.ac-action{flex:1;background:none;border:1px solid var(--border);color:var(--muted2);border-radius:7px;padding:7px;font-size:.72rem;cursor:pointer;transition:all .2s;font-family:'Instrument Sans',sans-serif;}
+.ac-action:hover{border-color:var(--accent);color:var(--text);}
+.ac-action.primary{background:rgba(249,115,22,.08);border-color:rgba(249,115,22,.3);color:var(--accent2);}
+.empty-analyses{text-align:center;padding:60px 20px;color:var(--muted);grid-column:1/-1;}
+.empty-analyses .big-ico{font-size:2.5rem;margin-bottom:12px;}
+.empty-analyses p{font-size:.88rem;line-height:1.7;}
+
+/* DETAIL */
+.detail-modal .modal-box{max-width:760px;}
+.detail-hero{background:linear-gradient(135deg,rgba(249,115,22,.1),rgba(251,191,36,.05));border:1px solid rgba(249,115,22,.2);border-radius:12px;padding:20px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-start;}
+.detail-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:4px;}
+.detail-type{font-size:.8rem;color:var(--accent2);}
+.detail-meta{font-size:.72rem;color:var(--muted2);margin-top:4px;}
+.score-num{font-family:'Syne',sans-serif;font-weight:800;font-size:2.8rem;line-height:1;}
+.score-lbl{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;text-align:right;}
+.detail-section{margin-bottom:22px;}
+.detail-section-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.summary-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;}
+.summary-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;margin-bottom:4px;}
+.summary-lbl{font-size:.65rem;color:var(--muted);line-height:1.4;}
+.zones-ranking{display:flex;flex-direction:column;gap:8px;}
+.ranking-row{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;}
+.ranking-row.first{border-color:var(--gold);background:rgba(251,191,36,.04);}
+.ranking-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.rk-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.86rem;}
+.rk-score{font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;}
+.rk-bars{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.rk-bar-item{font-size:.63rem;color:var(--muted);}
+.rk-bar-label{display:flex;justify-content:space-between;margin-bottom:3px;}
+.rk-bar-track{background:rgba(255,255,255,.06);height:4px;border-radius:2px;overflow:hidden;}
+.rk-bar-fill{height:100%;border-radius:2px;}
+.insight-list{display:flex;flex-direction:column;gap:8px;}
+.insight-item{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:12px;font-size:.78rem;line-height:1.55;color:#b0b8c8;}
+.insight-item strong{color:var(--text);}
 </style>
 </head>
 <body>
 
-<!-- TOPBAR -->
 <div class="topbar">
   <div class="logo">Loca<em>IA</em></div>
   <div class="topbar-right">
+    <button class="topbar-btn highlight" onclick="openAnalysesModal()">
+      📊 Mis análisis
+      <span class="badge-count" id="badge-count">0</span>
+    </button>
     <div class="user-chip">
       <div class="user-avatar" id="user-avatar">?</div>
       <span id="user-name">Cargando...</span>
@@ -207,42 +248,222 @@ input[type=range]::-webkit-slider-thumb{
   </div>
 </div>
 
-<!-- MAIN -->
 <div class="main">
-
-  <!-- SIDEBAR -->
   <aside class="sidebar">
 
-    <!-- INEGI -->
+    <!-- PERFIL DE LA CIUDAD -->
+    <div class="city-chip">
+      <div class="city-chip-head" onclick="toggleCityChip()">
+        <div class="city-chip-title">🏙️ Saltillo — Potencia Nacional</div>
+        <span class="city-chip-toggle" id="city-toggle">▼</span>
+      </div>
+      <div class="city-chip-body" id="cityBody">
+
+        <!-- TABS -->
+        <div class="cp-tabs">
+          <button class="cp-tab active" onclick="cpTab(this,'cp-general')">General</button>
+          <button class="cp-tab" onclick="cpTab(this,'cp-economia')">Economía</button>
+          <button class="cp-tab" onclick="cpTab(this,'cp-educacion')">Educación</button>
+          <button class="cp-tab" onclick="cpTab(this,'cp-infra')">Infra</button>
+          <button class="cp-tab" onclick="cpTab(this,'cp-turismo')">Turismo</button>
+          <button class="cp-tab" onclick="cpTab(this,'cp-rankings')">Rankings</button>
+        </div>
+
+        <div class="cp-panels">
+
+          <!-- GENERAL -->
+          <div class="cp-panel active" id="cp-general">
+            <div class="city-stats-grid three" style="margin-top:4px;">
+              <div class="city-stat"><div class="city-stat-val">864k</div><div class="city-stat-lbl">Habitantes municipio</div></div>
+              <div class="city-stat"><div class="city-stat-val">~1M</div><div class="city-stat-lbl">ZM Saltillo (Ramos + Arteaga)</div></div>
+              <div class="city-stat"><div class="city-stat-val">+20k</div><div class="city-stat-lbl">Hab. nuevos por año</div></div>
+              <div class="city-stat"><div class="city-stat-val">393k</div><div class="city-stat-lbl">PEA ocupada</div></div>
+              <div class="city-stat"><div class="city-stat-val">97.86%</div><div class="city-stat-lbl">Vive en mancha urbana</div></div>
+              <div class="city-stat"><div class="city-stat-val">1,560m</div><div class="city-stat-lbl">msnm · clima seco</div></div>
+            </div>
+            <div class="cp-label">Distancias desde Saltillo (km)</div>
+            <div class="cp-dist">
+              <div class="cp-dist-col">
+                <div class="cp-dist-head">🏁 Fronteras</div>
+                <div class="cp-dist-row">Nuevo Laredo <span>295</span></div>
+                <div class="cp-dist-row">Piedras Negras <span>435</span></div>
+                <div class="cp-dist-row">Ciudad Acuña <span>500</span></div>
+              </div>
+              <div class="cp-dist-col">
+                <div class="cp-dist-head">🌆 Ciudades</div>
+                <div class="cp-dist-row">Monterrey <span>75</span></div>
+                <div class="cp-dist-row">Guadalajara <span>700</span></div>
+                <div class="cp-dist-row">Ciudad de México <span>850</span></div>
+              </div>
+              <div class="cp-dist-col">
+                <div class="cp-dist-head">⚓ Puertos</div>
+                <div class="cp-dist-row">Tampico <span>595</span></div>
+                <div class="cp-dist-row">Mazatlán <span>750</span></div>
+                <div class="cp-dist-row">Manzanillo <span>1000</span></div>
+              </div>
+            </div>
+            <div class="cp-label">Clima 2017 — Temp. promedio</div>
+            <div class="cp-list">
+              Ene 15.4° · Feb 16.9° · Mar 18.0° · Abr 20.3° · May 23.4° · Jun 23.1°<br>
+              Jul 22.7° · Ago 22.4° · Sep 20.3° · Oct 17.9° · Nov 17.0° · Dic 13.4°<br>
+              <span>Lluvia principal:</span> Jul-Sep · Máx precipitación: Agosto (171mm)
+            </div>
+          </div>
+
+          <!-- ECONOMÍA -->
+          <div class="cp-panel" id="cp-economia">
+            <div class="city-stats-grid" style="margin-top:4px;">
+              <div class="city-stat"><div class="city-stat-val">83%</div><div class="city-stat-lbl">Actividades secundarias (manufactura)</div></div>
+              <div class="city-stat"><div class="city-stat-val">97.3%</div><div class="city-stat-lbl">Del sector secundario es industria mfr.</div></div>
+              <div class="city-stat"><div class="city-stat-val">$488M</div><div class="city-stat-lbl">Inversión acumulada USD 2017</div></div>
+              <div class="city-stat"><div class="city-stat-val">5.82%</div><div class="city-stat-lbl">Crecimiento anual hotelero</div></div>
+            </div>
+            <div class="cp-label">Sectores económicos (INEGI 2014)</div>
+            <div class="cp-list">
+              <span>Secundario (manufactura):</span> $132,174M MXN · 83.2%<br>
+              <span>Terciario (servicios):</span> $26,480M MXN · 16.6%<br>
+              <span>Primario:</span> $58M MXN · 0.1%
+            </div>
+            <div class="cp-label">Empresas líderes por sector</div>
+            <div class="cp-list">
+              <span>Automotriz:</span> Daimler · FCA (RAM 1500) · Linamar · Martinrea · Cooper Standard · Delphi · Inergy · Antolin · Alphabet<br>
+              <span>Aeroespacial:</span> Saint-Gobain (Tesla 3) · Alcoa · Parkway · Senior Aerospace · Unison · Saltillo Jet Center<br>
+              <span>Metalúrgico:</span> John Deere · Auma · Pace Industries<br>
+              <span>Otros:</span> Grupo Arca Continental (bebidas) · Vitromex · Cinsa (cocina) · Cerámica Santa Anita
+            </div>
+            <div class="cp-label">13 Parques Industriales</div>
+            <div class="cp-list">
+              Alianza Derramadero · Amistad Saltillo-Morelos · Amistad Saltillo Sur · FINSA Sur · Cerritos Mencorsa · Derramadero Mencorsa · Derramadero II · Santa Fe · Santa Mónica · Vito Alessio · Las Teresitas · La Angostura · Las Torres
+            </div>
+          </div>
+
+          <!-- EDUCACIÓN -->
+          <div class="cp-panel" id="cp-educacion">
+            <div class="city-stats-grid" style="margin-top:4px;">
+              <div class="city-stat"><div class="city-stat-val">10.56</div><div class="city-stat-lbl">Años promedio escolaridad (3° nacional)</div></div>
+              <div class="city-stat"><div class="city-stat-val">97.95%</div><div class="city-stat-lbl">Tasa de alfabetismo</div></div>
+              <div class="city-stat"><div class="city-stat-val">33,700</div><div class="city-stat-lbl">Estudiantes educación superior</div></div>
+              <div class="city-stat"><div class="city-stat-val">206</div><div class="city-stat-lbl">Investigadores SNI en Saltillo</div></div>
+            </div>
+            <div class="cp-label">Universidades</div>
+            <div class="cp-list">
+              ITS · UAdeC · Tec Monterrey Campus Saltillo · UAAAN Antonio Narro · La Salle Saltillo · Vizcaya · Carolina · UTS · Iberoamericana · UDurango · Valle de Santiago · UNID · UDEA · UANE
+            </div>
+            <div class="cp-label">Centros de Investigación</div>
+            <div class="cp-list">
+              COMIMSA · CINVESTAV Unidad Saltillo · CIQA (Química Aplicada) · CISE (Socioeconómico)
+            </div>
+            <div class="cp-label">Distribución universitaria por área</div>
+            <div class="cp-list">
+              <span>Cs. Sociales y Derecho:</span> 15,088 · <span>Ingeniería/Manufactura:</span> 10,407<br>
+              <span>Salud:</span> 2,743 · <span>Agronomía:</span> 2,318 · <span>Educación:</span> 1,341<br>
+              <span>Cs. Exactas/Computación:</span> 913 · <span>Artes:</span> 868
+            </div>
+          </div>
+
+          <!-- INFRAESTRUCTURA -->
+          <div class="cp-panel" id="cp-infra">
+            <div class="city-stats-grid three" style="margin-top:4px;">
+              <div class="city-stat"><div class="city-stat-val">98%</div><div class="city-stat-lbl">Índice agua entubada</div></div>
+              <div class="city-stat"><div class="city-stat-val">99%</div><div class="city-stat-lbl">Índice drenaje</div></div>
+              <div class="city-stat"><div class="city-stat-val">99%</div><div class="city-stat-lbl">Índice electricidad</div></div>
+            </div>
+            <div class="cp-label">Aeropuertos</div>
+            <div class="cp-list">
+              <span>Plan de Guadalupe</span> (Ramos Arizpe, 13 km) — 1 vuelo diario CDMX<br>
+              <span>Mariano Escobedo</span> (Apodaca NL, 90 km) — Internacional: CDMX, GDL, Houston, Dallas, LA, Chicago, NY, Atlanta, Panamá, Seúl
+            </div>
+            <div class="cp-label">Carreteras federales</div>
+            <div class="cp-list">
+              <span>Fed. 57:</span> Piedras Negras · Monclova · SLP · Querétaro · CDMX<br>
+              <span>Fed. 40:</span> Mazatlán · Durango · Torreón · Monterrey · Reynosa · Matamoros
+            </div>
+            <div class="cp-label">Ferrocarriles</div>
+            <div class="cp-list">
+              <span>Ferromex</span> y <span>KCSM</span> — conectados a fronteras, puertos y ciudades principales
+            </div>
+            <div class="cp-label">Servicios (Sec. Economía 2018)</div>
+            <div class="cp-list">
+              🍽️ <span>662</span> restaurantes · 🏨 <span>66</span> hoteles · 🏥 <span>22</span> hospitales<br>
+              ⚽ <span>63</span> instalaciones deportivas · 🎭 <span>76</span> espacios culturales · 🎬 <span>2</span> cines
+            </div>
+          </div>
+
+          <!-- TURISMO -->
+          <div class="cp-panel" id="cp-turismo">
+            <div class="cp-label" style="margin-top:4px;">Atractivos culturales</div>
+            <div class="cp-list">
+              🦕 <span>Museo del Desierto</span> — #1 LATAM en su tipo<br>
+              🐦 <span>Museo de las Aves</span> — 2,500 ejemplares, 73% avifauna nacional<br>
+              ⛪ <span>Catedral de Saltillo</span> — Barroca, la más alta del norte de México<br>
+              🎭 <span>Teatro García Carrillo</span> — Construcción 1919, centro cultural<br>
+              🏛️ <span>Teatro Fernando Soler</span> — Uno de los más importantes de Coahuila<br>
+              🏠 <span>Casa Purcell</span> — Arte contemporáneo, escultura y artes plásticas<br>
+              ⛪ <span>Santo Cristo del Ojo de Agua</span> — Donde nació Saltillo en 1577<br>
+              🧣 <span>Museo del Sarape</span> — Técnicas ancestrales del Sarape Fino de Saltillo<br>
+              🌄 <span>Parque Mirador Saltillo</span> — Vista panorámica de la ciudad
+            </div>
+            <div class="cp-label">Eventos anuales</div>
+            <div class="cp-list">
+              🏃 <span>21K Coahuila</span> — 9,000+ atletas, carrera más importante del noreste<br>
+              🥘 <span>Festival de la Paella</span> — 80+ equipos, miles de asistentes<br>
+              🤠 <span>Festival del Rodeo Saltillo</span> — 40,000+ personas, 4 días<br>
+              🎵 <span>Zapal</span> — Música, cultura y tecnología, artistas internacionales<br>
+              🎉 <span>Feria Saltillo · Sábados de Box (Televisa)</span><br>
+              💀 <span>Festival Ánimas del Desierto</span> · 🏍️ <span>Saltillo Extremo</span>
+            </div>
+            <div class="cp-label">🍷 Región Vitivinícola (2ª del país)</div>
+            <div class="cp-list">
+              420+ años historia vinícola · Vinos & Dinos (ruta única en México)<br>
+              <span>Vinícolas:</span> Casa Madero 1597 · Rivero González · San Juan Vaquería · Bodegas del Viento · Hacienda Florida · Hacienda del Marqués · Bodega Los Cedros · Bodega Capellanía · Viñedo Alto de San Juan · Rancho El Fortín
+            </div>
+            <div class="cp-label">Cultura popular</div>
+            <div class="cp-list">
+              💃 <span>Matlachines</span> — Patrimonio Cultural Inmaterial de Saltillo 2018<br>
+              🤠 <span>Charrería</span> — Tradición nacional, familias enteras<br>
+              🧣 <span>Sarape Fino de Saltillo</span> — Diseño de Rubén Herrera, siglo XX
+            </div>
+          </div>
+
+          <!-- RANKINGS -->
+          <div class="cp-panel" id="cp-rankings">
+            <div class="cp-ranks" style="margin-top:4px;">
+              <div class="cp-rank"><div class="cp-rank-val">🔒 #1</div><div class="cp-rank-lbl">Ciudad más segura de México (INEGI 2019)</div></div>
+              <div class="cp-rank blue"><div class="cp-rank-val">🚗 2°</div><div class="cp-rank-lbl">Ciudad con mejor movilidad urbana (IMCO)</div></div>
+              <div class="cp-rank green"><div class="cp-rank-val">👷 2°</div><div class="cp-rank-lbl">Mayor formalidad laboral del país (IMSS)</div></div>
+              <div class="cp-rank purple"><div class="cp-rank-val">🏆 Top3</div><div class="cp-rank-lbl">Mejor calidad de vida (Forbes)</div></div>
+              <div class="cp-rank blue"><div class="cp-rank-val">📈 Top</div><div class="cp-rank-lbl">Mayor competitividad y desarrollo económico (IMCO)</div></div>
+              <div class="cp-rank green"><div class="cp-rank-val">🦕 #1</div><div class="cp-rank-lbl">Museo del Desierto — más importante de América Latina</div></div>
+              <div class="cp-rank"><div class="cp-rank-val">🍷 2°</div><div class="cp-rank-lbl">Región vitivinícola más importante de México</div></div>
+              <div class="cp-rank purple"><div class="cp-rank-val">📚 3°</div><div class="cp-rank-lbl">Mayor grado promedio de escolaridad (Coahuila)</div></div>
+            </div>
+            <div class="cp-label">Fabricado en Saltillo</div>
+            <div class="cp-list">
+              🚗 <span>RAM 1500 2019</span> — camioneta más premiada del mundo (FCA)<br>
+              🚛 <span>200+ tracto-camiones Daimler</span> por día<br>
+              🔭 <span>Vidrio automotriz para Tesla 3</span> (Saint-Gobain)<br>
+              💧 <span>Aguas de Saltillo</span> — "Empresa Ejemplar" PROFECO, agua de la llave potable
+            </div>
+          </div>
+
+        </div><!-- /cp-panels -->
+      </div><!-- /city-chip-body -->
+    </div>
+
     <div class="inegi-chip">
       <div class="inegi-top">
         <span class="inegi-badge">INEGI</span>
         <span class="inegi-live"><span class="live-dot"></span>Live · Feb 2026</span>
       </div>
       <div class="inegi-row">
-        <div class="inegi-item">
-          <div class="inegi-val" id="i-inpc">—</div>
-          <div class="inegi-lbl">Negocios<br>en la zona</div>
-        </div>
-        <div class="inegi-item">
-          <div class="inegi-val down" id="i-var">▼ -0.93%</div>
-          <div class="inegi-lbl">Inflación<br>mensual</div>
-        </div>
-        <div class="inegi-item">
-          <div class="inegi-val" id="i-sub">—</div>
-          <div class="inegi-lbl">Competencia<br>libre</div>
-        </div>
-        <div class="inegi-item">
-          <div class="inegi-val" id="i-prod">—</div>
-          <div class="inegi-lbl">Saturación<br>del giro</div>
-        </div>
+        <div class="inegi-item"><div class="inegi-val" id="i-inpc">—</div><div class="inegi-lbl">Negocios<br>en la zona</div></div>
+        <div class="inegi-item"><div class="inegi-val down" id="i-var">▼ -0.93%</div><div class="inegi-lbl">Inflación<br>mensual</div></div>
+        <div class="inegi-item"><div class="inegi-val" id="i-sub">—</div><div class="inegi-lbl">Competencia<br>libre</div></div>
+        <div class="inegi-item"><div class="inegi-val" id="i-prod">—</div><div class="inegi-lbl">Saturación<br>del giro</div></div>
       </div>
-      <div class="inegi-note" id="inegi-note">
-        ⚠️ Inflación negativa: buenos costos para abrir ahora.
-      </div>
+      <div class="inegi-note" id="inegi-note">⚠️ Inflación negativa: buenos costos para abrir ahora.</div>
     </div>
 
-    <!-- TYPE -->
     <div>
       <div class="slabel">Tipo de negocio</div>
       <div class="type-grid" id="typeGrid">
@@ -259,7 +480,6 @@ input[type=range]::-webkit-slider-thumb{
       </div>
     </div>
 
-    <!-- BUDGET -->
     <div>
       <div class="slabel">Presupuesto de renta</div>
       <div class="budget-row" id="budgetGroup">
@@ -269,59 +489,27 @@ input[type=range]::-webkit-slider-thumb{
       </div>
     </div>
 
-    <!-- SLIDERS -->
     <div>
       <div class="slabel">Prioridades</div>
       <div class="slider-group">
-        <div class="sl-row">
-          <label>Tráfico peatonal <span id="v1">70%</span></label>
-          <input type="range" id="w1" min="0" max="100" value="70" oninput="document.getElementById('v1').textContent=this.value+'%'">
-        </div>
-        <div class="sl-row">
-          <label>Poca competencia <span id="v2">60%</span></label>
-          <input type="range" id="w2" min="0" max="100" value="60" oninput="document.getElementById('v2').textContent=this.value+'%'">
-        </div>
-        <div class="sl-row">
-          <label>Nivel socioeconómico <span id="v3">50%</span></label>
-          <input type="range" id="w3" min="0" max="100" value="50" oninput="document.getElementById('v3').textContent=this.value+'%'">
-        </div>
-        <div class="sl-row">
-          <label>Acceso / Parking <span id="v4">55%</span></label>
-          <input type="range" id="w4" min="0" max="100" value="55" oninput="document.getElementById('v4').textContent=this.value+'%'">
-        </div>
+        <div class="sl-row"><label>Tráfico peatonal <span id="v1">70%</span></label><input type="range" id="w1" min="0" max="100" value="70" oninput="document.getElementById('v1').textContent=this.value+'%'"></div>
+        <div class="sl-row"><label>Poca competencia <span id="v2">60%</span></label><input type="range" id="w2" min="0" max="100" value="60" oninput="document.getElementById('v2').textContent=this.value+'%'"></div>
+        <div class="sl-row"><label>Nivel socioeconómico <span id="v3">50%</span></label><input type="range" id="w3" min="0" max="100" value="50" oninput="document.getElementById('v3').textContent=this.value+'%'"></div>
+        <div class="sl-row"><label>Acceso / Parking <span id="v4">55%</span></label><input type="range" id="w4" min="0" max="100" value="55" oninput="document.getElementById('v4').textContent=this.value+'%'"></div>
       </div>
     </div>
 
     <button class="analyze-btn" onclick="analyze()">⚡ Analizar Saltillo</button>
 
-    <!-- RESULTS -->
-    <div id="resultsSection" style="display:none;display:flex;flex-direction:column;gap:8px;display:none;">
-      <div class="results-header">Zonas recomendadas</div>
+    <div id="resultsSection" style="display:none;flex-direction:column;gap:8px;">
+      <div class="results-header">Top 5 · <span id="results-type-label"></span></div>
       <div id="zoneCards"></div>
-      <button onclick="saveAnalysis()" style="background:var(--card);border:1px solid var(--border);color:var(--muted2);border-radius:8px;padding:10px;font-size:.78rem;cursor:pointer;transition:all .2s;font-family:'Instrument Sans',sans-serif;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
-        💾 Guardar este análisis
-      </button>
+      <button onclick="openSaveModal()" style="background:var(--card);border:1px solid var(--border);color:var(--muted2);border-radius:8px;padding:10px;font-size:.78rem;cursor:pointer;transition:all .2s;font-family:'Instrument Sans',sans-serif;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">💾 Guardar este análisis</button>
     </div>
 
-    <div id="emptyState" class="empty">
-      <div class="big">🗺️</div>
-      Configura y presiona<br><strong>Analizar Saltillo</strong>
-    </div>
-
-    <!-- HISTORIAL -->
-    <div class="history-section" id="historySection" style="display:none;">
-      <div class="history-header">
-        <div class="slabel" style="margin:0;">Mis análisis guardados</div>
-        <button class="history-toggle" onclick="loadHistory()">↻ Actualizar</button>
-      </div>
-      <div id="historyCards">
-        <div class="hist-empty">Cargando...</div>
-      </div>
-    </div>
-
+    <div id="emptyState" class="empty"><div class="big">🗺️</div>Configura y presiona<br><strong>Analizar Saltillo</strong></div>
   </aside>
 
-  <!-- MAP -->
   <div class="map-wrap">
     <div id="map"></div>
     <div class="legend">
@@ -335,53 +523,90 @@ input[type=range]::-webkit-slider-thumb{
 
 <div class="toast" id="toast">✅ Análisis guardado</div>
 
+<!-- SAVE MODAL -->
+<div class="modal-overlay save-modal" id="saveModal" onclick="if(event.target===this)closeSaveModal()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">💾 Guardar análisis</div>
+      <button class="modal-close" onclick="closeSaveModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="save-preview" id="savePreview"></div>
+      <div class="name-input-wrap">
+        <label class="name-label">Nombre del análisis</label>
+        <input type="text" class="name-input" id="analysisName" placeholder="Ej: Mi cafetería en el Valle..." maxlength="60">
+      </div>
+      <button class="save-confirm-btn" id="saveConfirmBtn" onclick="confirmSave()">✅ Guardar análisis</button>
+    </div>
+  </div>
+</div>
+
+<!-- MIS ANÁLISIS MODAL -->
+<div class="modal-overlay" id="analysesModal" onclick="if(event.target===this)closeAnalysesModal()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">📊 Mis análisis guardados</div>
+      <button class="modal-close" onclick="closeAnalysesModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="analyses-filters">
+        <div class="filter-chip active" onclick="filterAnalyses('all',this)">Todos</div>
+        <div class="filter-chip" onclick="filterAnalyses('comida_rapida',this)">🍔 Comida</div>
+        <div class="filter-chip" onclick="filterAnalyses('restaurante',this)">🍽️ Restaurante</div>
+        <div class="filter-chip" onclick="filterAnalyses('cafeteria',this)">☕ Cafetería</div>
+        <div class="filter-chip" onclick="filterAnalyses('ropa',this)">👗 Ropa</div>
+        <div class="filter-chip" onclick="filterAnalyses('farmacia',this)">💊 Farmacia</div>
+        <div class="filter-chip" onclick="filterAnalyses('estetica',this)">✂️ Estética</div>
+        <div class="filter-chip" onclick="filterAnalyses('gym',this)">🏋️ Gym</div>
+        <div class="filter-chip" onclick="filterAnalyses('tech',this)">📱 Tech</div>
+      </div>
+      <div class="analyses-grid" id="analysesGrid">
+        <div class="empty-analyses"><div class="big-ico">⏳</div><p>Cargando...</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay detail-modal" id="detailModal" onclick="if(event.target===this)closeDetailModal()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">🔍 Detalle del análisis</div>
+      <button class="modal-close" onclick="closeDetailModal()">✕</button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+  </div>
+</div>
+
 <script>
-// ── SUPABASE ──────────────────────────────────────────────
 const SUPABASE_URL = 'https://etdjlwtopaehamhlwwrd.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_OLKBJ7H2vfDMbCr0v9YnqA_yVrLfL0M';
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let currentUser = null;
+let currentUser=null, allAnalyses=[], activeFilter='all';
 
-// Auth guard
-sb.auth.getSession().then(({ data }) => {
-  if (!data.session) {
-    window.location.href = 'login.html';
-    return;
-  }
-  currentUser = data.session.user;
-  const name = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
-  const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  document.getElementById('user-name').textContent = name;
-  document.getElementById('user-avatar').textContent = initials;
-  // Mostrar historial al cargar
-  document.getElementById('historySection').style.display = 'block';
-  loadHistory();
+sb.auth.getSession().then(({data})=>{
+  if(!data.session){window.location.href='login.html';return;}
+  currentUser=data.session.user;
+  const name=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
+  const initials=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('user-name').textContent=name;
+  document.getElementById('user-avatar').textContent=initials;
+  loadAnalyses();
 });
 
-async function handleLogout() {
-  await sb.auth.signOut();
-  window.location.href = 'login.html';
-}
+async function handleLogout(){await sb.auth.signOut();window.location.href='login.html';}
 
-// ── INEGI DATA ────────────────────────────────────────────
-const INEGI_DATA = {
-  inpc: 115.667, varMes: -0.939, sub: 97.819, prod: 145.049
-};
-// Already shown as defaults. Try live fetch:
-(async () => {
-  try {
-    const token = 'baed5fab-59c2-955f-2db1-431bf6de0047';
-    const ids = '702095,702094,702097,702100';
-    const r = await fetch(`https://www.inegi.org.mx/app/api/indicadores/desarrolladores/jsonxml/INDICATOR/${ids}/es/0700/false/BIE/2.0/${token}?type=json`);
-    if (!r.ok) throw new Error();
-    const d = await r.json();
-    const get = id => { const s = d.Series?.find(s=>s.INDICADOR===String(id)); return s?parseFloat(s.OBSERVATIONS.at(-1).OBS_VALUE):null; };
-    const inpc=get(702095),sub=get(702094),varMes=get(702097),prod=get(702100);
-    if(inpc) document.getElementById('i-inpc').textContent=inpc.toFixed(2);
-    if(sub)  document.getElementById('i-sub').textContent=sub.toFixed(2);
-    if(prod) document.getElementById('i-prod').textContent=prod.toFixed(2);
+// INEGI live
+(async()=>{
+  try{
+    const token='baed5fab-59c2-955f-2db1-431bf6de0047';
+    const r=await fetch(`https://www.inegi.org.mx/app/api/indicadores/desarrolladores/jsonxml/INDICATOR/702095,702094,702097,702100/es/0700/false/BIE/2.0/${token}?type=json`);
+    if(!r.ok)throw new Error();
+    const d=await r.json();
+    const get=id=>{const s=d.Series?.find(s=>s.INDICADOR===String(id));return s?parseFloat(s.OBSERVATIONS.at(-1).OBS_VALUE):null;};
+    const varMes=get(702097);
     if(varMes!==null){
       const el=document.getElementById('i-var');
       const neg=varMes<0;
@@ -389,157 +614,166 @@ const INEGI_DATA = {
       el.className='inegi-val '+(neg?'down':'up');
       document.getElementById('inegi-note').textContent=neg?'⚠️ Inflación negativa: buenos costos para abrir ahora.':'📈 Inflación positiva: considera alza de costos en tu plan.';
     }
-  } catch(e) { /* use defaults */ }
+  }catch(e){}
 })();
 
-// ── MAP ───────────────────────────────────────────────────
-const map = L.map('map',{center:[25.4231,-101.0035],zoom:13,zoomControl:true,attributionControl:false});
+// MAP — Fix: LayerGroup para evitar el bug de círculos
+const map=L.map('map',{center:[25.4231,-101.0035],zoom:13,zoomControl:true,attributionControl:false});
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(map);
+const circleLayer=L.layerGroup().addTo(map);
 
-// ── COMPETENCIA REAL — FUENTE: DENUE INEGI Feb 2026 ──────────────────────
-// Score 0-100: 100 = zona libre (poca competencia), 0 = zona saturada
-const denue_competencia = {
-  centro:      {comida_rapida:0,  restaurante:0,  cafeteria:0,  panaderia:40, ropa:0,  farmacia:0,  papeleria:36, estetica:0,  gym:0,   tech:0  },
-  republica:   {comida_rapida:81, restaurante:85, cafeteria:75, panaderia:84, ropa:98, farmacia:85, papeleria:90, estetica:79, gym:100, tech:88 },
-  valle:       {comida_rapida:97, restaurante:97, cafeteria:98, panaderia:98, ropa:98, farmacia:95, papeleria:100,estetica:100,gym:100, tech:100},
-  tecnologico: {comida_rapida:87, restaurante:93, cafeteria:82, panaderia:66, ropa:80, farmacia:87, papeleria:65, estetica:85, gym:50,  tech:62 },
-  palmas:      {comida_rapida:99, restaurante:100,cafeteria:98, panaderia:98, ropa:99, farmacia:100,papeleria:100,estetica:99, gym:100, tech:100},
-  contry:      {comida_rapida:91, restaurante:91, cafeteria:78, panaderia:79, ropa:89, farmacia:97, papeleria:80, estetica:86, gym:100, tech:75 },
-  himno:       {comida_rapida:38, restaurante:89, cafeteria:16, panaderia:0,  ropa:30, farmacia:51, papeleria:0,  estetica:17, gym:50,  tech:50 },
-  fama:        {comida_rapida:61, restaurante:81, cafeteria:44, panaderia:41, ropa:58, farmacia:69, papeleria:51, estetica:49, gym:0,   tech:38 },
-  pedregal:    {comida_rapida:57, restaurante:88, cafeteria:56, panaderia:28, ropa:60, farmacia:77, papeleria:54, estetica:47, gym:100, tech:75 },
-  pinos:       {comida_rapida:82, restaurante:99, cafeteria:67, panaderia:64, ropa:79, farmacia:69, papeleria:71, estetica:72, gym:100, tech:88 },
+// DENUE Feb 2026 — score 100=libre, 0=saturado
+const denue_competencia={
+  centro:      {comida_rapida:0, restaurante:0, cafeteria:0, panaderia:40,ropa:0, farmacia:0, papeleria:36,estetica:0, gym:0,  tech:0  },
+  republica:   {comida_rapida:81,restaurante:85,cafeteria:75,panaderia:84,ropa:98,farmacia:85,papeleria:90,estetica:79,gym:100,tech:88 },
+  valle:       {comida_rapida:97,restaurante:97,cafeteria:98,panaderia:98,ropa:98,farmacia:95,papeleria:100,estetica:100,gym:100,tech:100},
+  tecnologico: {comida_rapida:87,restaurante:93,cafeteria:82,panaderia:66,ropa:80,farmacia:87,papeleria:65,estetica:85,gym:50, tech:62 },
+  palmas:      {comida_rapida:99,restaurante:100,cafeteria:98,panaderia:98,ropa:99,farmacia:100,papeleria:100,estetica:99,gym:100,tech:100},
+  contry:      {comida_rapida:91,restaurante:91,cafeteria:78,panaderia:79,ropa:89,farmacia:97,papeleria:80,estetica:86,gym:100,tech:75 },
+  himno:       {comida_rapida:38,restaurante:89,cafeteria:16,panaderia:0, ropa:30,farmacia:51,papeleria:0, estetica:17,gym:50, tech:50 },
+  fama:        {comida_rapida:61,restaurante:81,cafeteria:44,panaderia:41,ropa:58,farmacia:69,papeleria:51,estetica:49,gym:0,  tech:38 },
+  pedregal:    {comida_rapida:57,restaurante:88,cafeteria:56,panaderia:28,ropa:60,farmacia:77,papeleria:54,estetica:47,gym:100,tech:75 },
+  pinos:       {comida_rapida:82,restaurante:99,cafeteria:67,panaderia:64,ropa:79,farmacia:69,papeleria:71,estetica:72,gym:100,tech:88 },
+  valle_flores:{comida_rapida:92,restaurante:98,cafeteria:91,panaderia:88,ropa:93,farmacia:97,papeleria:92,estetica:88,gym:100,tech:100},
+  cardenas:    {comida_rapida:95,restaurante:98,cafeteria:96,panaderia:91,ropa:92,farmacia:95,papeleria:92,estetica:90,gym:100,tech:100},
+  chamizal:    {comida_rapida:96,restaurante:100,cafeteria:93,panaderia:88,ropa:90,farmacia:95,papeleria:92,estetica:90,gym:100,tech:100},
+  cerritos:    {comida_rapida:92,restaurante:98,cafeteria:91,panaderia:95,ropa:89,farmacia:97,papeleria:89,estetica:88,gym:100,tech:100},
+  provivienda: {comida_rapida:92,restaurante:96,cafeteria:96,panaderia:91,ropa:95,farmacia:95,papeleria:96,estetica:92,gym:100,tech:100},
+  landin:      {comida_rapida:96,restaurante:100,cafeteria:91,panaderia:93,ropa:93,farmacia:90,papeleria:92,estetica:93,gym:100,tech:100},
+  san_patricio:{comida_rapida:90,restaurante:86,cafeteria:84,panaderia:95,ropa:99,farmacia:92,papeleria:100,estetica:89,gym:100,tech:100},
+  bonanza:     {comida_rapida:82,restaurante:90,cafeteria:82,panaderia:74,ropa:91,farmacia:85,papeleria:88,estetica:76,gym:100,tech:100},
+  virreyes:    {comida_rapida:89,restaurante:95,cafeteria:89,panaderia:91,ropa:96,farmacia:95,papeleria:95,estetica:90,gym:100,tech:100},
+  nazario:     {comida_rapida:95,restaurante:97,cafeteria:93,panaderia:98,ropa:97,farmacia:97,papeleria:98,estetica:96,gym:100,tech:100},
+};
+const denue_total={
+  centro:4615,republica:728,valle:59,tecnologico:493,palmas:21,
+  contry:540,himno:2016,fama:1443,pedregal:1387,pinos:580,
+  valle_flores:225,cardenas:220,chamizal:220,cerritos:358,provivienda:395,
+  landin:185,san_patricio:333,bonanza:480,virreyes:314,nazario:342,
 };
 
-// Total de negocios reales por zona (DENUE Feb 2026)
-const denue_total = {
-  centro:4615, republica:728, valle:59, tecnologico:493,
-  palmas:21, contry:540, himno:2016, fama:1443, pedregal:1387, pinos:580
-};
-
-function updateInegiZone(zoneId) {
-  const total = denue_total[zoneId] || 0;
-  const comp  = denue_competencia[zoneId]?.[selectedType] ?? 50;
-  document.getElementById('i-inpc').textContent = total.toLocaleString();
-  document.getElementById('i-sub').textContent  = comp + '/100';
-  document.getElementById('i-prod').textContent = comp >= 70 ? '🟢 Libre' : comp >= 40 ? '🟡 Media' : '🔴 Alta';
-  document.querySelector('.inegi-top .inegi-live').innerHTML =
-    `<span class="live-dot"></span>DENUE · ${zoneId}`;
+function updateInegiZone(zid){
+  const total=denue_total[zid]||0;
+  const comp=denue_competencia[zid]?.[selectedType]??50;
+  document.getElementById('i-inpc').textContent=total.toLocaleString();
+  document.getElementById('i-sub').textContent=comp+'/100';
+  document.getElementById('i-prod').textContent=comp>=70?'🟢 Libre':comp>=40?'🟡 Media':'🔴 Alta';
+  document.querySelector('.inegi-top .inegi-live').innerHTML=`<span class="live-dot"></span>DENUE · ${zid}`;
 }
 
-const zones = [
-  {id:"centro",    name:"Centro Histórico",        lat:25.4244, lng:-100.9995, radius:600,
-   data:{trafico:97, nse:52, acceso:48, renta:{bajo:false,medio:true,alto:true}},
-   tags_pos:["Tráfico máximo","4,615 negocios DENUE"], tags_neg:["Muy saturado","Sin parking"],
-   desc:"El punto más transitado de Saltillo. 4,615 negocios reales según DENUE 2026."},
-
-  {id:"valle",     name:"Zona Valle",              lat:25.4516, lng:-100.9741, radius:550,
-   data:{trafico:45, nse:97, acceso:82, renta:{bajo:false,medio:false,alto:true}},
-   tags_pos:["NSE altísimo","Solo 59 negocios DENUE"], tags_neg:["Requiere auto","Renta muy alta"],
-   desc:"La zona más exclusiva. Apenas 59 negocios registrados en DENUE — casi virgen."},
-
-  {id:"republica", name:"Col. República",          lat:25.4391, lng:-100.9901, radius:480,
-   data:{trafico:83, nse:58, acceso:78, renta:{bajo:false,medio:true,alto:true}},
-   tags_pos:["Gran corredor","728 negocios activos"], tags_neg:["NSE medio"],
-   desc:"Eje comercial muy activo. 728 negocios reales en DENUE con buena diversidad."},
-
-  {id:"tecnologico",name:"Zona Tecnológico",       lat:25.4549, lng:-101.016,  radius:520,
-   data:{trafico:74, nse:35, acceso:52, renta:{bajo:true,medio:true,alto:false}},
-   tags_pos:["Universitarios","493 negocios","Renta baja"], tags_neg:["NSE bajo","Estacional"],
-   desc:"493 negocios activos. Alta densidad estudiantil, precios accesibles."},
-
-  {id:"palmas",    name:"Las Palmas",              lat:25.4091, lng:-100.9653, radius:500,
-   data:{trafico:38, nse:68, acceso:62, renta:{bajo:true,medio:true,alto:false}},
-   tags_pos:["Solo 21 negocios DENUE","Sin competencia"], tags_neg:["Tráfico muy bajo"],
-   desc:"La zona más libre de Saltillo. DENUE registra apenas 21 negocios. Oportunidad única."},
-
-  {id:"pedregal",  name:"Col. Morelos / Zaragoza", lat:25.4098, lng:-100.9701, radius:480,
-   data:{trafico:68, nse:38, acceso:45, renta:{bajo:true,medio:false,alto:false}},
-   tags_pos:["Renta mínima","1,387 negocios activos"], tags_neg:["NSE bajo","Lejos del centro"],
-   desc:"Zona popular muy activa. 1,387 negocios en DENUE. Mercado de volumen."},
-
-  {id:"contry",   name:"Contry / Las Américas",    lat:25.4306, lng:-100.9688, radius:480,
-   data:{trafico:68, nse:82, acceso:75, renta:{bajo:false,medio:true,alto:true}},
-   tags_pos:["NSE alto","540 negocios","Sin farmacias"], tags_neg:["Competencia media"],
-   desc:"540 negocios activos. Excelente NSE y casi sin farmacias según DENUE."},
-
-  {id:"himno",    name:"Mirasierra / Bellavista",   lat:25.413,  lng:-100.9554, radius:480,
-   data:{trafico:85, nse:55, acceso:58, renta:{bajo:false,medio:true,alto:true}},
-   tags_pos:["Alto tráfico","2,016 negocios activos"], tags_neg:["Saturado ropa/panadería"],
-   desc:"2,016 negocios activos en DENUE. Zona muy comercial y transitada."},
-
-  {id:"fama",     name:"Saltillo 2000 / Lourdes",   lat:25.427,  lng:-100.9918, radius:500,
-   data:{trafico:72, nse:72, acceso:85, renta:{bajo:false,medio:true,alto:true}},
-   tags_pos:["Buen acceso","NSE medio-alto","1,443 negocios"], tags_neg:["Gym saturado"],
-   desc:"1,443 negocios registrados. NSE medio-alto y excelente accesibilidad."},
-
-  {id:"pinos",    name:"La Madrid / Las Teresitas", lat:25.3864, lng:-100.9983, radius:450,
-   data:{trafico:42, nse:65, acceso:55, renta:{bajo:true,medio:true,alto:false}},
-   tags_pos:["NSE medio","580 negocios","1 solo restaurante DENUE"], tags_neg:["Tráfico bajo"],
-   desc:"580 negocios. Solo 1 restaurante en DENUE — oportunidad enorme para ese giro."}
+const zones=[
+  {id:"centro",     name:"Centro Histórico",          lat:25.4244,lng:-100.9995,radius:600,data:{trafico:97,nse:52,acceso:48,renta:{bajo:false,medio:true,alto:true}},
+   tags_pos:["Tráfico máximo","4,615 negocios","Catedral Barroca","Teatro García Carrillo"],tags_neg:["Muy saturado","Sin parking"],
+   desc:"Corazón comercial de Saltillo. 4,615 negocios DENUE. Aquí está la Catedral más alta del norte de MX, la Casa Purcell y el Teatro García Carrillo (1919). Máximo flujo peatonal de la ciudad."},
+  {id:"valle",      name:"Zona Valle",                lat:25.4516,lng:-100.9741,radius:550,data:{trafico:45,nse:97,acceso:82,renta:{bajo:false,medio:false,alto:true}},
+   tags_pos:["NSE altísimo","59 negocios — casi virgen","Directivos industriales"],tags_neg:["Requiere auto","Renta alta"],
+   desc:"La zona más exclusiva de Saltillo. NSE altísimo — directivos de Daimler, FCA, Saint-Gobain. Solo 59 negocios DENUE, prácticamente sin competencia en cualquier giro."},
+  {id:"republica",  name:"Col. República",            lat:25.4391,lng:-100.9901,radius:480,data:{trafico:83,nse:58,acceso:78,renta:{bajo:false,medio:true,alto:true}},
+   tags_pos:["Gran corredor comercial","728 negocios","Buena conectividad"],tags_neg:["NSE medio"],
+   desc:"Eje comercial muy activo con 728 negocios. Saltillo tiene 97.95% de alfabetismo y escolaridad promedio de 10.56 años — consumidores con buen poder adquisitivo medio."},
+  {id:"tecnologico",name:"Zona Tecnológico",          lat:25.4549,lng:-101.016, radius:520,data:{trafico:74,nse:38,acceso:52,renta:{bajo:true,medio:true,alto:false}},
+   tags_pos:["33,700 estudiantes universitarios","ITS · UAdeC · Tec MTY","Renta baja"],tags_neg:["Demanda estacional"],
+   desc:"Hub universitario: 33,700 estudiantes en educación superior (ANUIES 2017). ITS, UAdeC, Tec Monterrey Campus Saltillo. Ideal para giros de consumo frecuente y precio accesible."},
+  {id:"palmas",     name:"Las Palmas",                lat:25.4091,lng:-100.9653,radius:500,data:{trafico:38,nse:68,acceso:62,renta:{bajo:true,medio:true,alto:false}},
+   tags_pos:["21 negocios — sin competencia","NSE medio-alto","Zona residencial"],tags_neg:["Tráfico muy bajo"],
+   desc:"La zona con menos negocios de Saltillo — solo 21 en DENUE. NSE medio. Oportunidad pionera en una ciudad donde el 97.86% vive dentro de la mancha urbana."},
+  {id:"pedregal",   name:"Morelos / Zaragoza",        lat:25.4098,lng:-100.9701,radius:480,data:{trafico:68,nse:38,acceso:45,renta:{bajo:true,medio:false,alto:false}},
+   tags_pos:["Renta mínima","1,387 negocios","Mercado de volumen"],tags_neg:["NSE bajo"],
+   desc:"Zona popular con 1,387 negocios. Con 393,409 personas en la PEA (49% de la población), el volumen de clientes es enorme incluso en NSE bajo."},
+  {id:"contry",     name:"Contry / Las Américas",     lat:25.4306,lng:-100.9688,radius:480,data:{trafico:68,nse:82,acceso:75,renta:{bajo:false,medio:true,alto:true}},
+   tags_pos:["NSE alto","540 negocios","Cerca hospitales privados"],tags_neg:["Competencia media"],
+   desc:"540 negocios activos. Zona de alto NSE — cercana a hospitales privados y estadio. Saltillo es Top 3 en calidad de vida según Forbes."},
+  {id:"himno",      name:"Mirasierra / Bellavista",   lat:25.413, lng:-100.9554,radius:480,data:{trafico:85,nse:55,acceso:58,renta:{bajo:false,medio:true,alto:true}},
+   tags_pos:["Alto tráfico","2,016 negocios","Parque Las Maravillas"],tags_neg:["Saturado en varios giros"],
+   desc:"2,016 negocios activos. Zona muy comercial cercana al Parque Las Maravillas. Saltillo es la 2ª ciudad con mejor movilidad urbana del país."},
+  {id:"fama",       name:"Saltillo 2000 / Lourdes",   lat:25.427, lng:-100.9918,radius:500,data:{trafico:72,nse:72,acceso:85,renta:{bajo:false,medio:true,alto:true}},
+   tags_pos:["Buen acceso","NSE medio-alto","1,443 negocios","Cerca Hwy 57"],tags_neg:["Gym saturado"],
+   desc:"1,443 negocios. NSE medio-alto y acceso excelente por Carretera Federal 57 (Saltillo-CDMX). La ZM de Saltillo crece ~20,000 habitantes/año."},
+  {id:"pinos",      name:"La Madrid / Las Teresitas", lat:25.3864,lng:-100.9983,radius:450,data:{trafico:42,nse:65,acceso:55,renta:{bajo:true,medio:true,alto:false}},
+   tags_pos:["580 negocios","Solo 1 restaurante DENUE","Parque Industrial cercano"],tags_neg:["Tráfico bajo"],
+   desc:"580 negocios. Un solo restaurante en DENUE — oportunidad enorme. Cerca del Parque Industrial Las Teresitas con trabajadores de planta con empleo formal."},
+  {id:"valle_flores",name:"Valle de las Flores",      lat:25.433, lng:-100.9588,radius:430,data:{trafico:55,nse:42,acceso:52,renta:{bajo:true,medio:true,alto:false}},
+   tags_pos:["225 negocios","Colonia Infonavit","Competencia baja"],tags_neg:["NSE popular"],
+   desc:"225 negocios DENUE. Colonia Infonavit en crecimiento. Saltillo tiene la 2ª mejor formalidad laboral del país — incluso obreros de maquiladora tienen ingresos estables."},
+  {id:"cardenas",   name:"Col. Antonio Cárdenas",     lat:25.4248,lng:-101.0079,radius:420,data:{trafico:58,nse:40,acceso:48,renta:{bajo:true,medio:false,alto:false}},
+   tags_pos:["220 negocios","Renta muy accesible","Zona obrera"],tags_neg:["Lejos del centro"],
+   desc:"220 negocios. Colonia obrera con empleo formal — Saltillo fabrica RAM 1500, vidrio para Tesla 3 y más de 200 tracto-camiones Daimler al día. Ingreso constante."},
+  {id:"chamizal",   name:"Col. Chamizal",             lat:25.4134,lng:-101.028, radius:420,data:{trafico:52,nse:38,acceso:44,renta:{bajo:true,medio:false,alto:false}},
+   tags_pos:["Sin restaurantes formales","220 negocios"],tags_neg:["NSE bajo","Zona periférica"],
+   desc:"220 negocios sin restaurantes formales. Zona popular cerca de la zona industrial poniente. Renta muy accesible — ideal para primer local."},
+  {id:"cerritos",   name:"San José / Misión Cerritos",lat:25.4329,lng:-100.9225,radius:460,data:{trafico:48,nse:72,acceso:65,renta:{bajo:false,medio:true,alto:true}},
+   tags_pos:["NSE alto","358 negocios","Zona en auge","Cerca Hwy 40"],tags_neg:["Requiere auto"],
+   desc:"358 negocios en zona de alto crecimiento. NSE alto — área nueva residencial. La ZM de Saltillo crece ~20,000 hab/año y Cerritos capta gran parte del desarrollo."},
+  {id:"provivienda",name:"Provivienda / Topo Chico",  lat:25.4287,lng:-100.9821,radius:440,data:{trafico:62,nse:45,acceso:58,renta:{bajo:true,medio:true,alto:false}},
+   tags_pos:["395 negocios","Alta densidad","Buen tráfico"],tags_neg:["NSE medio-bajo"],
+   desc:"395 negocios activos cerca del centro. Agua entubada 99%, drenaje 99% — infraestructura básica sólida para cualquier giro de alimentos o servicios."},
+  {id:"landin",     name:"Col. Landín",               lat:25.4009,lng:-101.0215,radius:410,data:{trafico:45,nse:36,acceso:42,renta:{bajo:true,medio:false,alto:false}},
+   tags_pos:["185 negocios","Competencia muy baja","Renta mínima"],tags_neg:["NSE muy bajo"],
+   desc:"185 negocios sin restaurantes formales. Empleados de la industria automotriz con ingreso fijo. Renta mínima con alto potencial de volumen."},
+  {id:"san_patricio",name:"San Patricio / Peña",      lat:25.466, lng:-100.9676,radius:450,data:{trafico:50,nse:75,acceso:68,renta:{bajo:false,medio:true,alto:true}},
+   tags_pos:["NSE alto","333 negocios","Sin papelerías DENUE","Zona residencial nueva"],tags_neg:["Zona en desarrollo"],
+   desc:"333 negocios en zona residencial de alto NSE. Sin papelerías registradas — nicho claro. Saltillo tiene 66 hoteles y 76 espacios culturales que generan demanda de servicios."},
+  {id:"bonanza",    name:"Bonanza / Oceanía",         lat:25.4422,lng:-100.9592,radius:450,data:{trafico:64,nse:52,acceso:60,renta:{bajo:true,medio:true,alto:false}},
+   tags_pos:["480 negocios","Buena afluencia","Zona mixta"],tags_neg:["NSE medio"],
+   desc:"480 negocios. Zona mixta residencial-comercial con buen movimiento. La ocupación hotelera de Saltillo crece 5.82% anual — economía dinámica y en expansión."},
+  {id:"virreyes",   name:"Col. Virreyes",             lat:25.4655,lng:-100.987, radius:430,data:{trafico:52,nse:65,acceso:62,renta:{bajo:false,medio:true,alto:true}},
+   tags_pos:["314 negocios","NSE medio-alto","Colonia consolidada"],tags_neg:["Competencia creciente"],
+   desc:"314 negocios. Colonia establecida con poder adquisitivo medio-alto. Empleados nivel gerencial de John Deere, Linamar y Martinrea residen en esta zona."},
+  {id:"nazario",    name:"Nazario / Villa Olímpica",  lat:25.4628,lng:-100.9907,radius:440,data:{trafico:48,nse:55,acceso:58,renta:{bajo:true,medio:true,alto:false}},
+   tags_pos:["342 negocios","Muy poca saturación","Zona norte en crecimiento"],tags_neg:["Tráfico moderado"],
+   desc:"342 negocios con competencia muy baja en casi todos los giros. Zona norte en expansión — Saltillo crece 20,000 hab/año, la demanda de servicios aumenta constantemente."},
 ];
 
-const typeWeights = {
-  comida_rapida: { trafico:.60, competencia:.15, nse:.08, acceso:.17 },
-  restaurante:   { trafico:.15, competencia:.18, nse:.52, acceso:.15 },
-  cafeteria:     { trafico:.28, competencia:.22, nse:.35, acceso:.15 },
-  panaderia:     { trafico:.50, competencia:.32, nse:.08, acceso:.10 },
-  ropa:          { trafico:.10, competencia:.12, nse:.65, acceso:.13 },
-  farmacia:      { trafico:.38, competencia:.52, nse:.04, acceso:.06 },
-  papeleria:     { trafico:.33, competencia:.48, nse:.08, acceso:.11 },
-  estetica:      { trafico:.15, competencia:.55, nse:.15, acceso:.15 },
-  gym:           { trafico:.08, competencia:.30, nse:.45, acceso:.17 },
-  tech:          { trafico:.10, competencia:.18, nse:.55, acceso:.17 }
+const typeWeights={
+  comida_rapida:{trafico:.60,competencia:.15,nse:.08,acceso:.17},
+  restaurante:  {trafico:.15,competencia:.18,nse:.52,acceso:.15},
+  cafeteria:    {trafico:.28,competencia:.22,nse:.35,acceso:.15},
+  panaderia:    {trafico:.50,competencia:.32,nse:.08,acceso:.10},
+  ropa:         {trafico:.10,competencia:.12,nse:.65,acceso:.13},
+  farmacia:     {trafico:.38,competencia:.52,nse:.04,acceso:.06},
+  papeleria:    {trafico:.33,competencia:.48,nse:.08,acceso:.11},
+  estetica:     {trafico:.15,competencia:.55,nse:.15,acceso:.15},
+  gym:          {trafico:.08,competencia:.30,nse:.45,acceso:.17},
+  tech:         {trafico:.10,competencia:.18,nse:.55,acceso:.17},
+};
+const typeLabels={
+  comida_rapida:'🍔 Comida rápida',restaurante:'🍽️ Restaurante',cafeteria:'☕ Cafetería',
+  panaderia:'🥐 Panadería',ropa:'👗 Ropa',farmacia:'💊 Farmacia',papeleria:'📚 Papelería',
+  estetica:'✂️ Estética',gym:'🏋️ Gym',tech:'📱 Tecnología',
 };
 
-let selectedType='comida_rapida',selectedBudget='bajo',circles=[],analyzed=false,lastScored=[];
+let selectedType='comida_rapida',selectedBudget='bajo',analyzed=false,lastScored=[];
 
 function scoreZone(z){
-  const tw = typeWeights[selectedType] || typeWeights.comida_rapida;
-  const competenciaReal = denue_competencia[z.id]?.[selectedType] ?? 50;
-  const uw = {
-    trafico:     +document.getElementById('w1').value / 100,
-    competencia: +document.getElementById('w2').value / 100,
-    nse:         +document.getElementById('w3').value / 100,
-    acceso:      +document.getElementById('w4').value / 100
-  };
-  const tot = uw.trafico+uw.competencia+uw.nse+uw.acceso;
-  const un  = {trafico:uw.trafico/tot,competencia:uw.competencia/tot,nse:uw.nse/tot,acceso:uw.acceso/tot};
-  const w   = {
-    trafico:     tw.trafico     *.80 + un.trafico     *.20,
-    competencia: tw.competencia *.80 + un.competencia *.20,
-    nse:         tw.nse         *.80 + un.nse         *.20,
-    acceso:      tw.acceso      *.80 + un.acceso      *.20
-  };
-  let s = z.data.trafico*w.trafico + competenciaReal*w.competencia
-        + z.data.nse*w.nse + z.data.acceso*w.acceso;
-  if(!z.data.renta[selectedBudget]) s *= .50;
-  return Math.round(Math.min(s, 100));
+  const tw=typeWeights[selectedType]||typeWeights.comida_rapida;
+  const competenciaReal=denue_competencia[z.id]?.[selectedType]??50;
+  const uw={trafico:+document.getElementById('w1').value/100,competencia:+document.getElementById('w2').value/100,nse:+document.getElementById('w3').value/100,acceso:+document.getElementById('w4').value/100};
+  const tot=uw.trafico+uw.competencia+uw.nse+uw.acceso;
+  const un={trafico:uw.trafico/tot,competencia:uw.competencia/tot,nse:uw.nse/tot,acceso:uw.acceso/tot};
+  const w={trafico:tw.trafico*.80+un.trafico*.20,competencia:tw.competencia*.80+un.competencia*.20,nse:tw.nse*.80+un.nse*.20,acceso:tw.acceso*.80+un.acceso*.20};
+  let s=z.data.trafico*w.trafico+competenciaReal*w.competencia+z.data.nse*w.nse+z.data.acceso*w.acceso;
+  if(!z.data.renta[selectedBudget])s*=.50;
+  return Math.round(Math.min(s,100));
 }
-function scoreColor(s){if(s>=85)return'#f97316';if(s>=70)return'#3b82f6';return'#8b5cf6';}
+function scoreColor(s){return s>=85?'#f97316':s>=70?'#3b82f6':'#8b5cf6';}
 
 function analyze(){
   analyzed=true;
-  circles.forEach(c=>map.removeLayer(c));
-  circles=[];
+  circleLayer.clearLayers(); // FIX: limpia correctamente todos los círculos
+
   lastScored=zones.map(z=>({...z,score:scoreZone(z)})).sort((a,b)=>b.score-a.score);
-  // Actualizar panel INEGI con datos de la zona #1
-  if(lastScored[0]) updateInegiZone(lastScored[0].id);
+  if(lastScored[0])updateInegiZone(lastScored[0].id);
 
   lastScored.forEach((z,i)=>{
     const color=scoreColor(z.score);
-    const c=L.circle([z.lat,z.lng],{radius:z.radius,color,fillColor:color,fillOpacity:.18,weight:2,opacity:.75}).addTo(map);
+    const c=L.circle([z.lat,z.lng],{radius:z.radius,color,fillColor:color,fillOpacity:.22,weight:2,opacity:.8});
     const rank=i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`;
-    c.bindPopup(`
-      <div class="popup-name">${rank} ${z.name}</div>
-      <div class="popup-score">${z.score}<span style="font-size:.65rem;color:#5a6478;font-weight:400"> / 100</span></div>
-      <div class="popup-sub">Para ${selectedType.replace('_',' ')}</div>
-      <div class="popup-desc">${z.desc}</div>
-    `);
+    c.bindPopup(`<div class="popup-name">${rank} ${z.name}</div><div class="popup-score">${z.score}<span style="font-size:.65rem;color:#5a6478;font-weight:400"> / 100</span></div><div class="popup-sub">Para ${typeLabels[selectedType]}</div><div class="popup-desc">${z.desc}</div>`);
     c.on('mouseover',function(){this.openPopup();});
-    circles.push(c);
+    circleLayer.addLayer(c);
   });
 
+  document.getElementById('results-type-label').textContent=typeLabels[selectedType].replace(/^.\s/,'');
   const cards=document.getElementById('zoneCards');
   cards.innerHTML='';
   lastScored.slice(0,5).forEach((z,i)=>{
@@ -548,149 +782,219 @@ function analyze(){
     card.className='zone-card'+(i===0?' top-zone':'');
     card.style.animationDelay=(i*.07)+'s';
     const color=scoreColor(z.score);
-    card.innerHTML=`
-      <div class="zh">
-        <div class="zname">${rank} ${z.name}</div>
-        <div class="zscore${i===0?' gold':''}">${z.score}</div>
-      </div>
-      <div class="ztags">
-        ${z.tags_pos.map(t=>`<span class="tag pos">✓ ${t}</span>`).join('')}
-        ${z.tags_neg.map(t=>`<span class="tag neg">✗ ${t}</span>`).join('')}
-      </div>
-      <div class="zbar"><div class="zfill" style="width:0%;background:${color}" data-w="${z.score}"></div></div>
-      <div class="zdesc">${z.desc}</div>
-    `;
+    card.innerHTML=`<div class="zh"><div class="zname">${rank} ${z.name}</div><div class="zscore${i===0?' gold':''}">${z.score}</div></div><div class="ztags">${z.tags_pos.map(t=>`<span class="tag pos">✓ ${t}</span>`).join('')}${z.tags_neg.map(t=>`<span class="tag neg">✗ ${t}</span>`).join('')}</div><div class="zbar"><div class="zfill" style="width:0%;background:${color}" data-w="${z.score}"></div></div><div class="zdesc">${z.desc}</div>`;
     card.onclick=()=>{map.setView([z.lat,z.lng],15);};
     cards.appendChild(card);
     setTimeout(()=>{const b=card.querySelector('.zfill');b.style.width=b.dataset.w+'%';},50+i*60);
   });
 
-  document.getElementById('resultsSection').style.display='flex';
-  document.getElementById('resultsSection').style.flexDirection='column';
-  document.getElementById('resultsSection').style.gap='8px';
+  const rs=document.getElementById('resultsSection');
+  rs.style.display='flex';rs.style.flexDirection='column';rs.style.gap='8px';
   document.getElementById('emptyState').style.display='none';
 }
 
-// ── SAVE TO SUPABASE ──────────────────────────────────────
-const typeLabels = {
-  comida_rapida:'🍔 Comida rápida', restaurante:'🍽️ Restaurante',
-  cafeteria:'☕ Cafetería', panaderia:'🥐 Panadería', ropa:'👗 Ropa',
-  farmacia:'💊 Farmacia', papeleria:'📚 Papelería', estetica:'✂️ Estética',
-  gym:'🏋️ Gym', tech:'📱 Tecnología'
-};
-
-async function saveAnalysis(){
-  if(!currentUser || !lastScored.length) return;
-  const btn = event.target;
-  btn.textContent = '💾 Guardando...';
-  btn.disabled = true;
-
-  const { error } = await sb.from('analyses').insert({
-    user_id:   currentUser.id,
-    type:      selectedType,
-    budget:    selectedBudget,
-    top_zone:  lastScored[0]?.name,
-    top_score: lastScored[0]?.score,
-    results:   lastScored.slice(0,5).map(z=>({name:z.name,score:z.score}))
-  });
-
-  btn.textContent = error ? '❌ Error al guardar' : '✅ Guardado';
-  setTimeout(()=>{ btn.textContent='💾 Guardar este análisis'; btn.disabled=false; }, 2500);
-
-  if(!error) {
-    const t = document.getElementById('toast');
-    t.classList.add('show');
-    setTimeout(()=>t.classList.remove('show'), 2800);
-    loadHistory(); // refrescar lista
-  }
-}
-
-// ── LOAD HISTORY ──────────────────────────────────────────
-async function loadHistory(){
-  if(!currentUser) return;
-  const container = document.getElementById('historyCards');
-  container.innerHTML = '<div class="hist-empty">Cargando...</div>';
-
-  const { data, error } = await sb
-    .from('analyses')
-    .select('*')
-    .eq('user_id', currentUser.id)
-    .order('created_at', { ascending: false })
-    .limit(10);
-
-  if(error || !data?.length) {
-    container.innerHTML = '<div class="hist-empty">Sin análisis guardados aún.<br>Analiza y guarda tu primera búsqueda.</div>';
-    return;
-  }
-
-  container.innerHTML = '';
-  data.forEach((a, i) => {
-    const fecha = new Date(a.created_at).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'2-digit'});
-    const label = typeLabels[a.type] || a.type;
-    const budget = a.budget === 'bajo' ? '$5–15k' : a.budget === 'medio' ? '$15–35k' : '$35k+';
-
-    const card = document.createElement('div');
-    card.className = 'hist-card';
-    card.style.animationDelay = (i * .05) + 's';
-    card.innerHTML = `
-      <div>
-        <div class="hist-type">${label}</div>
-        <div class="hist-meta">Renta ${budget} · ${fecha}</div>
-      </div>
-      <div style="text-align:right">
-        <div class="hist-score">${a.top_score}</div>
-        <div class="hist-zone">${a.top_zone}</div>
-      </div>
-    `;
-    // Al hacer click, cargar ese análisis en el mapa
-    card.onclick = () => replayAnalysis(a);
-    container.appendChild(card);
-  });
-}
-
-// Revive un análisis guardado en el mapa
-function replayAnalysis(a){
-  circles.forEach(c=>map.removeLayer(c));
-  circles=[];
-  const scored = (a.results||[]).map((r,i)=>{
-    const z = zones.find(z=>z.name===r.name);
-    if(!z) return null;
-    const color = r.score>=85?'#f97316':r.score>=70?'#3b82f6':'#8b5cf6';
-    const c = L.circle([z.lat,z.lng],{radius:z.radius,color,fillColor:color,fillOpacity:.18,weight:2,opacity:.75}).addTo(map);
-    const rank = i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`;
-    c.bindPopup(`<div class="popup-name">${rank} ${z.name}</div><div class="popup-score">${r.score}<span style="font-size:.65rem;color:#5a6478"> / 100</span></div><div class="popup-desc">${z.desc}</div>`);
-    c.on('mouseover',function(){this.openPopup();});
-    circles.push(c);
-    return {...z, score:r.score};
-  }).filter(Boolean);
-
-  if(scored[0]) map.setView([scored[0].lat, scored[0].lng], 14);
-
-  // Mostrar toast
-  const t=document.getElementById('toast');
-  t.style.background='#3b82f6';
-  t.textContent=`📂 Mostrando: ${typeLabels[a.type]||a.type}`;
-  t.classList.add('show');
-  setTimeout(()=>{ t.classList.remove('show'); t.style.background=''; t.textContent='✅ Análisis guardado'; },2500);
-}
-
-// ── UI EVENTS ─────────────────────────────────────────────
 document.getElementById('typeGrid').querySelectorAll('.type-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
     document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    selectedType=btn.dataset.type;
-    if(analyzed) analyze();
+    btn.classList.add('active');selectedType=btn.dataset.type;if(analyzed)analyze();
   });
 });
 document.getElementById('budgetGroup').querySelectorAll('.budget-opt').forEach(opt=>{
   opt.addEventListener('click',()=>{
     document.querySelectorAll('.budget-opt').forEach(o=>o.classList.remove('active'));
-    opt.classList.add('active');
-    selectedBudget=opt.dataset.budget;
-    if(analyzed) analyze();
+    opt.classList.add('active');selectedBudget=opt.dataset.budget;if(analyzed)analyze();
   });
 });
+
+// ── SAVE MODAL ──
+function openSaveModal(){
+  if(!lastScored.length)return;
+  const top=lastScored[0];
+  const budgetLabel=selectedBudget==='bajo'?'$5–15k':selectedBudget==='medio'?'$15–35k':'$35k+';
+  const color=scoreColor(top.score);
+  document.getElementById('savePreview').innerHTML=`
+    <div class="save-preview-row"><div><div class="save-preview-title">${typeLabels[selectedType]}</div><div class="save-preview-meta">Presupuesto ${budgetLabel} · ${new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'})}</div></div><div class="save-preview-score" style="color:${color}">${top.score}</div></div>
+    <div class="save-zones">${lastScored.slice(0,5).map((z,i)=>`<div class="save-zone-row"><span style="color:var(--muted2)">${i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}.`} ${z.name}</span><span style="font-family:'Syne',sans-serif;font-weight:700;color:${scoreColor(z.score)}">${z.score}/100</span></div>`).join('')}</div>`;
+  document.getElementById('analysisName').value=`${typeLabels[selectedType].replace(/^.\s/,'')} en ${top.name}`;
+  document.getElementById('saveModal').classList.add('open');
+}
+function closeSaveModal(){document.getElementById('saveModal').classList.remove('open');}
+
+async function confirmSave(){
+  if(!currentUser||!lastScored.length)return;
+  const btn=document.getElementById('saveConfirmBtn');
+  const name=document.getElementById('analysisName').value.trim()||`${typeLabels[selectedType]} · ${lastScored[0].name}`;
+  btn.textContent='⏳ Guardando...';btn.disabled=true;
+
+  const {error}=await sb.from('analyses').insert({
+    user_id:currentUser.id,type:selectedType,budget:selectedBudget,
+    top_zone:lastScored[0]?.name,top_score:lastScored[0]?.score,
+    name:name,
+    results:lastScored.slice(0,10).map(z=>({
+      name:z.name,id:z.id,score:z.score,
+      trafico:z.data.trafico,nse:z.data.nse,acceso:z.data.acceso,
+      competencia:denue_competencia[z.id]?.[selectedType]??50,
+      total_negocios:denue_total[z.id]||0,
+    })),
+  });
+
+  btn.textContent=error?'❌ Error':'✅ Guardado';
+  setTimeout(()=>{btn.textContent='✅ Guardar análisis';btn.disabled=false;},2000);
+  if(!error){
+    closeSaveModal();
+    const t=document.getElementById('toast');
+    t.textContent='✅ Análisis guardado';t.style.background='';
+    t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);
+    loadAnalyses();
+  }
+}
+
+// ── MIS ANÁLISIS ──
+async function loadAnalyses(){
+  if(!currentUser)return;
+  const{data,error}=await sb.from('analyses').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(50);
+  if(error||!data)return;
+  allAnalyses=data;
+  document.getElementById('badge-count').textContent=data.length;
+  renderAnalysesGrid();
+}
+
+function renderAnalysesGrid(){
+  const grid=document.getElementById('analysesGrid');
+  const data=activeFilter==='all'?allAnalyses:allAnalyses.filter(a=>a.type===activeFilter);
+  if(!data.length){
+    grid.innerHTML=`<div class="empty-analyses"><div class="big-ico">${activeFilter==='all'?'📭':'🔍'}</div><p>${activeFilter==='all'?'Aún no tienes análisis.<br>Analiza y guarda tu primera búsqueda.':'Sin análisis de este tipo guardados.'}</p></div>`;
+    return;
+  }
+  grid.innerHTML='';
+  data.forEach((a,i)=>{
+    const fecha=new Date(a.created_at).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'2-digit'});
+    const label=typeLabels[a.type]||a.type;
+    const budget=a.budget==='bajo'?'$5–15k':a.budget==='medio'?'$15–35k':'$35k+';
+    const color=scoreColor(a.top_score||0);
+    const aName=a.name||`${label} · ${a.top_zone}`;
+    const zones5=(a.results||[]).slice(0,3);
+    const safeA=encodeURIComponent(JSON.stringify(a));
+    const card=document.createElement('div');
+    card.className='analysis-card';card.style.animationDelay=(i*.04)+'s';
+    card.innerHTML=`
+      <div class="ac-header"><div><div class="ac-type">${label}</div><div class="ac-name">${aName}</div></div><div class="ac-score" style="color:${color}">${a.top_score}</div></div>
+      <div class="ac-meta">Renta ${budget} · ${fecha}</div>
+      <div class="ac-zones">${zones5.map((z,ii)=>`<div class="ac-zone-row"><span class="ac-zone-name">${ii===0?'🥇':ii===1?'🥈':'🥉'} ${z.name}</span><span class="ac-zone-score" style="color:${scoreColor(z.score||0)}">${z.score}</span></div><div class="ac-bar"><div class="ac-bar-fill" style="width:${z.score||0}%"></div></div>`).join('')}</div>
+      <div class="ac-footer">
+        <button class="ac-action primary" onclick="event.stopPropagation();openDetailModal(decodeURIComponent('${safeA}'))">🔍 Detalle</button>
+        <button class="ac-action" onclick="event.stopPropagation();replayOnMap(decodeURIComponent('${safeA}'));closeAnalysesModal()">🗺️ Mapa</button>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function filterAnalyses(f,el){
+  activeFilter=f;
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderAnalysesGrid();
+}
+
+function openAnalysesModal(){
+  document.getElementById('analysesModal').classList.add('open');
+  loadAnalyses();
+}
+function closeAnalysesModal(){document.getElementById('analysesModal').classList.remove('open');}
+
+// ── DETAIL MODAL ──
+function openDetailModal(aRaw){
+  const a=typeof aRaw==='string'?JSON.parse(aRaw):aRaw;
+  const label=typeLabels[a.type]||a.type;
+  const budget=a.budget==='bajo'?'$5–15k':a.budget==='medio'?'$15–35k':'$35k+';
+  const fecha=new Date(a.created_at).toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});
+  const aName=a.name||`${label} · ${a.top_zone}`;
+  const zList=a.results||[];
+  const top=zList[0]||{};
+  const color=scoreColor(a.top_score||0);
+  const avgScore=zList.length?Math.round(zList.reduce((s,z)=>s+(z.score||0),0)/zList.length):0;
+  const topComp=zList.slice().sort((a,b)=>(b.competencia||0)-(a.competencia||0))[0];
+
+  const insights=[];
+  if(top.score>=85) insights.push(`🟢 <strong>${top.name}</strong> tiene score excelente de ${top.score}/100. Es la recomendación principal para ${label}.`);
+  if(topComp?.competencia>=90) insights.push(`✅ <strong>${topComp.name}</strong> tiene muy poca competencia (${topComp.competencia}/100) — el giro está casi libre en esa zona.`);
+  if(top.total_negocios) insights.push(`📊 <strong>${top.name}</strong> tiene ${(top.total_negocios||0).toLocaleString()} negocios registrados en DENUE Feb 2026.`);
+  if(zList.length>=5){const gap=zList[0].score-zList[4].score;if(gap>30)insights.push(`⚠️ Hay <strong>${gap} puntos</strong> de diferencia entre la #1 y la #5. La oportunidad está muy concentrada.`);else insights.push(`ℹ️ Las top 5 zonas están dentro de <strong>${gap} puntos</strong> — hay varias opciones viables.`);}
+  if(a.budget==='bajo') insights.push(`💰 Con presupuesto bajo ($5–15k), las zonas populares dan la mejor relación oportunidad/costo.`);
+  if(a.budget==='alto') insights.push(`💎 Presupuesto alto ($35k+) permite entrar a zonas premium como Valle o San Patricio.`);
+
+  const safeA=encodeURIComponent(JSON.stringify(a));
+  document.getElementById('detailBody').innerHTML=`
+    <div class="detail-hero">
+      <div><div class="detail-name">${aName}</div><div class="detail-type">${label}</div><div class="detail-meta">Renta ${budget} · ${fecha}</div></div>
+      <div><div class="score-num" style="color:${color}">${a.top_score}</div><div class="score-lbl">Score máximo</div></div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Resumen estadístico</div>
+      <div class="summary-grid">
+        <div class="summary-card"><div class="summary-val" style="color:${color}">${a.top_score}</div><div class="summary-lbl">Mejor zona<br>${top.name||'—'}</div></div>
+        <div class="summary-card"><div class="summary-val" style="color:var(--blue)">${avgScore}</div><div class="summary-lbl">Score promedio<br>${zList.length} zonas analizadas</div></div>
+        <div class="summary-card"><div class="summary-val" style="color:var(--green)">${topComp?.competencia??'—'}</div><div class="summary-lbl">Menor competencia<br>${topComp?.name||'—'}</div></div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Ranking completo · ${zList.length} zonas</div>
+      <div class="zones-ranking">
+        ${zList.map((z,i)=>{const sc=scoreColor(z.score||0);return`
+          <div class="ranking-row${i===0?' first':''}">
+            <div class="ranking-top"><div class="rk-name">${i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}.`} ${z.name}</div><div class="rk-score" style="color:${sc}">${z.score}<span style="font-size:.6rem;color:var(--muted);font-weight:400">/100</span></div></div>
+            <div class="rk-bars">
+              <div class="rk-bar-item"><div class="rk-bar-label"><span>🚶 Afluencia</span><span>${z.trafico||'—'}</span></div><div class="rk-bar-track"><div class="rk-bar-fill" style="width:${z.trafico||0}%;background:#3b82f6"></div></div></div>
+              <div class="rk-bar-item"><div class="rk-bar-label"><span>🏪 Comp. libre</span><span>${z.competencia||'—'}</span></div><div class="rk-bar-track"><div class="rk-bar-fill" style="width:${z.competencia||0}%;background:#22c55e"></div></div></div>
+              <div class="rk-bar-item"><div class="rk-bar-label"><span>💰 NSE</span><span>${z.nse||'—'}</span></div><div class="rk-bar-track"><div class="rk-bar-fill" style="width:${z.nse||0}%;background:#f59e0b"></div></div></div>
+              <div class="rk-bar-item"><div class="rk-bar-label"><span>🅿️ Acceso</span><span>${z.acceso||'—'}</span></div><div class="rk-bar-track"><div class="rk-bar-fill" style="width:${z.acceso||0}%;background:#8b5cf6"></div></div></div>
+            </div>
+          </div>`}).join('')}
+      </div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Insights del análisis</div>
+      <div class="insight-list">${insights.map(ins=>`<div class="insight-item">${ins}</div>`).join('')}</div>
+    </div>
+    <button onclick="replayOnMap(decodeURIComponent('${safeA}'));closeDetailModal();closeAnalysesModal();" style="width:100%;background:var(--accent);color:#000;border:none;border-radius:9px;padding:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;margin-top:4px;">🗺️ Ver en el mapa</button>
+  `;
+  document.getElementById('detailModal').classList.add('open');
+}
+function closeDetailModal(){document.getElementById('detailModal').classList.remove('open');}
+
+// ── REPLAY ──
+function replayOnMap(aRaw){
+  const a=typeof aRaw==='string'?JSON.parse(aRaw):aRaw;
+  circleLayer.clearLayers();
+  (a.results||[]).forEach((r,i)=>{
+    const z=zones.find(z=>z.id===r.id||z.name===r.name);
+    if(!z)return;
+    const color=scoreColor(r.score||0);
+    const c=L.circle([z.lat,z.lng],{radius:z.radius,color,fillColor:color,fillOpacity:.22,weight:2,opacity:.8});
+    const rank=i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`;
+    c.bindPopup(`<div class="popup-name">${rank} ${z.name}</div><div class="popup-score">${r.score}<span style="font-size:.65rem;color:#5a6478"> / 100</span></div><div class="popup-desc">${z.desc}</div>`);
+    c.on('mouseover',function(){this.openPopup();});
+    circleLayer.addLayer(c);
+  });
+  const first=a.results?.[0];
+  if(first){const z0=zones.find(z=>z.id===first.id||z.name===first.name);if(z0)map.setView([z0.lat,z0.lng],14);}
+  const t=document.getElementById('toast');
+  t.style.background='#3b82f6';t.textContent=`📂 ${a.name||typeLabels[a.type]||a.type}`;
+  t.classList.add('show');setTimeout(()=>{t.classList.remove('show');t.style.background='';},2500);
+}
+
+function toggleCityChip(){
+  const body=document.getElementById('cityBody');
+  const tog=document.getElementById('city-toggle');
+  const open=body.classList.toggle('open');
+  tog.textContent=open?'▲':'▼';
+}
+function cpTab(btn,panelId){
+  document.querySelectorAll('.cp-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.cp-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(panelId).classList.add('active');
+}
 </script>
 </body>
 </html>
