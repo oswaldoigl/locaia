@@ -7,8 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css"/>
-<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
 <style>
 :root{
   --bg:#06080b;--surface:#0d1017;--card:#121620;--border:#1c2230;
@@ -740,8 +738,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
 const SUPABASE_URL = 'https://etdjlwtopaehamhlwwrd.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_OLKBJ7H2vfDMbCr0v9YnqA_yVrLfL0M';
 const { createClient } = supabase;
@@ -1585,7 +1584,6 @@ function cpTab(btn,panelId){
   btn.classList.add('active');
   document.getElementById(panelId).classList.add('active');
 }
-}); // end DOMContentLoaded
 </script>
 </body>
 </html>
