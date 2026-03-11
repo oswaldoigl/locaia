@@ -1117,6 +1117,7 @@ const typeLabels={
 
 let selectedType='comida_rapida',selectedBudget='bajo',analyzed=false,lastScored=[];
 let selectedParking='poco',selectedNSE='todos',selectedComp='todos',selectedTrafico=0,selectedFormato='todos';
+let proDiscovery='impulso',proTicket='bajo',proPresencia='funcional';
 
 function scoreZone(z){
   const tw=typeWeights[selectedType]||typeWeights.comida_rapida;
@@ -1363,24 +1364,7 @@ if(typeGrid) typeGrid.querySelectorAll('.type-btn').forEach(btn=>{
     if(analyzed) analyze();
   });
 });
-document.getElementById('budgetGroup').querySelectorAll('.budget-opt').forEach(opt=>{
-  opt.addEventListener('click',()=>{
-    document.querySelectorAll('#budgetGroup .budget-opt').forEach(o=>o.classList.remove('active'));
-    opt.classList.add('active');selectedBudget=opt.dataset.budget;if(analyzed)analyze();
-  });
-});
-document.getElementById('nseGroup').querySelectorAll('.budget-opt').forEach(opt=>{
-  opt.addEventListener('click',()=>{
-    document.querySelectorAll('#nseGroup .budget-opt').forEach(o=>o.classList.remove('active'));
-    opt.classList.add('active');selectedNSE=opt.dataset.nse;if(analyzed)analyze();
-  });
-});
-document.getElementById('formatoGroup').querySelectorAll('.budget-opt').forEach(opt=>{
-  opt.addEventListener('click',()=>{
-    document.querySelectorAll('#formatoGroup .budget-opt').forEach(o=>o.classList.remove('active'));
-    opt.classList.add('active');selectedFormato=opt.dataset.formato;if(analyzed)analyze();
-  });
-});
+// listeners handled above
 
 // ── SAVE MODAL ──
 function openSaveModal(){
@@ -1872,9 +1856,7 @@ const PMD_BONUS = {
 };
 
 // ── PRO STATE ──────────────────────────────────────────────────────────────
-let proDiscovery = 'impulso';
-let proTicket    = 'bajo';
-let proPresencia = 'funcional';
+// proDiscovery/Ticket/Presencia moved to top-level declarations
 
 function setProChip(groupId, el){
   document.getElementById(groupId).querySelectorAll('.pro-chip').forEach(c=>{
