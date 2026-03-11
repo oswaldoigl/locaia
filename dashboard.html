@@ -146,6 +146,30 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--green);color:#000;font-weight:700;font-family:'Syne',sans-serif;padding:12px 24px;border-radius:10px;font-size:.85rem;z-index:9999;transition:transform .3s ease;pointer-events:none;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 
+
+/* ── AI ADVISOR MODAL ── */
+.ai-modal-box{background:var(--surface);border:1px solid rgba(139,92,246,.3);border-radius:16px;max-width:680px;width:100%;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.7);}
+.ai-modal-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.ai-modal-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;display:flex;align-items:center;gap:8px;}
+.ai-chat{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;}
+.ai-chat::-webkit-scrollbar{width:4px;}
+.ai-chat::-webkit-scrollbar-track{background:transparent;}
+.ai-chat::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.ai-msg{max-width:88%;line-height:1.55;font-size:.82rem;padding:10px 14px;border-radius:12px;}
+.ai-msg.user{align-self:flex-end;background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.25);color:var(--text);}
+.ai-msg.bot{align-self:flex-start;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);color:var(--text);}
+.ai-msg.bot strong{color:#a78bfa;}
+.ai-msg.typing{color:var(--muted);font-style:italic;}
+.ai-input-row{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--border);flex-shrink:0;}
+.ai-input{flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 12px;font-size:.82rem;font-family:'Instrument Sans',sans-serif;outline:none;transition:border .2s;}
+.ai-input:focus{border-color:rgba(139,92,246,.5);}
+.ai-send{background:rgba(139,92,246,.8);border:none;color:#fff;padding:9px 16px;border-radius:8px;font-size:.82rem;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;transition:background .2s;flex-shrink:0;}
+.ai-send:hover{background:rgba(139,92,246,1);}
+.ai-send:disabled{opacity:.4;cursor:not-allowed;}
+.ai-pills{display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px 0;}
+.ai-pill{font-size:.68rem;padding:4px 10px;border-radius:20px;border:1px solid rgba(139,92,246,.3);color:#a78bfa;cursor:pointer;background:rgba(139,92,246,.08);transition:all .15s;}
+.ai-pill:hover{background:rgba(139,92,246,.2);}
+
 /* ── MODALS ── */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(6px);z-index:1000;align-items:center;justify-content:center;padding:20px;}
 .modal-overlay.open{display:flex;}
@@ -236,6 +260,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 <div class="topbar">
   <div class="logo">Loca<em>IA</em></div>
   <div class="topbar-right">
+    <button class="topbar-btn" id="aiBtn" onclick="openAIModal()" style="border-color:rgba(139,92,246,.4);color:#a78bfa;">🤖 Asesor IA</button>
     <button class="topbar-btn highlight" onclick="openAnalysesModal()">
       📊 Mis análisis
       <span class="badge-count" id="badge-count">0</span>
@@ -267,6 +292,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
           <button class="cp-tab" onclick="cpTab(this,'cp-infra')">Infra</button>
           <button class="cp-tab" onclick="cpTab(this,'cp-turismo')">Turismo</button>
           <button class="cp-tab" onclick="cpTab(this,'cp-rankings')">Rankings</button>
+          <button class="cp-tab" onclick="cpTab(this,'cp-plan')">Plan 25-27</button>
         </div>
 
         <div class="cp-panels">
@@ -274,8 +300,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
           <!-- GENERAL -->
           <div class="cp-panel active" id="cp-general">
             <div class="city-stats-grid three" style="margin-top:4px;">
-              <div class="city-stat"><div class="city-stat-val">864k</div><div class="city-stat-lbl">Habitantes municipio</div></div>
-              <div class="city-stat"><div class="city-stat-val">~1M</div><div class="city-stat-lbl">ZM Saltillo (Ramos + Arteaga)</div></div>
+              <div class="city-stat"><div class="city-stat-val">962k</div><div class="city-stat-lbl">Habitantes 2024 (CONAPO)</div></div>
+              <div class="city-stat"><div class="city-stat-val">~1.1M</div><div class="city-stat-lbl">ZM Saltillo (Ramos + Arteaga)</div></div>
               <div class="city-stat"><div class="city-stat-val">+20k</div><div class="city-stat-lbl">Hab. nuevos por año</div></div>
               <div class="city-stat"><div class="city-stat-val">393k</div><div class="city-stat-lbl">PEA ocupada</div></div>
               <div class="city-stat"><div class="city-stat-val">97.86%</div><div class="city-stat-lbl">Vive en mancha urbana</div></div>
@@ -315,8 +341,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
             <div class="city-stats-grid" style="margin-top:4px;">
               <div class="city-stat"><div class="city-stat-val">83%</div><div class="city-stat-lbl">Actividades secundarias (manufactura)</div></div>
               <div class="city-stat"><div class="city-stat-val">97.3%</div><div class="city-stat-lbl">Del sector secundario es industria mfr.</div></div>
-              <div class="city-stat"><div class="city-stat-val">$488M</div><div class="city-stat-lbl">Inversión acumulada USD 2017</div></div>
-              <div class="city-stat"><div class="city-stat-val">5.82%</div><div class="city-stat-lbl">Crecimiento anual hotelero</div></div>
+              <div class="city-stat"><div class="city-stat-val">$488M+</div><div class="city-stat-lbl">Inversión USD (2017, creciendo)</div></div>
+              <div class="city-stat"><div class="city-stat-val">8%</div><div class="city-stat-lbl">Crecimiento hotelero 2024 (OCV)</div></div>
             </div>
             <div class="cp-label">Sectores económicos (INEGI 2014)</div>
             <div class="cp-list">
@@ -446,6 +472,50 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
             </div>
           </div>
 
+
+          <!-- PLAN MUNICIPAL 2025-2027 -->
+          <div class="cp-panel" id="cp-plan">
+            <div class="cp-label" style="margin-top:4px;">Visión 2025-2027</div>
+            <div class="cp-list" style="margin-bottom:8px;">
+              Consolidar a Saltillo como la <span>mejor capital de México para vivir</span>. Presidente: Javier Díaz González.
+            </div>
+            <div class="cp-label">5 Ejes rectores</div>
+            <div class="cp-list">
+              🔒 <span>Saltillo Seguro</span> — #1 capital más segura del país (ENSU Q4 2024)<br>
+              📈 <span>Saltillo Competitivo</span> — Nearshoring, industria 5.0, Saltillo Valley<br>
+              🏙️ <span>Saltillo del Futuro</span> — Infraestructura, movilidad sostenible, agua<br>
+              🏛️ <span>Saltillo Honesto</span> — #1 confianza en autoridades municipales (ENCIG 2023)<br>
+              🤝 <span>Saltillo de Oportunidades</span> — Inclusión, educación, cultura, deporte
+            </div>
+            <div class="cp-label">14 Proyectos prioritarios 2025-2027</div>
+            <div class="cp-list">
+              1. Infraestructura de seguridad pública integral<br>
+              2. Mejora regulatoria y simplificación de trámites<br>
+              3. <span>Modelo Distrito Centro</span> — reactivación Centro Histórico<br>
+              4. <span>Saltillo como polo nearshoring</span> — atracción inversión extranjera<br>
+              5. <span>Saltillo Valley</span> — ecosistema tecnológico e industria 5.0<br>
+              6. Paso inferior Blvd. Fundadores × Misión <span>Cerritos</span><br>
+              7. Modernización Bulevares <span>Antonio Narro</span> y Vito Alessio<br>
+              8. Movilidad sustentable (ciclovías, cruceros inteligentes)<br>
+              9. Pavimentación y bacheo permanente (colonias periféricas)<br>
+              10. Reforestación municipal<br>
+              11. Presupuesto Participativo<br>
+              12. Rehabilitación <span>Alameda Zaragoza</span><br>
+              13. Estudio regional agua subterránea<br>
+              14. Atención coordinada a fenómenos naturales
+            </div>
+            <div class="cp-label">Datos sociales clave (CONEVAL 2020)</div>
+            <div class="city-stats-grid three">
+              <div class="city-stat"><div class="city-stat-val">1.6%</div><div class="city-stat-lbl">Pobreza extrema (vs 8.5% nacional)</div></div>
+              <div class="city-stat"><div class="city-stat-val">242k</div><div class="city-stat-lbl">Viviendas habitadas</div></div>
+              <div class="city-stat"><div class="city-stat-val">27.4%</div><div class="city-stat-lbl">Sin seguridad social</div></div>
+            </div>
+            <div class="cp-list" style="margin-top:6px;">
+              <span>Infraestructura seguridad:</span> 215 patrullas · 1,197 policías · 873 cámaras (211 con reconocimiento facial) · 2 drones<br>
+              <span>Red ciudadana:</span> 120,000 participantes — la más grande del país, replicada en 14 ciudades<br>
+              <span>Turismo de negocios:</span> 70% de los ingresos hoteleros de Saltillo
+            </div>
+          </div>
         </div><!-- /cp-panels -->
       </div><!-- /city-chip-body -->
     </div>
@@ -505,6 +575,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
       <div class="results-header">Top 5 · <span id="results-type-label"></span></div>
       <div id="zoneCards"></div>
       <button onclick="openSaveModal()" style="background:var(--card);border:1px solid var(--border);color:var(--muted2);border-radius:8px;padding:10px;font-size:.78rem;cursor:pointer;transition:all .2s;font-family:'Instrument Sans',sans-serif;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">💾 Guardar este análisis</button>
+      <button id="aiBtn" onclick="runAIAnalysis()" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);border:none;color:#fff;border-radius:8px;padding:10px;font-size:.78rem;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;width:100%;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;">✨ Análisis IA — Recomendación personalizada</button>
+      <div id="aiResult" style="display:none;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.25);border-radius:10px;padding:12px;font-size:.72rem;color:var(--muted2);line-height:1.7;"></div>
     </div>
 
     <div id="emptyState" class="empty"><div class="big">🗺️</div>Configura y presiona<br><strong>Analizar Saltillo</strong></div>
@@ -537,6 +609,31 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
         <input type="text" class="name-input" id="analysisName" placeholder="Ej: Mi cafetería en el Valle..." maxlength="60">
       </div>
       <button class="save-confirm-btn" id="saveConfirmBtn" onclick="confirmSave()">✅ Guardar análisis</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI ADVISOR MODAL -->
+<div class="modal-overlay" id="aiModal" onclick="if(event.target===this)closeAIModal()">
+  <div class="ai-modal-box">
+    <div class="ai-modal-head">
+      <div class="ai-modal-title">🤖 <span style="background:linear-gradient(90deg,#a78bfa,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Asesor IA · LocaIA</span></div>
+      <button class="modal-close" onclick="closeAIModal()">✕</button>
+    </div>
+    <div class="ai-chat" id="aiChat">
+      <div class="ai-msg bot">¡Hola! Soy el Asesor IA de LocaIA. Conozco a fondo Saltillo: datos DENUE 2026, el Plan Municipal de Desarrollo 2025-2027, los 13 parques industriales, las 20 zonas comerciales, rankings nacionales y mucho más.<br><br>¿Sobre qué negocio o zona quieres saber más?</div>
+    </div>
+    <div class="ai-pills" id="aiPills">
+      <span class="ai-pill" onclick="aiQuick('¿Qué zona recomiendas para una cafetería con NSE alto?')">☕ Cafetería NSE alto</span>
+      <span class="ai-pill" onclick="aiQuick('¿Qué impacto tiene el nearshoring en la demanda de negocios?')">🏭 Nearshoring</span>
+      <span class="ai-pill" onclick="aiQuick('¿Cuáles son las zonas con mayor crecimiento en Saltillo 2025?')">📈 Zonas en crecimiento</span>
+      <span class="ai-pill" onclick="aiQuick('¿Qué tipo de negocio es más viable en el Centro Histórico?')">🏛️ Centro Histórico</span>
+      <span class="ai-pill" onclick="aiQuick('¿Qué proyectos municipales 2025-2027 afectan las zonas comerciales?')">🏗️ Proyectos PMD</span>
+      <span class="ai-pill" onclick="aiQuick('¿Cómo afecta la demografía de Saltillo a mi negocio de ropa?')">👗 Demografía + ropa</span>
+    </div>
+    <div class="ai-input-row">
+      <input class="ai-input" id="aiInput" placeholder="Pregunta sobre zonas, negocios, demografía..." onkeydown="if(event.key==='Enter')sendAI()">
+      <button class="ai-send" id="aiSendBtn" onclick="sendAI()">Enviar</button>
     </div>
   </div>
 </div>
@@ -624,32 +721,98 @@ const circleLayer=L.layerGroup().addTo(map);
 
 // DENUE Feb 2026 — score 100=libre, 0=saturado
 const denue_competencia={
-  centro:      {comida_rapida:0, restaurante:0, cafeteria:0, panaderia:40,ropa:0, farmacia:0, papeleria:36,estetica:0, gym:0,  tech:0  },
-  republica:   {comida_rapida:81,restaurante:85,cafeteria:75,panaderia:84,ropa:98,farmacia:85,papeleria:90,estetica:79,gym:100,tech:88 },
-  valle:       {comida_rapida:97,restaurante:97,cafeteria:98,panaderia:98,ropa:98,farmacia:95,papeleria:100,estetica:100,gym:100,tech:100},
-  tecnologico: {comida_rapida:87,restaurante:93,cafeteria:82,panaderia:66,ropa:80,farmacia:87,papeleria:65,estetica:85,gym:50, tech:62 },
-  palmas:      {comida_rapida:99,restaurante:100,cafeteria:98,panaderia:98,ropa:99,farmacia:100,papeleria:100,estetica:99,gym:100,tech:100},
-  contry:      {comida_rapida:91,restaurante:91,cafeteria:78,panaderia:79,ropa:89,farmacia:97,papeleria:80,estetica:86,gym:100,tech:75 },
-  himno:       {comida_rapida:38,restaurante:89,cafeteria:16,panaderia:0, ropa:30,farmacia:51,papeleria:0, estetica:17,gym:50, tech:50 },
-  fama:        {comida_rapida:61,restaurante:81,cafeteria:44,panaderia:41,ropa:58,farmacia:69,papeleria:51,estetica:49,gym:0,  tech:38 },
-  pedregal:    {comida_rapida:57,restaurante:88,cafeteria:56,panaderia:28,ropa:60,farmacia:77,papeleria:54,estetica:47,gym:100,tech:75 },
-  pinos:       {comida_rapida:82,restaurante:99,cafeteria:67,panaderia:64,ropa:79,farmacia:69,papeleria:71,estetica:72,gym:100,tech:88 },
-  valle_flores:{comida_rapida:92,restaurante:98,cafeteria:91,panaderia:88,ropa:93,farmacia:97,papeleria:92,estetica:88,gym:100,tech:100},
-  cardenas:    {comida_rapida:95,restaurante:98,cafeteria:96,panaderia:91,ropa:92,farmacia:95,papeleria:92,estetica:90,gym:100,tech:100},
-  chamizal:    {comida_rapida:96,restaurante:100,cafeteria:93,panaderia:88,ropa:90,farmacia:95,papeleria:92,estetica:90,gym:100,tech:100},
-  cerritos:    {comida_rapida:92,restaurante:98,cafeteria:91,panaderia:95,ropa:89,farmacia:97,papeleria:89,estetica:88,gym:100,tech:100},
-  provivienda: {comida_rapida:92,restaurante:96,cafeteria:96,panaderia:91,ropa:95,farmacia:95,papeleria:96,estetica:92,gym:100,tech:100},
-  landin:      {comida_rapida:96,restaurante:100,cafeteria:91,panaderia:93,ropa:93,farmacia:90,papeleria:92,estetica:93,gym:100,tech:100},
-  san_patricio:{comida_rapida:90,restaurante:86,cafeteria:84,panaderia:95,ropa:99,farmacia:92,papeleria:100,estetica:89,gym:100,tech:100},
-  bonanza:     {comida_rapida:82,restaurante:90,cafeteria:82,panaderia:74,ropa:91,farmacia:85,papeleria:88,estetica:76,gym:100,tech:100},
-  virreyes:    {comida_rapida:89,restaurante:95,cafeteria:89,panaderia:91,ropa:96,farmacia:95,papeleria:95,estetica:90,gym:100,tech:100},
-  nazario:     {comida_rapida:95,restaurante:97,cafeteria:93,panaderia:98,ropa:97,farmacia:97,papeleria:98,estetica:96,gym:100,tech:100},
+  centro:{comida_rapida:0,restaurante:0,cafeteria:100,panaderia:33,ropa:100,farmacia:0,papeleria:100,estetica:0,gym:10,tech:54},
+  republica:{comida_rapida:65,restaurante:86,cafeteria:100,panaderia:81,ropa:100,farmacia:80,papeleria:100,estetica:59,gym:70,tech:93},
+  bellavista:{comida_rapida:67,restaurante:93,cafeteria:100,panaderia:53,ropa:100,farmacia:78,papeleria:100,estetica:36,gym:50,tech:33},
+  mirasierra:{comida_rapida:73,restaurante:84,cafeteria:100,panaderia:61,ropa:100,farmacia:91,papeleria:100,estetica:67,gym:85,tech:69},
+  morelos:{comida_rapida:66,restaurante:88,cafeteria:100,panaderia:44,ropa:100,farmacia:84,papeleria:100,estetica:40,gym:70,tech:41},
+  saltillo2000:{comida_rapida:68,restaurante:86,cafeteria:100,panaderia:14,ropa:100,farmacia:85,papeleria:100,estetica:28,gym:75,tech:35},
+  ign_zaragoza:{comida_rapida:79,restaurante:88,cafeteria:100,panaderia:67,ropa:100,farmacia:90,papeleria:100,estetica:66,gym:50,tech:65},
+  topochico:{comida_rapida:29,restaurante:41,cafeteria:100,panaderia:64,ropa:100,farmacia:66,papeleria:100,estetica:48,gym:20,tech:64},
+  vistahermosa:{comida_rapida:72,restaurante:89,cafeteria:100,panaderia:31,ropa:100,farmacia:89,papeleria:100,estetica:54,gym:45,tech:51},
+  la_madrid:{comida_rapida:58,restaurante:70,cafeteria:100,panaderia:28,ropa:100,farmacia:74,papeleria:100,estetica:34,gym:45,tech:28},
+  vic_guerrero:{comida_rapida:84,restaurante:92,cafeteria:100,panaderia:47,ropa:100,farmacia:96,papeleria:100,estetica:54,gym:90,tech:56},
+  lourdes:{comida_rapida:44,restaurante:74,cafeteria:100,panaderia:42,ropa:100,farmacia:70,papeleria:100,estetica:42,gym:0,tech:53},
+  m_hidalgo:{comida_rapida:82,restaurante:88,cafeteria:100,panaderia:67,ropa:100,farmacia:90,papeleria:100,estetica:67,gym:80,tech:70},
+  san_ramon:{comida_rapida:70,restaurante:92,cafeteria:100,panaderia:72,ropa:100,farmacia:90,papeleria:100,estetica:77,gym:55,tech:42},
+  la_salle:{comida_rapida:76,restaurante:88,cafeteria:100,panaderia:94,ropa:100,farmacia:76,papeleria:100,estetica:89,gym:75,tech:94},
+  satelite_n:{comida_rapida:70,restaurante:89,cafeteria:100,panaderia:39,ropa:100,farmacia:85,papeleria:100,estetica:40,gym:85,tech:36},
+  nuevo_mir:{comida_rapida:88,restaurante:90,cafeteria:100,panaderia:31,ropa:100,farmacia:95,papeleria:100,estetica:58,gym:95,tech:48},
+  las_teresitas:{comida_rapida:64,restaurante:85,cafeteria:100,panaderia:44,ropa:100,farmacia:79,papeleria:100,estetica:54,gym:80,tech:60},
+  valle_flores:{comida_rapida:67,restaurante:89,cafeteria:100,panaderia:72,ropa:100,farmacia:90,papeleria:100,estetica:58,gym:55,tech:66},
+  ant_cardenas:{comida_rapida:21,restaurante:55,cafeteria:100,panaderia:53,ropa:100,farmacia:30,papeleria:100,estetica:17,gym:70,tech:51},
+  chamizal:{comida_rapida:65,restaurante:86,cafeteria:100,panaderia:6,ropa:100,farmacia:82,papeleria:100,estetica:37,gym:65,tech:0},
+  col25:{comida_rapida:77,restaurante:85,cafeteria:100,panaderia:89,ropa:100,farmacia:91,papeleria:100,estetica:81,gym:65,tech:86},
+  sj_cerritos:{comida_rapida:76,restaurante:85,cafeteria:100,panaderia:83,ropa:100,farmacia:86,papeleria:100,estetica:79,gym:70,tech:69},
+  satelite_s:{comida_rapida:89,restaurante:99,cafeteria:100,panaderia:83,ropa:100,farmacia:95,papeleria:100,estetica:83,gym:90,tech:77},
+  landin:{comida_rapida:80,restaurante:95,cafeteria:100,panaderia:31,ropa:100,farmacia:91,papeleria:100,estetica:62,gym:85,tech:22},
+  v_olimpica:{comida_rapida:58,restaurante:78,cafeteria:100,panaderia:89,ropa:100,farmacia:69,papeleria:100,estetica:68,gym:40,tech:94},
+  lomas_ref:{comida_rapida:91,restaurante:96,cafeteria:100,panaderia:64,ropa:100,farmacia:95,papeleria:100,estetica:68,gym:75,tech:62},
+  lomas_zap:{comida_rapida:86,restaurante:96,cafeteria:100,panaderia:39,ropa:100,farmacia:99,papeleria:100,estetica:72,gym:90,tech:31},
+  san_patricio:{comida_rapida:64,restaurante:78,cafeteria:100,panaderia:83,ropa:100,farmacia:89,papeleria:100,estetica:45,gym:80,tech:84},
+  rancho_pena:{comida_rapida:79,restaurante:89,cafeteria:100,panaderia:92,ropa:100,farmacia:95,papeleria:100,estetica:81,gym:70,tech:94},
+  nazario:{comida_rapida:89,restaurante:96,cafeteria:100,panaderia:81,ropa:100,farmacia:98,papeleria:100,estetica:85,gym:100,tech:73},
+  bonanza:{comida_rapida:43,restaurante:74,cafeteria:100,panaderia:44,ropa:100,farmacia:76,papeleria:100,estetica:17,gym:0,tech:68},
+  virreyes:{comida_rapida:80,restaurante:96,cafeteria:100,panaderia:75,ropa:100,farmacia:98,papeleria:100,estetica:79,gym:100,tech:86},
+  mision_orte:{comida_rapida:90,restaurante:96,cafeteria:100,panaderia:89,ropa:100,farmacia:94,papeleria:100,estetica:71,gym:100,tech:65},
+  fed_berrueto:{comida_rapida:88,restaurante:85,cafeteria:100,panaderia:39,ropa:100,farmacia:91,papeleria:100,estetica:57,gym:85,tech:44},
+  guanajuato:{comida_rapida:60,restaurante:84,cafeteria:100,panaderia:83,ropa:100,farmacia:79,papeleria:100,estetica:34,gym:65,tech:88},
+  universidad:{comida_rapida:67,restaurante:93,cafeteria:100,panaderia:19,ropa:100,farmacia:84,papeleria:100,estetica:44,gym:80,tech:27},
+  los_pinos:{comida_rapida:61,restaurante:79,cafeteria:100,panaderia:75,ropa:100,farmacia:84,papeleria:100,estetica:4,gym:45,tech:92},
+  los_gonzalez:{comida_rapida:83,restaurante:90,cafeteria:100,panaderia:97,ropa:100,farmacia:96,papeleria:100,estetica:82,gym:50,tech:93},
+  lomalinda:{comida_rapida:86,restaurante:99,cafeteria:100,panaderia:50,ropa:100,farmacia:94,papeleria:100,estetica:74,gym:90,tech:51},
+  roma:{comida_rapida:76,restaurante:88,cafeteria:100,panaderia:0,ropa:100,farmacia:86,papeleria:100,estetica:45,gym:55,tech:24},
+  hacienda_n:{comida_rapida:92,restaurante:95,cafeteria:100,panaderia:100,ropa:100,farmacia:100,papeleria:100,estetica:93,gym:85,tech:80},
+  n_teresitas:{comida_rapida:87,restaurante:100,cafeteria:100,panaderia:81,ropa:100,farmacia:99,papeleria:100,estetica:83,gym:90,tech:66},
+  el_salvador:{comida_rapida:87,restaurante:95,cafeteria:100,panaderia:58,ropa:100,farmacia:94,papeleria:100,estetica:62,gym:75,tech:48},
+  b_aires:{comida_rapida:64,restaurante:85,cafeteria:100,panaderia:39,ropa:100,farmacia:90,papeleria:100,estetica:35,gym:45,tech:36},
 };
 const denue_total={
-  centro:4615,republica:728,valle:59,tecnologico:493,palmas:21,
-  contry:540,himno:2016,fama:1443,pedregal:1387,pinos:580,
-  valle_flores:225,cardenas:220,chamizal:220,cerritos:358,provivienda:395,
-  landin:185,san_patricio:333,bonanza:480,virreyes:314,nazario:342,
+  centro:2719,
+  republica:908,
+  bellavista:880,
+  mirasierra:423,
+  morelos:715,
+  saltillo2000:735,
+  ign_zaragoza:467,
+  topochico:1466,
+  vistahermosa:778,
+  la_madrid:1150,
+  vic_guerrero:486,
+  lourdes:1146,
+  m_hidalgo:435,
+  san_ramon:941,
+  la_salle:615,
+  satelite_n:711,
+  nuevo_mir:473,
+  las_teresitas:618,
+  valle_flores:797,
+  ant_cardenas:1541,
+  chamizal:1014,
+  col25:637,
+  sj_cerritos:633,
+  satelite_s:262,
+  landin:709,
+  v_olimpica:895,
+  lomas_ref:318,
+  lomas_zap:618,
+  san_patricio:572,
+  rancho_pena:300,
+  nazario:527,
+  bonanza:1046,
+  virreyes:443,
+  mision_orte:337,
+  fed_berrueto:470,
+  guanajuato:927,
+  universidad:832,
+  los_pinos:775,
+  los_gonzalez:231,
+  lomalinda:444,
+  roma:839,
+  hacienda_n:178,
+  n_teresitas:260,
+  el_salvador:500,
+  b_aires:842,
 };
 
 function updateInegiZone(zid){
@@ -662,66 +825,51 @@ function updateInegiZone(zid){
 }
 
 const zones=[
-  {id:"centro",     name:"Centro Histórico",          lat:25.4244,lng:-100.9995,radius:600,data:{trafico:97,nse:52,acceso:48,renta:{bajo:false,medio:true,alto:true}},
-   tags_pos:["Tráfico máximo","4,615 negocios","Catedral Barroca","Teatro García Carrillo"],tags_neg:["Muy saturado","Sin parking"],
-   desc:"Corazón comercial de Saltillo. 4,615 negocios DENUE. Aquí está la Catedral más alta del norte de MX, la Casa Purcell y el Teatro García Carrillo (1919). Máximo flujo peatonal de la ciudad."},
-  {id:"valle",      name:"Zona Valle",                lat:25.4516,lng:-100.9741,radius:550,data:{trafico:45,nse:97,acceso:82,renta:{bajo:false,medio:false,alto:true}},
-   tags_pos:["NSE altísimo","59 negocios — casi virgen","Directivos industriales"],tags_neg:["Requiere auto","Renta alta"],
-   desc:"La zona más exclusiva de Saltillo. NSE altísimo — directivos de Daimler, FCA, Saint-Gobain. Solo 59 negocios DENUE, prácticamente sin competencia en cualquier giro."},
-  {id:"republica",  name:"Col. República",            lat:25.4391,lng:-100.9901,radius:480,data:{trafico:83,nse:58,acceso:78,renta:{bajo:false,medio:true,alto:true}},
-   tags_pos:["Gran corredor comercial","728 negocios","Buena conectividad"],tags_neg:["NSE medio"],
-   desc:"Eje comercial muy activo con 728 negocios. Saltillo tiene 97.95% de alfabetismo y escolaridad promedio de 10.56 años — consumidores con buen poder adquisitivo medio."},
-  {id:"tecnologico",name:"Zona Tecnológico",          lat:25.4549,lng:-101.016, radius:520,data:{trafico:74,nse:38,acceso:52,renta:{bajo:true,medio:true,alto:false}},
-   tags_pos:["33,700 estudiantes universitarios","ITS · UAdeC · Tec MTY","Renta baja"],tags_neg:["Demanda estacional"],
-   desc:"Hub universitario: 33,700 estudiantes en educación superior (ANUIES 2017). ITS, UAdeC, Tec Monterrey Campus Saltillo. Ideal para giros de consumo frecuente y precio accesible."},
-  {id:"palmas",     name:"Las Palmas",                lat:25.4091,lng:-100.9653,radius:500,data:{trafico:38,nse:68,acceso:62,renta:{bajo:true,medio:true,alto:false}},
-   tags_pos:["21 negocios — sin competencia","NSE medio-alto","Zona residencial"],tags_neg:["Tráfico muy bajo"],
-   desc:"La zona con menos negocios de Saltillo — solo 21 en DENUE. NSE medio. Oportunidad pionera en una ciudad donde el 97.86% vive dentro de la mancha urbana."},
-  {id:"pedregal",   name:"Morelos / Zaragoza",        lat:25.4098,lng:-100.9701,radius:480,data:{trafico:68,nse:38,acceso:45,renta:{bajo:true,medio:false,alto:false}},
-   tags_pos:["Renta mínima","1,387 negocios","Mercado de volumen"],tags_neg:["NSE bajo"],
-   desc:"Zona popular con 1,387 negocios. Con 393,409 personas en la PEA (49% de la población), el volumen de clientes es enorme incluso en NSE bajo."},
-  {id:"contry",     name:"Contry / Las Américas",     lat:25.4306,lng:-100.9688,radius:480,data:{trafico:68,nse:82,acceso:75,renta:{bajo:false,medio:true,alto:true}},
-   tags_pos:["NSE alto","540 negocios","Cerca hospitales privados"],tags_neg:["Competencia media"],
-   desc:"540 negocios activos. Zona de alto NSE — cercana a hospitales privados y estadio. Saltillo es Top 3 en calidad de vida según Forbes."},
-  {id:"himno",      name:"Mirasierra / Bellavista",   lat:25.413, lng:-100.9554,radius:480,data:{trafico:85,nse:55,acceso:58,renta:{bajo:false,medio:true,alto:true}},
-   tags_pos:["Alto tráfico","2,016 negocios","Parque Las Maravillas"],tags_neg:["Saturado en varios giros"],
-   desc:"2,016 negocios activos. Zona muy comercial cercana al Parque Las Maravillas. Saltillo es la 2ª ciudad con mejor movilidad urbana del país."},
-  {id:"fama",       name:"Saltillo 2000 / Lourdes",   lat:25.427, lng:-100.9918,radius:500,data:{trafico:72,nse:72,acceso:85,renta:{bajo:false,medio:true,alto:true}},
-   tags_pos:["Buen acceso","NSE medio-alto","1,443 negocios","Cerca Hwy 57"],tags_neg:["Gym saturado"],
-   desc:"1,443 negocios. NSE medio-alto y acceso excelente por Carretera Federal 57 (Saltillo-CDMX). La ZM de Saltillo crece ~20,000 habitantes/año."},
-  {id:"pinos",      name:"La Madrid / Las Teresitas", lat:25.3864,lng:-100.9983,radius:450,data:{trafico:42,nse:65,acceso:55,renta:{bajo:true,medio:true,alto:false}},
-   tags_pos:["580 negocios","Solo 1 restaurante DENUE","Parque Industrial cercano"],tags_neg:["Tráfico bajo"],
-   desc:"580 negocios. Un solo restaurante en DENUE — oportunidad enorme. Cerca del Parque Industrial Las Teresitas con trabajadores de planta con empleo formal."},
-  {id:"valle_flores",name:"Valle de las Flores",      lat:25.433, lng:-100.9588,radius:430,data:{trafico:55,nse:42,acceso:52,renta:{bajo:true,medio:true,alto:false}},
-   tags_pos:["225 negocios","Colonia Infonavit","Competencia baja"],tags_neg:["NSE popular"],
-   desc:"225 negocios DENUE. Colonia Infonavit en crecimiento. Saltillo tiene la 2ª mejor formalidad laboral del país — incluso obreros de maquiladora tienen ingresos estables."},
-  {id:"cardenas",   name:"Col. Antonio Cárdenas",     lat:25.4248,lng:-101.0079,radius:420,data:{trafico:58,nse:40,acceso:48,renta:{bajo:true,medio:false,alto:false}},
-   tags_pos:["220 negocios","Renta muy accesible","Zona obrera"],tags_neg:["Lejos del centro"],
-   desc:"220 negocios. Colonia obrera con empleo formal — Saltillo fabrica RAM 1500, vidrio para Tesla 3 y más de 200 tracto-camiones Daimler al día. Ingreso constante."},
-  {id:"chamizal",   name:"Col. Chamizal",             lat:25.4134,lng:-101.028, radius:420,data:{trafico:52,nse:38,acceso:44,renta:{bajo:true,medio:false,alto:false}},
-   tags_pos:["Sin restaurantes formales","220 negocios"],tags_neg:["NSE bajo","Zona periférica"],
-   desc:"220 negocios sin restaurantes formales. Zona popular cerca de la zona industrial poniente. Renta muy accesible — ideal para primer local."},
-  {id:"cerritos",   name:"San José / Misión Cerritos",lat:25.4329,lng:-100.9225,radius:460,data:{trafico:48,nse:72,acceso:65,renta:{bajo:false,medio:true,alto:true}},
-   tags_pos:["NSE alto","358 negocios","Zona en auge","Cerca Hwy 40"],tags_neg:["Requiere auto"],
-   desc:"358 negocios en zona de alto crecimiento. NSE alto — área nueva residencial. La ZM de Saltillo crece ~20,000 hab/año y Cerritos capta gran parte del desarrollo."},
-  {id:"provivienda",name:"Provivienda / Topo Chico",  lat:25.4287,lng:-100.9821,radius:440,data:{trafico:62,nse:45,acceso:58,renta:{bajo:true,medio:true,alto:false}},
-   tags_pos:["395 negocios","Alta densidad","Buen tráfico"],tags_neg:["NSE medio-bajo"],
-   desc:"395 negocios activos cerca del centro. Agua entubada 99%, drenaje 99% — infraestructura básica sólida para cualquier giro de alimentos o servicios."},
-  {id:"landin",     name:"Col. Landín",               lat:25.4009,lng:-101.0215,radius:410,data:{trafico:45,nse:36,acceso:42,renta:{bajo:true,medio:false,alto:false}},
-   tags_pos:["185 negocios","Competencia muy baja","Renta mínima"],tags_neg:["NSE muy bajo"],
-   desc:"185 negocios sin restaurantes formales. Empleados de la industria automotriz con ingreso fijo. Renta mínima con alto potencial de volumen."},
-  {id:"san_patricio",name:"San Patricio / Peña",      lat:25.466, lng:-100.9676,radius:450,data:{trafico:50,nse:75,acceso:68,renta:{bajo:false,medio:true,alto:true}},
-   tags_pos:["NSE alto","333 negocios","Sin papelerías DENUE","Zona residencial nueva"],tags_neg:["Zona en desarrollo"],
-   desc:"333 negocios en zona residencial de alto NSE. Sin papelerías registradas — nicho claro. Saltillo tiene 66 hoteles y 76 espacios culturales que generan demanda de servicios."},
-  {id:"bonanza",    name:"Bonanza / Oceanía",         lat:25.4422,lng:-100.9592,radius:450,data:{trafico:64,nse:52,acceso:60,renta:{bajo:true,medio:true,alto:false}},
-   tags_pos:["480 negocios","Buena afluencia","Zona mixta"],tags_neg:["NSE medio"],
-   desc:"480 negocios. Zona mixta residencial-comercial con buen movimiento. La ocupación hotelera de Saltillo crece 5.82% anual — economía dinámica y en expansión."},
-  {id:"virreyes",   name:"Col. Virreyes",             lat:25.4655,lng:-100.987, radius:430,data:{trafico:52,nse:65,acceso:62,renta:{bajo:false,medio:true,alto:true}},
-   tags_pos:["314 negocios","NSE medio-alto","Colonia consolidada"],tags_neg:["Competencia creciente"],
-   desc:"314 negocios. Colonia establecida con poder adquisitivo medio-alto. Empleados nivel gerencial de John Deere, Linamar y Martinrea residen en esta zona."},
-  {id:"nazario",    name:"Nazario / Villa Olímpica",  lat:25.4628,lng:-100.9907,radius:440,data:{trafico:48,nse:55,acceso:58,renta:{bajo:true,medio:true,alto:false}},
-   tags_pos:["342 negocios","Muy poca saturación","Zona norte en crecimiento"],tags_neg:["Tráfico moderado"],
-   desc:"342 negocios con competencia muy baja en casi todos los giros. Zona norte en expansión — Saltillo crece 20,000 hab/año, la demanda de servicios aumenta constantemente."},
+  {id:"centro",name:"Centro Histórico",lat:25.4241,lng:-100.9995,radius:600,desc:"Hub comercial de Saltillo. 2,719 negocios (DENUE). Proyecto Distrito Centro + Alameda Zaragoza (PMD 2025).",tags_pos:[],tags_neg:[],data:{trafico:100,nse:70,acceso:85,renta:{bajo:true,medio:true,alto:true}}},
+  {id:"republica",name:"Col. República",lat:25.4391,lng:-100.9899,radius:400,desc:"Corredor comercial norte-centro. 908 negocios. Alta densidad peatonal.",tags_pos:[],tags_neg:[],data:{trafico:33,nse:62,acceso:85,renta:{bajo:true,medio:true,alto:true}}},
+  {id:"bellavista",name:"Bellavista/Olímpica Sur",lat:25.4055,lng:-101.0063,radius:400,desc:"Zona sur-centro con alta densidad residencial. 880 negocios.",tags_pos:[],tags_neg:[],data:{trafico:32,nse:38,acceso:65,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"mirasierra",name:"Mirasierra/Oriente",lat:25.4239,lng:-100.9242,radius:500,desc:"Zona oriente con crecimiento sostenido. 423 negocios. Acceso por autopista a Monterrey.",tags_pos:[],tags_neg:[],data:{trafico:16,nse:55,acceso:65,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"morelos",name:"Morelos/Zaragoza",lat:25.4115,lng:-100.9444,radius:400,desc:"Colonia popular densa. 715 negocios. Alto volumen y tráfico cotidiano.",tags_pos:[],tags_neg:[],data:{trafico:26,nse:35,acceso:65,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"saltillo2000",name:"Saltillo 2000/Nte",lat:25.4644,lng:-101.0286,radius:450,desc:"Zona norte en expansión. 735 negocios. Conectividad a parques industriales.",tags_pos:[],tags_neg:[],data:{trafico:27,nse:60,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"ign_zaragoza",name:"Ignacio Zaragoza",lat:25.4213,lng:-100.9338,radius:350,desc:"Zona oriente-centro. 467 negocios. NSE medio, buen tráfico.",tags_pos:[],tags_neg:[],data:{trafico:17,nse:42,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"topochico",name:"Topo Chico/Provivienda",lat:25.43,lng:-100.983,radius:400,desc:"Gran zona residencial popular. 1,466 negocios. Buen volumen comercial.",tags_pos:[],tags_neg:[],data:{trafico:54,nse:38,acceso:85,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"vistahermosa",name:"Vista Hermosa/Fund.",lat:25.4125,lng:-100.9496,radius:400,desc:"Vista Hermosa y Fundadores. 778 negocios. NSE medio, bien conectado.",tags_pos:[],tags_neg:[],data:{trafico:29,nse:50,acceso:65,renta:{bajo:true,medio:true,alto:true}}},
+  {id:"la_madrid",name:"La Madrid/Miravalle",lat:25.4005,lng:-100.9913,radius:400,desc:"Zona sur con alta concentración residencial. 1,150 negocios.",tags_pos:[],tags_neg:[],data:{trafico:42,nse:35,acceso:65,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"vic_guerrero",name:"Vicente Guerrero/Sur",lat:25.393,lng:-100.9831,radius:350,desc:"Colonia popular sur. 486 negocios. Mercado de proximidad y lealtad local.",tags_pos:[],tags_neg:[],data:{trafico:18,nse:30,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"lourdes",name:"Lourdes/Poniente Sur",lat:25.3917,lng:-101.0027,radius:350,desc:"Zona sur-poniente. 1,146 negocios. Buena masa crítica residencial.",tags_pos:[],tags_neg:[],data:{trafico:42,nse:32,acceso:65,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"m_hidalgo",name:"Miguel Hidalgo/Gonzalez",lat:25.3886,lng:-100.9853,radius:350,desc:"Miguel Hidalgo y González. 435 negocios. Mercado de proximidad sur.",tags_pos:[],tags_neg:[],data:{trafico:16,nse:32,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"san_ramon",name:"San Ramón/Cumbres",lat:25.4215,lng:-100.9716,radius:350,desc:"San Ramón y Cumbres. 941 negocios. NSE medio-alto.",tags_pos:[],tags_neg:[],data:{trafico:35,nse:55,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"la_salle",name:"La Salle/Latinoam.",lat:25.4524,lng:-100.9924,radius:350,desc:"La Salle y Latinoamericana. 615 negocios. NSE alto, alto poder adquisitivo.",tags_pos:[],tags_neg:[],data:{trafico:23,nse:68,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"satelite_n",name:"Satélite Norte",lat:25.4593,lng:-101.0164,radius:350,desc:"Satélite Norte. 711 negocios. En crecimiento ligada al nearshoring.",tags_pos:[],tags_neg:[],data:{trafico:26,nse:62,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"nuevo_mir",name:"Nuevo Mirasierra",lat:25.4093,lng:-100.9189,radius:400,desc:"Nuevo Mirasierra. 473 negocios. Zona oriente emergente.",tags_pos:[],tags_neg:[],data:{trafico:17,nse:48,acceso:65,renta:{bajo:true,medio:true,alto:true}}},
+  {id:"las_teresitas",name:"Las Teresitas/Sur",lat:25.3644,lng:-101.0093,radius:450,desc:"Las Teresitas sur. 618 negocios. NSE bajo, mercado de alto volumen.",tags_pos:[],tags_neg:[],data:{trafico:23,nse:28,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"valle_flores",name:"Valle de las Flores",lat:25.433,lng:-100.9588,radius:350,desc:"Valle de las Flores. 797 negocios. Residencial nueva con poca competencia.",tags_pos:[],tags_neg:[],data:{trafico:29,nse:52,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"ant_cardenas",name:"Antonio Cárdenas",lat:25.4248,lng:-101.0079,radius:300,desc:"Antonio Cárdenas. 1,541 negocios. Una de las zonas de mayor potencial.",tags_pos:[],tags_neg:[],data:{trafico:57,nse:45,acceso:85,renta:{bajo:true,medio:true,alto:true}}},
+  {id:"chamizal",name:"Chamizal/Guayulera",lat:25.4134,lng:-101.028,radius:350,desc:"Chamizal y Guayulera. 1,014 negocios. Beneficia modernización Blvd. Vito Alessio (PMD).",tags_pos:[],tags_neg:[],data:{trafico:37,nse:34,acceso:65,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"col25",name:"Col. 25/Norte Lejano",lat:25.4778,lng:-100.978,radius:400,desc:"Col. 25 y alrededores. 637 negocios. Zona norte con espacio de crecimiento.",tags_pos:[],tags_neg:[],data:{trafico:23,nse:55,acceso:65,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"sj_cerritos",name:"San José/Misión Cerritos",lat:25.435,lng:-100.925,radius:500,desc:"San José y Misión Cerritos. 633 negocios. Paso inferior Blvd. Fundadores en construcción (PMD).",tags_pos:[],tags_neg:[],data:{trafico:23,nse:55,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"satelite_s",name:"Satélite Sur",lat:25.4529,lng:-101.0207,radius:350,desc:"Satélite Sur. 262 negocios. NSE alto, baja competencia.",tags_pos:[],tags_neg:[],data:{trafico:10,nse:62,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"landin",name:"Col. Landín/La Minita",lat:25.4009,lng:-101.027,radius:350,desc:"Landín y La Minita. 709 negocios. Zona poniente con bulevar en modernización.",tags_pos:[],tags_neg:[],data:{trafico:26,nse:34,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"v_olimpica",name:"Villa Olímpica",lat:25.4609,lng:-100.9823,radius:350,desc:"Villa Olímpica. 895 negocios. Zona norte-oriente activa.",tags_pos:[],tags_neg:[],data:{trafico:33,nse:55,acceso:65,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"lomas_ref",name:"Lomas del Refugio",lat:25.351,lng:-101.0123,radius:400,desc:"Lomas del Refugio. 318 negocios. Zona sur lejana con mercado captivo.",tags_pos:[],tags_neg:[],data:{trafico:12,nse:28,acceso:45,renta:{bajo:true,medio:false,alto:false}}},
+  {id:"lomas_zap",name:"Lomas de Zapalinamé",lat:25.3917,lng:-100.9514,radius:350,desc:"Lomas de Zapalinamé. 618 negocios. Zona sur con demanda desatendida.",tags_pos:[],tags_neg:[],data:{trafico:23,nse:40,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"san_patricio",name:"San Patricio",lat:25.4581,lng:-100.9568,radius:350,desc:"San Patricio. 572 negocios. NSE alto al norte.",tags_pos:[],tags_neg:[],data:{trafico:21,nse:70,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"rancho_pena",name:"Rancho de Peña",lat:25.4739,lng:-100.9787,radius:350,desc:"Rancho de Peña. 300 negocios. NSE alto, zona norte residencial.",tags_pos:[],tags_neg:[],data:{trafico:11,nse:68,acceso:65,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"nazario",name:"Nazario/Villa Olímpica",lat:25.4649,lng:-100.9999,radius:350,desc:"Nazario Ortiz Garza. 527 negocios. Zona norte consolidada.",tags_pos:[],tags_neg:[],data:{trafico:19,nse:50,acceso:65,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"bonanza",name:"Bonanza/Oceanía",lat:25.444,lng:-100.959,radius:400,desc:"Bonanza y Oceanía. 1,046 negocios. Zona oriente activa con buen crecimiento.",tags_pos:[],tags_neg:[],data:{trafico:38,nse:48,acceso:85,renta:{bajo:true,medio:true,alto:true}}},
+  {id:"virreyes",name:"Col. Virreyes",lat:25.4655,lng:-100.987,radius:350,desc:"Col. Virreyes. 443 negocios. NSE muy alto, máximo poder adquisitivo.",tags_pos:[],tags_neg:[],data:{trafico:16,nse:72,acceso:85,renta:{bajo:false,medio:false,alto:true}}},
+  {id:"mision_orte",name:"Misión Cerritos/Oriente",lat:25.4238,lng:-100.9015,radius:400,desc:"Misión Cerritos oriente. 337 negocios. Baja competencia y crecimiento constante.",tags_pos:[],tags_neg:[],data:{trafico:12,nse:50,acceso:65,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"fed_berrueto",name:"F. Berrueto/Sur-Pte",lat:25.3853,lng:-100.977,radius:350,desc:"F. Berrueto y aledañas. 470 negocios. Zona sur-poniente consolidada.",tags_pos:[],tags_neg:[],data:{trafico:17,nse:32,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"guanajuato",name:"Guanajuato/Latinoam.",lat:25.442,lng:-100.981,radius:350,desc:"Guanajuato y Latinoam. 927 negocios. Zona céntrica con buena conectividad.",tags_pos:[],tags_neg:[],data:{trafico:34,nse:55,acceso:85,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"universidad",name:"Universidad/T.Libertad",lat:25.403,lng:-100.965,radius:350,desc:"Universidad Pueblo y T.Libertad. 832 negocios. Demanda estudiantil activa.",tags_pos:[],tags_neg:[],data:{trafico:31,nse:42,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"los_pinos",name:"Los Pinos/Norte",lat:25.4624,lng:-100.9648,radius:300,desc:"Los Pinos norte. 775 negocios. Zona norte con nearshoring cercano.",tags_pos:[],tags_neg:[],data:{trafico:29,nse:58,acceso:65,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"los_gonzalez",name:"Los González/NE",lat:25.4718,lng:-100.9467,radius:350,desc:"Los González noreste. 231 negocios. NSE alto, poca competencia.",tags_pos:[],tags_neg:[],data:{trafico:8,nse:62,acceso:45,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"lomalinda",name:"Loma Linda/Oriente",lat:25.419,lng:-100.908,radius:400,desc:"Loma Linda oriente. 444 negocios. Zona oriente con espacio de crecimiento.",tags_pos:[],tags_neg:[],data:{trafico:16,nse:50,acceso:65,renta:{bajo:true,medio:true,alto:true}}},
+  {id:"roma",name:"Roma/Poniente",lat:25.4469,lng:-101.0214,radius:300,desc:"Roma y poniente norte. 839 negocios. Zona mixta industrial-residencial.",tags_pos:[],tags_neg:[],data:{trafico:31,nse:52,acceso:65,renta:{bajo:false,medio:true,alto:true}}},
+  {id:"hacienda_n",name:"Hacienda Narro/Sur",lat:25.3632,lng:-101.0339,radius:400,desc:"Hacienda Narro y sur lejano. 178 negocios. Mercado captivo con poca oferta.",tags_pos:[],tags_neg:[],data:{trafico:7,nse:28,acceso:45,renta:{bajo:true,medio:false,alto:false}}},
+  {id:"n_teresitas",name:"Nuevo Teresitas/Sur",lat:25.355,lng:-101.004,radius:400,desc:"Nuevo Teresitas. 260 negocios. Sur lejano, demanda insatisfecha.",tags_pos:[],tags_neg:[],data:{trafico:10,nse:28,acceso:45,renta:{bajo:true,medio:false,alto:false}}},
+  {id:"el_salvador",name:"El Salvador/T.Libertad",lat:25.394,lng:-100.964,radius:350,desc:"El Salvador y T.Libertad. 500 negocios. Zona popular muy activa.",tags_pos:[],tags_neg:[],data:{trafico:18,nse:36,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
+  {id:"b_aires",name:"Buenos Aires/Sur-Pte",lat:25.3957,lng:-101.0162,radius:350,desc:"Buenos Aires y sur-poniente. 842 negocios. Gran concentración residencial.",tags_pos:[],tags_neg:[],data:{trafico:31,nse:32,acceso:45,renta:{bajo:true,medio:true,alto:false}}},
 ];
 
 const typeWeights={
@@ -753,6 +901,9 @@ function scoreZone(z){
   const w={trafico:tw.trafico*.80+un.trafico*.20,competencia:tw.competencia*.80+un.competencia*.20,nse:tw.nse*.80+un.nse*.20,acceso:tw.acceso*.80+un.acceso*.20};
   let s=z.data.trafico*w.trafico+competenciaReal*w.competencia+z.data.nse*w.nse+z.data.acceso*w.acceso;
   if(!z.data.renta[selectedBudget])s*=.50;
+  // PMD 2025-2027 zone bonus
+  const pmdB=PMD_BONUS[z.id];
+  if(pmdB) s+=pmdB.pts;
   return Math.round(Math.min(s,100));
 }
 function scoreColor(s){return s>=85?'#f97316':s>=70?'#3b82f6':'#8b5cf6';}
@@ -768,7 +919,7 @@ function analyze(){
     const color=scoreColor(z.score);
     const c=L.circle([z.lat,z.lng],{radius:z.radius,color,fillColor:color,fillOpacity:.22,weight:2,opacity:.8});
     const rank=i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`;
-    c.bindPopup(`<div class="popup-name">${rank} ${z.name}</div><div class="popup-score">${z.score}<span style="font-size:.65rem;color:#5a6478;font-weight:400"> / 100</span></div><div class="popup-sub">Para ${typeLabels[selectedType]}</div><div class="popup-desc">${z.desc}</div>`);
+    const pmdTag=PMD_BONUS[z.id]?`<div style="font-size:.68rem;color:#818cf8;margin-top:4px">🏗️ ${PMD_BONUS[z.id].motivo}</div>`:"";c.bindPopup(`<div class="popup-name">${rank} ${z.name}</div><div class="popup-score">${z.score}<span style="font-size:.65rem;color:#5a6478;font-weight:400"> / 100</span></div><div class="popup-sub">Para ${typeLabels[selectedType]}</div><div class="popup-desc">${z.desc}</div>${pmdTag}`);
     c.on('mouseover',function(){this.openPopup();});
     circleLayer.addLayer(c);
   });
@@ -782,7 +933,8 @@ function analyze(){
     card.className='zone-card'+(i===0?' top-zone':'');
     card.style.animationDelay=(i*.07)+'s';
     const color=scoreColor(z.score);
-    card.innerHTML=`<div class="zh"><div class="zname">${rank} ${z.name}</div><div class="zscore${i===0?' gold':''}">${z.score}</div></div><div class="ztags">${z.tags_pos.map(t=>`<span class="tag pos">✓ ${t}</span>`).join('')}${z.tags_neg.map(t=>`<span class="tag neg">✗ ${t}</span>`).join('')}</div><div class="zbar"><div class="zfill" style="width:0%;background:${color}" data-w="${z.score}"></div></div><div class="zdesc">${z.desc}</div>`;
+    const pmdBadge=PMD_BONUS[z.id]?`<span class="tag" style="background:rgba(129,140,248,.1);border-color:rgba(129,140,248,.3);color:#818cf8">🏗️ Proyecto PMD</span>`:'';
+    card.innerHTML=`<div class="zh"><div class="zname">${rank} ${z.name}</div><div class="zscore${i===0?' gold':''}">${z.score}</div></div><div class="ztags">${z.tags_pos.map(t=>`<span class="tag pos">✓ ${t}</span>`).join('')}${z.tags_neg.map(t=>`<span class="tag neg">✗ ${t}</span>`).join('')}${pmdBadge}</div><div class="zbar"><div class="zfill" style="width:0%;background:${color}" data-w="${z.score}"></div></div><div class="zdesc">${z.desc}</div>`;
     card.onclick=()=>{map.setView([z.lat,z.lng],15);};
     cards.appendChild(card);
     setTimeout(()=>{const b=card.querySelector('.zfill');b.style.width=b.dataset.w+'%';},50+i*60);
@@ -982,6 +1134,304 @@ function replayOnMap(aRaw){
   t.style.background='#3b82f6';t.textContent=`📂 ${a.name||typeLabels[a.type]||a.type}`;
   t.classList.add('show');setTimeout(()=>{t.classList.remove('show');t.style.background='';},2500);
 }
+
+
+// ── AI ANALYSIS ──────────────────────────────────────────────────────────────
+const PMD_CONTEXT = `
+Contexto: Saltillo, Coahuila — Plan Municipal de Desarrollo 2025-2027 + DENUE Feb 2026
+
+DATOS CLAVE:
+- Población: 961,895 hab (CONAPO 2024). ZM ~1.1M. Crece +20k hab/año.
+- 25.9% de la población tiene 15-29 años (249,536 personas) — mercado joven fuerte.
+- 57,000+ adultos mayores, 105,000+ personas con discapacidad.
+- Pobreza extrema: 1.6% (nacional 8.5%) — ciudad próspera.
+- Seguridad social: 27.4% sin cobertura — nicho para servicios de salud privada.
+- 242,496 viviendas habitadas. Hacinamiento: solo 1.89%.
+
+ECONOMÍA:
+- 83% secundario (manufactura), 97.3% es industria manufacturera.
+- Turismo de negocios = 70% del ingreso hotelero. Crecimiento hotelero 8% en 2024.
+- Nearshoring: prioridad #1 del gobierno 2025-2027 — más ejecutivos y técnicos llegando.
+- "Saltillo Valley": ecosistema tecnológico planificado — demanda de cafeterías, tech, coworking.
+- Industria automotriz genera alta demanda de servicios: comida, ropa, estéticas, gimnasios.
+
+PROYECTOS GOBIERNO 2025-2027 (impacto por zona):
+- "Distrito Centro": inversión y reactivación del Centro Histórico → mejor para restaurantes, cultura, turismo.
+- Paso inferior Blvd. Fundadores × Misión Cerritos → mejora acceso a zona Cerritos, aumentará valor.
+- Modernización Bulevares Antonio Narro y Vito Alessio → mejora colonias tecnológico/norte.
+- Pavimentación permanente de colonias periféricas → mejora Landín, Chamizal, Cárdenas a mediano plazo.
+- Rehabilitación Alameda Zaragoza → reactivación zona centro-sur.
+- Movilidad sustentable: ciclovías y cruceros inteligentes → favorece zonas peatonales.
+
+PERFIL DE ZONAS (del PMD):
+- Centro: máximo tráfico, saturado, gobierno invierte para reactivar ("Distrito Centro"). Restaurantes y cafeterías con diferenciación tienen oportunidad.
+- Tecnológico: 33,700 estudiantes. "Saltillo Valley" lo convierte en zona tech prioritaria.
+- Valle/Contry/San Patricio: NSE altísimo. Ejecutivos de nearshoring llegarán más. Premium services.
+- Colonias periféricas (Landín, Chamizal, Cárdenas): baja competencia, inversión gubernamental en infraestructura planificada. Riesgo/recompensa alta.
+- Cerritos: paso inferior planificado → zona en explosión de crecimiento. Invertir hoy = ventaja.
+- Zona industrial (Las Teresitas, Morelos): trabajadores de manufactura con empleo formal estable.
+
+FUENTES: DENUE INEGI Feb 2026, PMD Saltillo 2025-2027, CONAPO 2024, CONEVAL 2020, ENSU Q4 2024.
+`;
+
+async function runAIAnalysis() {
+  if (!lastScored.length) return;
+  const btn = document.getElementById('aiBtn');
+  const result = document.getElementById('aiResult');
+  
+  btn.textContent = '⏳ Analizando con IA...';
+  btn.disabled = true;
+  result.style.display = 'none';
+
+  const top5 = lastScored.slice(0,5).map((z,i) => 
+    `${i+1}. ${z.name} — Score ${z.score}/100 (Tráfico:${z.data.trafico}, NSE:${z.data.nse}, Competencia:${denue_competencia[z.id]?.[selectedType]??'?'}/100 libre)`
+  ).join('
+');
+
+  const userMsg = `Soy un emprendedor en Saltillo. Quiero abrir: ${typeLabels[selectedType]}. Presupuesto de renta: ${selectedBudget} (${ {bajo:'$5-15k',medio:'$15-35k',alto:'$35k+'}[selectedBudget] } MXN/mes).
+
+Resultados del análisis LocaIA (datos DENUE Feb 2026):
+${top5}
+
+Con base en estos resultados Y en el Plan Municipal de Desarrollo 2025-2027, dame una recomendación concreta y específica. Menciona:
+1. Cuál zona es la mejor opción para este giro y por qué (con datos reales)
+2. Qué está planeando el gobierno en esa zona que puede beneficiarme
+3. Un riesgo real a considerar
+4. Un consejo práctico final para este tipo de negocio en Saltillo
+
+Sé directo, específico y usa datos concretos. Máximo 200 palabras.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 400,
+        system: `Eres un consultor experto en apertura de negocios en Saltillo, Coahuila. Tienes acceso a datos reales del DENUE INEGI 2026 y del Plan Municipal de Desarrollo 2025-2027. ${PMD_CONTEXT}`,
+        messages: [{role:'user', content: userMsg}]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || 'No se pudo obtener respuesta.';
+    result.innerHTML = '<strong style="color:#a78bfa;font-family:'Syne',sans-serif;">✨ Recomendación IA</strong><br><br>' + text.replace(/
+/g,'<br>');
+    result.style.display = 'block';
+  } catch(e) {
+    result.innerHTML = '⚠️ Error al conectar con la IA. Intenta de nuevo.';
+    result.style.display = 'block';
+  }
+  
+  btn.textContent = '✨ Análisis IA — Recomendación personalizada';
+  btn.disabled = false;
+}
+
+// ══════════════════════════════════════════════════════════
+// ASESOR IA — con PMD Saltillo 2025-2027 como contexto
+// ══════════════════════════════════════════════════════════
+
+const PMD_CONTEXT = `Eres el Asesor IA de LocaIA, la plataforma de inteligencia comercial para Saltillo. Tienes conocimiento profundo de:
+
+SALTILLO — DATOS GENERALES (PMD 2025-2027 + DENUE Feb 2026):
+- Población 2024: 961,895 habitantes (CONAPO). ZM ~1.1M. Crecimiento ~20k hab/año.
+- Capital del estado de Coahuila. 6,837 km² municipio. Altitud 1,560m.
+- La CAPITAL MÁS SEGURA del país (ENSU Q4-2024, INEGI). #1 en confianza a autoridades municipales (ENCIG 2023).
+- Grupo más numeroso: 15-29 años = 249,536 personas (25.9% del total).
+- Pobreza extrema: solo 1.6% (vs 8.5% nacional). Gini muy bajo para México.
+- 242,496 viviendas habitadas. Promedio 3.62 ocupantes. Solo 1.89% hacinamiento.
+
+ECONOMÍA:
+- Hub automotriz mundial: Daimler, General Motors, Chrysler, Nemak, Vitro, Ram 1500, Tesla Model 3.
+- 13 parques industriales activos. >200 tractos Daimler/día. $488M USD inversión reciente.
+- Turismo de negocios: 70% de ingresos hoteleros. Ocupación hotelera creció 8% en 2024 (encima del promedio nacional).
+- IMCO Índice de Competitividad Urbana: Saltillo en posiciones top nacionales.
+- Nearshoring: Saltillo como polo estratégico confirmado por PMD. Plan "Saltillo Valley" en marcha.
+- Comercio, servicios, educación y salud muy relevantes además de manufactura.
+
+EDUCACIÓN:
+- 14 universidades. 4 centros de investigación. 33,700+ estudiantes. 206 investigadores SNI.
+- ITESM, Universidad Autónoma de Coahuila, Universidad de Monterrey campus, etc.
+
+INFRAESTRUCTURA:
+- Aeropuerto Plan de Guadalupe (13km centro), Mariano Escobedo Monterrey (90km).
+- Hwy 57 (a CDMX/Laredo) y Hwy 40 (a Monterrey). Ferromex + KCSM.
+- 7,646 luminarias en bulevares. 140 rutas de recolección de basura. 700 ton/día residuos.
+- Blvd. Fundadores/Misión Cerritos: paso inferior en construcción (proyecto PMD prioritario).
+- Modernización Blvd. Antonio Narro y Vito Alessio Robles (PMD 2025-2027).
+- Alameda Zaragoza: rehabilitación parque insignia (PMD prioritario).
+- Sistema transporte público: rediseño en curso (PMD). Ciclovías planificadas.
+
+SEGURIDAD:
+- 215 patrullas, 1,197 policías activos. 873 cámaras (211 con reconocimiento facial). 2 drones tácticos.
+- Red ciudadana de seguridad: +120,000 participantes. La más grande del país.
+
+MEDIO AMBIENTE:
+- Depende EXCLUSIVAMENTE de fuentes subterráneas para agua. Acuíferos bajo presión.
+- Sierra Zapalinamé: pulmón ecológico con riesgos de incendio.
+- Estrategia Municipal de Acción Climática planificada.
+
+CARENCIAS SOCIALES (CONEVAL 2020):
+- Rezago educativo: 8.3% (72,679 personas)
+- Acceso a alimentación nutritiva: 11.1% (96,884)
+- Servicios de salud: 18.0% (156,877)
+- Seguridad social: 27.4% (239,214) — mayor carencia
+
+PROYECTOS PMD 2025-2027 QUE AFECTAN ZONAS COMERCIALES:
+1. Saltillo Valley (polo tech/nearshoring): beneficia zona Tecnológico
+2. Blvd. Fundadores/Misión Cerritos paso inferior: beneficia zona Cerritos (San José/Misión Cerritos)
+3. Modernización Blvd. Antonio Narro: beneficia zona sur/poniente
+4. Modernización Blvd. Vito Alessio Robles: beneficia zonas poniente (Chamizal, Landín)
+5. Rehabilitación Alameda Zaragoza: beneficia Centro Histórico y zona República
+6. Programa de movilidad sustentable (ciclovías, transporte): beneficia zonas densas
+7. Distrito Centro (modelo de zona compacta): regenera Centro Histórico y alrededores
+8. Programa de pavimentación y bacheo permanente: mejora acceso zonas periféricas
+
+20 ZONAS COMERCIALES (datos DENUE Feb 2026 — 33,434 negocios en Saltillo):
+1. Centro Histórico: 4,615 negocios. Máxima densidad, turismo, proyectos Alameda+Distrito Centro.
+2. Zona Valle: 59 negocios. Residencial premium, NSE muy alto, competencia casi nula.
+3. Col. República: 728 negocios. Corredor comercial maduro.
+4. Zona Tecnológico: 493 negocios. Hub universitario, nearshoring, Saltillo Valley.
+5. Las Palmas: 21 negocios. NSE alto, muy sin explotar.
+6. Col. Morelos/Zaragoza (Pedregal): 1,387 negocios. Zona popular densa.
+7. Contry/Las Américas: 540 negocios. NSE medio-alto.
+8. Mirasierra/Bellavista: 2,016 negocios. Gran densidad residencial.
+9. Saltillo 2000/Lourdes: 1,443 negocios. Zona consolidada.
+10. La Madrid/Las Teresitas (Pinos): 580 negocios. Zona sur en crecimiento.
+11. Valle de las Flores: 225 negocios. Residencial reciente, poca competencia.
+12. Col. Antonio Cárdenas: 220 negocios. Potencial sin explotar.
+13. Col. Chamizal: 220 negocios. Beneficia Blvd. Vito Alessio Robles.
+14. San José/Misión Cerritos: 358 negocios. Paso inferior en construcción = oportunidad.
+15. Provivienda/Topo Chico: 395 negocios. Zona popular emergente.
+16. Col. Landín: 185 negocios. Baja densidad comercial, uso de suelo mixto.
+17. San Patricio/Rancho de Peña: 333 negocios. NSE alto-norte.
+18. Bonanza/Oceanía: 480 negocios. Zona oriente consolidada.
+19. Col. Virreyes: 314 negocios. NSE medio-alto norte.
+20. Nazario/Villa Olímpica: 342 negocios. Zona popular con buena accesibilidad.
+
+TIPOS DE NEGOCIO QUE ANALIZA LOCAIA:
+Comida rápida, Restaurante, Cafetería, Panadería, Ropa, Farmacia, Papelería, Estética, Gym, Tech/Celulares.
+
+CRITERIOS DE SCORING (peso por tipo):
+- Comida rápida: tráfico 60%, competencia 15%, NSE 8%, acceso 17%
+- Restaurante: tráfico 15%, competencia 18%, NSE 52%, acceso 15%
+- Cafetería: tráfico 28%, competencia 22%, NSE 35%, acceso 15%
+- Farmacia: tráfico 38%, competencia 52%, NSE 4%, acceso 6%
+- Estética: tráfico 15%, competencia 55%, NSE 15%, acceso 15%
+- Gym: tráfico 8%, competencia 30%, NSE 45%, acceso 17%
+- Ropa/Boutique: tráfico 10%, competencia 12%, NSE 65%, acceso 13%
+- Tech: tráfico 10%, competencia 18%, NSE 55%, acceso 17%
+
+VISIÓN Y MISIÓN PMD:
+"Consolidar a Saltillo como una ciudad modelo en competitividad, calidad de vida y desarrollo sostenible, posicionándose como la mejor capital de México para vivir."
+
+EJE "SALTILLO COMPETITIVO" — líneas relevantes para emprendedores:
+- Nearshoring y relocalización de empresas
+- Sistema SARE (apertura rápida de empresas)
+- Simplificación de trámites y Expediente Único Digital
+- Apoyo a MiPyMEs: capacitación, acceso a financiamiento y vinculación
+- Incubadoras de empresas y apoyo a emprendedores
+- Ventanilla Única para Construcciones
+
+INSTRUCCIONES:
+- Responde SIEMPRE en español.
+- Sé conciso pero útil. Máximo 4 párrafos.
+- Cuando recomiendas zonas, justifica con datos (DENUE, PMD, NSE, tráfico).
+- Si el usuario pregunta sobre un negocio, menciona la zona top y el por qué.
+- Usa emojis con moderación para estructurar (📍, 📊, 🏗️, 💡).
+- No inventes datos. Si no sabes algo específico, dilo claramente.
+- Menciona los proyectos PMD relevantes cuando apliquen a la pregunta.
+`;
+
+let aiHistory = [];
+let aiTyping = false;
+
+function openAIModal(){
+  document.getElementById('aiModal').classList.add('active');
+  document.getElementById('aiInput').focus();
+}
+function closeAIModal(){
+  document.getElementById('aiModal').classList.remove('active');
+}
+
+function aiQuick(q){
+  document.getElementById('aiInput').value = q;
+  sendAI();
+}
+
+function appendMsg(text, role){
+  const chat = document.getElementById('aiChat');
+  const div = document.createElement('div');
+  div.className = `ai-msg ${role}`;
+  div.innerHTML = text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  return div;
+}
+
+async function sendAI(){
+  if(aiTyping) return;
+  const input = document.getElementById('aiInput');
+  const btn = document.getElementById('aiSendBtn');
+  const q = input.value.trim();
+  if(!q) return;
+
+  // Hide pills after first message
+  document.getElementById('aiPills').style.display = 'none';
+
+  appendMsg(q, 'user');
+  aiHistory.push({ role:'user', content: q });
+  input.value = '';
+  aiTyping = true;
+  btn.disabled = true;
+
+  const typing = appendMsg('Analizando...', 'bot typing');
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: PMD_CONTEXT,
+        messages: aiHistory
+      })
+    });
+
+    const data = await resp.json();
+    const answer = data?.content?.[0]?.text || 'No pude obtener respuesta. Intenta de nuevo.';
+
+    typing.remove();
+    appendMsg(answer, 'bot');
+    aiHistory.push({ role:'assistant', content: answer });
+
+    // Keep history to last 10 exchanges
+    if(aiHistory.length > 20) aiHistory = aiHistory.slice(-20);
+
+  } catch(e) {
+    typing.remove();
+    appendMsg('❌ Error de conexión. Verifica tu internet e intenta de nuevo.', 'bot');
+  }
+
+  aiTyping = false;
+  btn.disabled = false;
+  input.focus();
+}
+
+// ══════════════════════════════════════════════════════════
+// PMD ZONE BONUS — proyectos municipales que suben score
+// ══════════════════════════════════════════════════════════
+// Zonas beneficiadas por proyectos PMD 2025-2027:
+// Se aplican al calcular scores — bonus de 0-8 puntos
+const PMD_BONUS = {
+  centro:      { pts: 7, motivo: '🏛️ Proyecto Distrito Centro + Rehabilitación Alameda Zaragoza (PMD 2025)' },
+  sj_cerritos: { pts: 8, motivo: '🏗️ Paso inferior Blvd. Fundadores/Misión Cerritos en construcción (PMD)' },
+  satelite_n:  { pts: 6, motivo: '💻 Saltillo Valley + nearshoring zona norte (PMD 2025)' },
+  chamizal:    { pts: 5, motivo: '🛣️ Modernización Blvd. Vito Alessio Robles (PMD 2025)' },
+  landin:      { pts: 4, motivo: '🛣️ Modernización Blvd. Vito Alessio Robles zona poniente (PMD)' },
+  republica:   { pts: 4, motivo: '🏛️ Desbordamiento del proyecto Alameda/Centro (PMD 2025)' },
+  ant_cardenas:{ pts: 3, motivo: '🏗️ Conectividad mejorada por modernización de vialidades (PMD)' },
+};
 
 function toggleCityChip(){
   const body=document.getElementById('cityBody');
