@@ -283,6 +283,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
   <div class="logo">Loca<em>IA</em></div>
   <div class="topbar-right">
     <button class="topbar-btn" id="aiBtn" onclick="openAIModal()" style="border-color:rgba(139,92,246,.4);color:#a78bfa;">🤖 Asesor IA</button>
+    <button class="topbar-btn" onclick="openProModal()" style="border-color:rgba(249,115,22,.5);color:var(--accent);font-weight:600;">✦ Pro $299</button>
     <button class="topbar-btn highlight" onclick="openAnalysesModal()">
       📊 Mis análisis
       <span class="badge-count" id="badge-count">0</span>
@@ -569,6 +570,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
         <button class="type-btn" data-type="estetica"><span class="ico">✂️</span>Estética</button>
         <button class="type-btn" data-type="gym"><span class="ico">🏋️</span>Gym</button>
         <button class="type-btn" data-type="tech"><span class="ico">📱</span>Tecnología</button>
+        <button class="type-btn" data-type="veterinaria"><span class="ico">🐾</span>Veterinaria</button>
+        <button class="type-btn" data-type="lavanderia"><span class="ico">👕</span>Lavandería</button>
+        <button class="type-btn" data-type="bar"><span class="ico">🍺</span>Bar/Cantina</button>
+        <button class="type-btn" data-type="ferreteria"><span class="ico">🔧</span>Ferretería</button>
+        <button class="type-btn" data-type="supermercado"><span class="ico">🛒</span>Super/Abarrotes</button>
+        <button class="type-btn" data-type="salon_eventos"><span class="ico">🎉</span>Salón eventos</button>
+        <button class="type-btn" data-type="escuela"><span class="ico">📐</span>Escuela/Kinder</button>
+        <button class="type-btn" data-type="consultorio"><span class="ico">🩺</span>Consultorio</button>
       </div>
     </div>
 
@@ -705,7 +714,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 <div class="modal-overlay" id="analysesModal" onclick="if(event.target===this)closeAnalysesModal()">
   <div class="modal-box">
     <div class="modal-head">
-      <div class="modal-title">📊 Mis análisis guardados</div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div class="modal-title">📊 Mis análisis guardados</div>
+        <button onclick="generateExecutivePDF()" style="background:linear-gradient(135deg,#f97316,#ea580c);color:#000;border:none;border-radius:8px;padding:7px 14px;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;cursor:pointer;display:flex;align-items:center;gap:6px;">📄 Resumen ejecutivo PDF</button>
+      </div>
       <button class="modal-close" onclick="closeAnalysesModal()">✕</button>
     </div>
     <div class="modal-body">
@@ -738,6 +750,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
@@ -800,51 +813,51 @@ const circleLayer=L.layerGroup().addTo(map);
 
 // DENUE Feb 2026 — score 100=libre, 0=saturado
 const denue_competencia={
-  centro:{comida_rapida:0,restaurante:0,cafeteria:100,panaderia:33,ropa:100,farmacia:0,papeleria:100,estetica:0,gym:10,tech:54},
-  republica:{comida_rapida:65,restaurante:86,cafeteria:100,panaderia:81,ropa:100,farmacia:80,papeleria:100,estetica:59,gym:70,tech:93},
-  bellavista:{comida_rapida:67,restaurante:93,cafeteria:100,panaderia:53,ropa:100,farmacia:78,papeleria:100,estetica:36,gym:50,tech:33},
-  mirasierra:{comida_rapida:73,restaurante:84,cafeteria:100,panaderia:61,ropa:100,farmacia:91,papeleria:100,estetica:67,gym:85,tech:69},
-  morelos:{comida_rapida:66,restaurante:88,cafeteria:100,panaderia:44,ropa:100,farmacia:84,papeleria:100,estetica:40,gym:70,tech:41},
+  centro:{comida_rapida:0,restaurante:0,cafeteria:100,panaderia:33,ropa:100,farmacia:0,papeleria:100,estetica:0,gym:10,tech:54,veterinaria:20,lavanderia:30,bar:15,ferreteria:25,supermercado:10,salon_eventos:40,escuela:60,consultorio:25},
+  republica:{comida_rapida:65,restaurante:86,cafeteria:100,panaderia:81,ropa:100,farmacia:80,papeleria:100,estetica:59,gym:70,tech:93,veterinaria:65,lavanderia:70,bar:60,ferreteria:55,supermercado:45,salon_eventos:55,escuela:65,consultorio:60},
+  bellavista:{comida_rapida:67,restaurante:93,cafeteria:100,panaderia:53,ropa:100,farmacia:78,papeleria:100,estetica:36,gym:50,tech:33,veterinaria:70,lavanderia:65,bar:55,ferreteria:60,supermercado:50,salon_eventos:65,escuela:70,consultorio:65},
+  mirasierra:{comida_rapida:73,restaurante:84,cafeteria:100,panaderia:61,ropa:100,farmacia:91,papeleria:100,estetica:67,gym:85,tech:69,veterinaria:75,lavanderia:80,bar:70,ferreteria:70,supermercado:65,salon_eventos:75,escuela:80,consultorio:75},
+  morelos:{comida_rapida:66,restaurante:88,cafeteria:100,panaderia:44,ropa:100,farmacia:84,papeleria:100,estetica:40,gym:70,tech:41,veterinaria:60,lavanderia:65,bar:50,ferreteria:55,supermercado:45,salon_eventos:50,escuela:60,consultorio:55},
   saltillo2000:{comida_rapida:68,restaurante:86,cafeteria:100,panaderia:14,ropa:100,farmacia:85,papeleria:100,estetica:28,gym:75,tech:35},
-  ign_zaragoza:{comida_rapida:79,restaurante:88,cafeteria:100,panaderia:67,ropa:100,farmacia:90,papeleria:100,estetica:66,gym:50,tech:65},
-  topochico:{comida_rapida:29,restaurante:41,cafeteria:100,panaderia:64,ropa:100,farmacia:66,papeleria:100,estetica:48,gym:20,tech:64},
-  vistahermosa:{comida_rapida:72,restaurante:89,cafeteria:100,panaderia:31,ropa:100,farmacia:89,papeleria:100,estetica:54,gym:45,tech:51},
-  la_madrid:{comida_rapida:58,restaurante:70,cafeteria:100,panaderia:28,ropa:100,farmacia:74,papeleria:100,estetica:34,gym:45,tech:28},
-  vic_guerrero:{comida_rapida:84,restaurante:92,cafeteria:100,panaderia:47,ropa:100,farmacia:96,papeleria:100,estetica:54,gym:90,tech:56},
-  lourdes:{comida_rapida:44,restaurante:74,cafeteria:100,panaderia:42,ropa:100,farmacia:70,papeleria:100,estetica:42,gym:0,tech:53},
-  m_hidalgo:{comida_rapida:82,restaurante:88,cafeteria:100,panaderia:67,ropa:100,farmacia:90,papeleria:100,estetica:67,gym:80,tech:70},
-  san_ramon:{comida_rapida:70,restaurante:92,cafeteria:100,panaderia:72,ropa:100,farmacia:90,papeleria:100,estetica:77,gym:55,tech:42},
-  la_salle:{comida_rapida:76,restaurante:88,cafeteria:100,panaderia:94,ropa:100,farmacia:76,papeleria:100,estetica:89,gym:75,tech:94},
-  satelite_n:{comida_rapida:70,restaurante:89,cafeteria:100,panaderia:39,ropa:100,farmacia:85,papeleria:100,estetica:40,gym:85,tech:36},
-  nuevo_mir:{comida_rapida:88,restaurante:90,cafeteria:100,panaderia:31,ropa:100,farmacia:95,papeleria:100,estetica:58,gym:95,tech:48},
-  las_teresitas:{comida_rapida:64,restaurante:85,cafeteria:100,panaderia:44,ropa:100,farmacia:79,papeleria:100,estetica:54,gym:80,tech:60},
-  valle_flores:{comida_rapida:67,restaurante:89,cafeteria:100,panaderia:72,ropa:100,farmacia:90,papeleria:100,estetica:58,gym:55,tech:66},
-  ant_cardenas:{comida_rapida:21,restaurante:55,cafeteria:100,panaderia:53,ropa:100,farmacia:30,papeleria:100,estetica:17,gym:70,tech:51},
-  chamizal:{comida_rapida:65,restaurante:86,cafeteria:100,panaderia:6,ropa:100,farmacia:82,papeleria:100,estetica:37,gym:65,tech:0},
+  ign_zaragoza:{comida_rapida:79,restaurante:88,cafeteria:100,panaderia:67,ropa:100,farmacia:90,papeleria:100,estetica:66,gym:50,tech:65,veterinaria:70,lavanderia:75,bar:65,ferreteria:65,supermercado:60,salon_eventos:70,escuela:75,consultorio:70},
+  topochico:{comida_rapida:29,restaurante:41,cafeteria:100,panaderia:64,ropa:100,farmacia:66,papeleria:100,estetica:48,gym:20,tech:64,veterinaria:35,lavanderia:40,bar:30,ferreteria:40,supermercado:25,salon_eventos:30,escuela:40,consultorio:30},
+  vistahermosa:{comida_rapida:72,restaurante:89,cafeteria:100,panaderia:31,ropa:100,farmacia:89,papeleria:100,estetica:54,gym:45,tech:51,veterinaria:65,lavanderia:70,bar:60,ferreteria:60,supermercado:55,salon_eventos:65,escuela:70,consultorio:65},
+  la_madrid:{comida_rapida:58,restaurante:70,cafeteria:100,panaderia:28,ropa:100,farmacia:74,papeleria:100,estetica:34,gym:45,tech:28,veterinaria:45,lavanderia:50,bar:35,ferreteria:45,supermercado:35,salon_eventos:40,escuela:50,consultorio:40},
+  vic_guerrero:{comida_rapida:84,restaurante:92,cafeteria:100,panaderia:47,ropa:100,farmacia:96,papeleria:100,estetica:54,gym:90,tech:56,veterinaria:75,lavanderia:80,bar:70,ferreteria:75,supermercado:70,salon_eventos:80,escuela:85,consultorio:75},
+  lourdes:{comida_rapida:44,restaurante:74,cafeteria:100,panaderia:42,ropa:100,farmacia:70,papeleria:100,estetica:42,gym:0,tech:53,veterinaria:40,lavanderia:45,bar:35,ferreteria:40,supermercado:30,salon_eventos:40,escuela:50,consultorio:38},
+  m_hidalgo:{comida_rapida:82,restaurante:88,cafeteria:100,panaderia:67,ropa:100,farmacia:90,papeleria:100,estetica:67,gym:80,tech:70,veterinaria:75,lavanderia:80,bar:70,ferreteria:70,supermercado:65,salon_eventos:75,escuela:80,consultorio:72},
+  san_ramon:{comida_rapida:70,restaurante:92,cafeteria:100,panaderia:72,ropa:100,farmacia:90,papeleria:100,estetica:77,gym:55,tech:42,veterinaria:80,lavanderia:75,bar:65,ferreteria:68,supermercado:60,salon_eventos:75,escuela:80,consultorio:75},
+  la_salle:{comida_rapida:76,restaurante:88,cafeteria:100,panaderia:94,ropa:100,farmacia:76,papeleria:100,estetica:89,gym:75,tech:94,veterinaria:85,lavanderia:80,bar:75,ferreteria:75,supermercado:70,salon_eventos:85,escuela:90,consultorio:82},
+  satelite_n:{comida_rapida:70,restaurante:89,cafeteria:100,panaderia:39,ropa:100,farmacia:85,papeleria:100,estetica:40,gym:85,tech:36,veterinaria:70,lavanderia:72,bar:60,ferreteria:62,supermercado:55,salon_eventos:70,escuela:75,consultorio:68},
+  nuevo_mir:{comida_rapida:88,restaurante:90,cafeteria:100,panaderia:31,ropa:100,farmacia:95,papeleria:100,estetica:58,gym:95,tech:48,veterinaria:80,lavanderia:85,bar:75,ferreteria:75,supermercado:72,salon_eventos:82,escuela:88,consultorio:80},
+  las_teresitas:{comida_rapida:64,restaurante:85,cafeteria:100,panaderia:44,ropa:100,farmacia:79,papeleria:100,estetica:54,gym:80,tech:60,veterinaria:65,lavanderia:68,bar:58,ferreteria:60,supermercado:55,salon_eventos:65,escuela:72,consultorio:63},
+  valle_flores:{comida_rapida:67,restaurante:89,cafeteria:100,panaderia:72,ropa:100,farmacia:90,papeleria:100,estetica:58,gym:55,tech:66,veterinaria:72,lavanderia:70,bar:62,ferreteria:65,supermercado:58,salon_eventos:70,escuela:78,consultorio:68},
+  ant_cardenas:{comida_rapida:21,restaurante:55,cafeteria:100,panaderia:53,ropa:100,farmacia:30,papeleria:100,estetica:17,gym:70,tech:51,veterinaria:60,lavanderia:60,bar:55,ferreteria:55,supermercado:50,salon_eventos:60,escuela:65,consultorio:58},
+  chamizal:{comida_rapida:65,restaurante:86,cafeteria:100,panaderia:6,ropa:100,farmacia:82,papeleria:100,estetica:37,gym:65,tech:0,veterinaria:60,lavanderia:60,bar:55,ferreteria:55,supermercado:50,salon_eventos:60,escuela:65,consultorio:58},
   col25:{comida_rapida:77,restaurante:85,cafeteria:100,panaderia:89,ropa:100,farmacia:91,papeleria:100,estetica:81,gym:65,tech:86},
-  sj_cerritos:{comida_rapida:76,restaurante:85,cafeteria:100,panaderia:83,ropa:100,farmacia:86,papeleria:100,estetica:79,gym:70,tech:69},
-  satelite_s:{comida_rapida:89,restaurante:99,cafeteria:100,panaderia:83,ropa:100,farmacia:95,papeleria:100,estetica:83,gym:90,tech:77},
-  landin:{comida_rapida:80,restaurante:95,cafeteria:100,panaderia:31,ropa:100,farmacia:91,papeleria:100,estetica:62,gym:85,tech:22},
-  v_olimpica:{comida_rapida:58,restaurante:78,cafeteria:100,panaderia:89,ropa:100,farmacia:69,papeleria:100,estetica:68,gym:40,tech:94},
-  lomas_ref:{comida_rapida:91,restaurante:96,cafeteria:100,panaderia:64,ropa:100,farmacia:95,papeleria:100,estetica:68,gym:75,tech:62},
-  lomas_zap:{comida_rapida:86,restaurante:96,cafeteria:100,panaderia:39,ropa:100,farmacia:99,papeleria:100,estetica:72,gym:90,tech:31},
-  san_patricio:{comida_rapida:64,restaurante:78,cafeteria:100,panaderia:83,ropa:100,farmacia:89,papeleria:100,estetica:45,gym:80,tech:84},
-  rancho_pena:{comida_rapida:79,restaurante:89,cafeteria:100,panaderia:92,ropa:100,farmacia:95,papeleria:100,estetica:81,gym:70,tech:94},
-  nazario:{comida_rapida:89,restaurante:96,cafeteria:100,panaderia:81,ropa:100,farmacia:98,papeleria:100,estetica:85,gym:100,tech:73},
-  bonanza:{comida_rapida:43,restaurante:74,cafeteria:100,panaderia:44,ropa:100,farmacia:76,papeleria:100,estetica:17,gym:0,tech:68},
-  virreyes:{comida_rapida:80,restaurante:96,cafeteria:100,panaderia:75,ropa:100,farmacia:98,papeleria:100,estetica:79,gym:100,tech:86},
-  mision_orte:{comida_rapida:90,restaurante:96,cafeteria:100,panaderia:89,ropa:100,farmacia:94,papeleria:100,estetica:71,gym:100,tech:65},
-  fed_berrueto:{comida_rapida:88,restaurante:85,cafeteria:100,panaderia:39,ropa:100,farmacia:91,papeleria:100,estetica:57,gym:85,tech:44},
-  guanajuato:{comida_rapida:60,restaurante:84,cafeteria:100,panaderia:83,ropa:100,farmacia:79,papeleria:100,estetica:34,gym:65,tech:88},
-  universidad:{comida_rapida:67,restaurante:93,cafeteria:100,panaderia:19,ropa:100,farmacia:84,papeleria:100,estetica:44,gym:80,tech:27},
-  los_pinos:{comida_rapida:61,restaurante:79,cafeteria:100,panaderia:75,ropa:100,farmacia:84,papeleria:100,estetica:4,gym:45,tech:92},
-  los_gonzalez:{comida_rapida:83,restaurante:90,cafeteria:100,panaderia:97,ropa:100,farmacia:96,papeleria:100,estetica:82,gym:50,tech:93},
-  lomalinda:{comida_rapida:86,restaurante:99,cafeteria:100,panaderia:50,ropa:100,farmacia:94,papeleria:100,estetica:74,gym:90,tech:51},
-  roma:{comida_rapida:76,restaurante:88,cafeteria:100,panaderia:0,ropa:100,farmacia:86,papeleria:100,estetica:45,gym:55,tech:24},
-  hacienda_n:{comida_rapida:92,restaurante:95,cafeteria:100,panaderia:100,ropa:100,farmacia:100,papeleria:100,estetica:93,gym:85,tech:80},
-  n_teresitas:{comida_rapida:87,restaurante:100,cafeteria:100,panaderia:81,ropa:100,farmacia:99,papeleria:100,estetica:83,gym:90,tech:66},
-  el_salvador:{comida_rapida:87,restaurante:95,cafeteria:100,panaderia:58,ropa:100,farmacia:94,papeleria:100,estetica:62,gym:75,tech:48},
-  b_aires:{comida_rapida:64,restaurante:85,cafeteria:100,panaderia:39,ropa:100,farmacia:90,papeleria:100,estetica:35,gym:45,tech:36},
+  sj_cerritos:{comida_rapida:76,restaurante:85,cafeteria:100,panaderia:83,ropa:100,farmacia:86,papeleria:100,estetica:79,gym:70,tech:69,veterinaria:60,lavanderia:60,bar:55,ferreteria:55,supermercado:50,salon_eventos:60,escuela:65,consultorio:58},
+  satelite_s:{comida_rapida:89,restaurante:99,cafeteria:100,panaderia:83,ropa:100,farmacia:95,papeleria:100,estetica:83,gym:90,tech:77,veterinaria:60,lavanderia:60,bar:55,ferreteria:55,supermercado:50,salon_eventos:60,escuela:65,consultorio:58},
+  landin:{comida_rapida:80,restaurante:95,cafeteria:100,panaderia:31,ropa:100,farmacia:91,papeleria:100,estetica:62,gym:85,tech:22,veterinaria:60,lavanderia:60,bar:55,ferreteria:55,supermercado:50,salon_eventos:60,escuela:65,consultorio:58},
+  v_olimpica:{comida_rapida:58,restaurante:78,cafeteria:100,panaderia:89,ropa:100,farmacia:69,papeleria:100,estetica:68,gym:40,tech:94,veterinaria:60,lavanderia:65,bar:55,ferreteria:58,supermercado:50,salon_eventos:62,escuela:68,consultorio:58},
+  lomas_ref:{comida_rapida:91,restaurante:96,cafeteria:100,panaderia:64,ropa:100,farmacia:95,papeleria:100,estetica:68,gym:75,tech:62,veterinaria:88,lavanderia:85,bar:78,ferreteria:80,supermercado:75,salon_eventos:85,escuela:90,consultorio:85},
+  lomas_zap:{comida_rapida:86,restaurante:96,cafeteria:100,panaderia:39,ropa:100,farmacia:99,papeleria:100,estetica:72,gym:90,tech:31,veterinaria:85,lavanderia:82,bar:75,ferreteria:78,supermercado:72,salon_eventos:83,escuela:88,consultorio:82},
+  san_patricio:{comida_rapida:64,restaurante:78,cafeteria:100,panaderia:83,ropa:100,farmacia:89,papeleria:100,estetica:45,gym:80,tech:84,veterinaria:78,lavanderia:75,bar:68,ferreteria:70,supermercado:65,salon_eventos:78,escuela:83,consultorio:76},
+  rancho_pena:{comida_rapida:79,restaurante:89,cafeteria:100,panaderia:92,ropa:100,farmacia:95,papeleria:100,estetica:81,gym:70,tech:94,veterinaria:82,lavanderia:80,bar:72,ferreteria:72,supermercado:68,salon_eventos:80,escuela:85,consultorio:78},
+  nazario:{comida_rapida:89,restaurante:96,cafeteria:100,panaderia:81,ropa:100,farmacia:98,papeleria:100,estetica:85,gym:100,tech:73,veterinaria:90,lavanderia:88,bar:82,ferreteria:82,supermercado:80,salon_eventos:88,escuela:92,consultorio:88},
+  bonanza:{comida_rapida:43,restaurante:74,cafeteria:100,panaderia:44,ropa:100,farmacia:76,papeleria:100,estetica:17,gym:0,tech:68,veterinaria:35,lavanderia:40,bar:30,ferreteria:38,supermercado:25,salon_eventos:30,escuela:38,consultorio:32},
+  virreyes:{comida_rapida:80,restaurante:96,cafeteria:100,panaderia:75,ropa:100,farmacia:98,papeleria:100,estetica:79,gym:100,tech:86,veterinaria:88,lavanderia:85,bar:78,ferreteria:78,supermercado:75,salon_eventos:85,escuela:90,consultorio:85},
+  mision_orte:{comida_rapida:90,restaurante:96,cafeteria:100,panaderia:89,ropa:100,farmacia:94,papeleria:100,estetica:71,gym:100,tech:65,veterinaria:85,lavanderia:82,bar:75,ferreteria:75,supermercado:72,salon_eventos:82,escuela:88,consultorio:82},
+  fed_berrueto:{comida_rapida:88,restaurante:85,cafeteria:100,panaderia:39,ropa:100,farmacia:91,papeleria:100,estetica:57,gym:85,tech:44,veterinaria:72,lavanderia:75,bar:65,ferreteria:65,supermercado:60,salon_eventos:70,escuela:76,consultorio:70},
+  guanajuato:{comida_rapida:60,restaurante:84,cafeteria:100,panaderia:83,ropa:100,farmacia:79,papeleria:100,estetica:34,gym:65,tech:88,veterinaria:65,lavanderia:68,bar:58,ferreteria:60,supermercado:55,salon_eventos:65,escuela:72,consultorio:62},
+  universidad:{comida_rapida:67,restaurante:93,cafeteria:100,panaderia:19,ropa:100,farmacia:84,papeleria:100,estetica:44,gym:80,tech:27,veterinaria:70,lavanderia:65,bar:60,ferreteria:58,supermercado:55,salon_eventos:65,escuela:75,consultorio:65},
+  los_pinos:{comida_rapida:61,restaurante:79,cafeteria:100,panaderia:75,ropa:100,farmacia:84,papeleria:100,estetica:4,gym:45,tech:92,veterinaria:58,lavanderia:62,bar:50,ferreteria:55,supermercado:45,salon_eventos:55,escuela:62,consultorio:55},
+  los_gonzalez:{comida_rapida:83,restaurante:90,cafeteria:100,panaderia:97,ropa:100,farmacia:96,papeleria:100,estetica:82,gym:50,tech:93,veterinaria:80,lavanderia:78,bar:70,ferreteria:72,supermercado:68,salon_eventos:78,escuela:83,consultorio:78},
+  lomalinda:{comida_rapida:86,restaurante:99,cafeteria:100,panaderia:50,ropa:100,farmacia:94,papeleria:100,estetica:74,gym:90,tech:51,veterinaria:82,lavanderia:80,bar:72,ferreteria:74,supermercado:70,salon_eventos:80,escuela:85,consultorio:80},
+  roma:{comida_rapida:76,restaurante:88,cafeteria:100,panaderia:0,ropa:100,farmacia:86,papeleria:100,estetica:45,gym:55,tech:24,veterinaria:68,lavanderia:65,bar:58,ferreteria:60,supermercado:52,salon_eventos:62,escuela:70,consultorio:62},
+  hacienda_n:{comida_rapida:92,restaurante:95,cafeteria:100,panaderia:100,ropa:100,farmacia:100,papeleria:100,estetica:93,gym:85,tech:80,veterinaria:90,lavanderia:88,bar:82,ferreteria:82,supermercado:80,salon_eventos:88,escuela:92,consultorio:88},
+  n_teresitas:{comida_rapida:87,restaurante:100,cafeteria:100,panaderia:81,ropa:100,farmacia:99,papeleria:100,estetica:83,gym:90,tech:66,veterinaria:88,lavanderia:85,bar:78,ferreteria:80,supermercado:76,salon_eventos:86,escuela:90,consultorio:86},
+  el_salvador:{comida_rapida:87,restaurante:95,cafeteria:100,panaderia:58,ropa:100,farmacia:94,papeleria:100,estetica:62,gym:75,tech:48,veterinaria:80,lavanderia:78,bar:70,ferreteria:72,supermercado:68,salon_eventos:78,escuela:83,consultorio:78},
+  b_aires:{comida_rapida:64,restaurante:85,cafeteria:100,panaderia:39,ropa:100,farmacia:90,papeleria:100,estetica:35,gym:45,tech:36,veterinaria:55,lavanderia:58,bar:48,ferreteria:52,supermercado:42,salon_eventos:52,escuela:60,consultorio:52},
 };
 const denue_total={
   centro:2719,
@@ -962,11 +975,22 @@ const typeWeights={
   estetica:     {trafico:.15,competencia:.55,nse:.15,acceso:.15},
   gym:          {trafico:.08,competencia:.30,nse:.45,acceso:.17},
   tech:         {trafico:.10,competencia:.18,nse:.55,acceso:.17},
+  veterinaria:  {trafico:.12,competencia:.62,nse:.18,acceso:.08},
+  lavanderia:   {trafico:.40,competencia:.45,nse:.05,acceso:.10},
+  bar:          {trafico:.55,competencia:.20,nse:.12,acceso:.13},
+  ferreteria:   {trafico:.25,competencia:.42,nse:.15,acceso:.18},
+  supermercado: {trafico:.52,competencia:.28,nse:.10,acceso:.10},
+  salon_eventos:{trafico:.08,competencia:.35,nse:.42,acceso:.15},
+  escuela:      {trafico:.10,competencia:.48,nse:.28,acceso:.14},
+  consultorio:  {trafico:.15,competencia:.40,nse:.32,acceso:.13},
 };
 const typeLabels={
   comida_rapida:'🍔 Comida rápida',restaurante:'🍽️ Restaurante',cafeteria:'☕ Cafetería',
   panaderia:'🥐 Panadería',ropa:'👗 Ropa',farmacia:'💊 Farmacia',papeleria:'📚 Papelería',
   estetica:'✂️ Estética',gym:'🏋️ Gym',tech:'📱 Tecnología',
+  veterinaria:'🐾 Veterinaria',lavanderia:'👕 Lavandería',bar:'🍺 Bar/Cantina',
+  ferreteria:'🔧 Ferretería',supermercado:'🛒 Super/Abarrotes',salon_eventos:'🎉 Salón de eventos',
+  escuela:'📐 Escuela/Kinder',consultorio:'🩺 Consultorio',
 };
 
 let selectedType='comida_rapida',selectedBudget='bajo',analyzed=false,lastScored=[];
@@ -1428,11 +1452,11 @@ let aiHistory = [];
 let aiTyping = false;
 
 function openAIModal(){
-  document.getElementById('aiModal').classList.add('active');
+  document.getElementById('aiModal').classList.add('open');
   document.getElementById('aiInput').focus();
 }
 function closeAIModal(){
-  document.getElementById('aiModal').classList.remove('active');
+  document.getElementById('aiModal').classList.remove('open');
 }
 
 function aiQuick(q){
@@ -1584,6 +1608,209 @@ function cpTab(btn,panelId){
   btn.classList.add('active');
   document.getElementById(panelId).classList.add('active');
 }
+
+
+// ── RESUMEN EJECUTIVO PDF ──
+async function generateExecutivePDF(){
+  if(!allAnalyses.length){
+    const t=document.getElementById('toast');
+    t.textContent='⚠️ No tienes análisis guardados';t.style.background='#dc2626';
+    t.classList.add('show');setTimeout(()=>{t.classList.remove('show');t.style.background='';},2500);
+    return;
+  }
+  const btn = document.querySelector('[onclick="generateExecutivePDF()"]');
+  const origText = btn.innerHTML;
+  btn.innerHTML = '⏳ Generando...';
+  btn.disabled = true;
+
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+    const W = 210, M = 18;
+
+    // ── Helpers ──
+    const hex2rgb = h => { const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16); return [r,g,b]; };
+    const setFont = (size, style='normal', color=[236,238,242]) => {
+      doc.setFontSize(size); doc.setFont('helvetica', style);
+      doc.setTextColor(...color);
+    };
+
+    // ── COVER PAGE ──
+    doc.setFillColor(6,8,11); doc.rect(0,0,W,297,'F');
+    // Orange accent bar
+    doc.setFillColor(249,115,22); doc.rect(0,0,8,297,'F');
+    // Title
+    setFont(28,'bold',[249,115,22]); doc.text('LocaIA',22,45);
+    setFont(20,'bold',[236,238,242]); doc.text('Reporte Ejecutivo',22,57);
+    setFont(11,'normal',[138,149,168]);
+    const user = currentUser?.user_metadata?.full_name || currentUser?.email || 'Usuario';
+    doc.text('Saltillo, Coahuila  ·  Datos DENUE Feb 2026', 22, 68);
+    doc.text(`Generado: ${new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'})}`, 22, 76);
+    doc.text(`Cuenta: ${user}`, 22, 84);
+    // Divider
+    doc.setDrawColor(249,115,22); doc.setLineWidth(0.5); doc.line(22,92,W-M,92);
+    // Summary stats
+    const types = [...new Set(allAnalyses.map(a=>a.type))];
+    const avgScore = Math.round(allAnalyses.reduce((s,a)=>s+(a.top_score||0),0)/allAnalyses.length);
+    const bestA = allAnalyses.reduce((b,a)=>(a.top_score||0)>(b.top_score||0)?a:b, allAnalyses[0]);
+    setFont(11,'bold',[249,115,22]); doc.text('RESUMEN GENERAL', 22, 105);
+    const stats = [
+      ['Análisis realizados', String(allAnalyses.length)],
+      ['Giros evaluados', String(types.length)],
+      ['Score promedio', `${avgScore}/100`],
+      ['Mejor resultado', `${bestA.top_zone||'—'} (${bestA.top_score||0}/100)`],
+    ];
+    let sy = 113;
+    stats.forEach(([k,v]) => {
+      setFont(9,'normal',[90,100,120]); doc.text(k.toUpperCase(), 22, sy);
+      setFont(11,'bold',[236,238,242]); doc.text(v, 120, sy);
+      doc.setDrawColor(28,34,48); doc.setLineWidth(0.3); doc.line(22,sy+3,W-M,sy+3);
+      sy += 11;
+    });
+
+    // ── ANALYSIS PAGES ──
+    allAnalyses.forEach((a, idx) => {
+      doc.addPage();
+      doc.setFillColor(6,8,11); doc.rect(0,0,W,297,'F');
+      doc.setFillColor(249,115,22); doc.rect(0,0,8,297,'F');
+
+      const label = typeLabels[a.type] || a.type;
+      const budgetStr = a.budget==='bajo'?'$5–15k MXN/mes':a.budget==='medio'?'$15–35k MXN/mes':'$35k+ MXN/mes';
+      const date = new Date(a.created_at).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});
+      const zones = a.results || [];
+
+      // Header
+      setFont(9,'normal',[90,100,120]); doc.text(`ANÁLISIS #${idx+1}  ·  ${date}`, 22, 22);
+      setFont(15,'bold',[249,115,22]); doc.text(label.replace(/^.\s/,''), 22, 32);
+      setFont(10,'normal',[138,149,168]); doc.text(`Presupuesto de renta: ${budgetStr}`, 22, 40);
+      if(a.name){ setFont(9,'normal',[90,100,120]); doc.text(`"${a.name}"`, 22, 47); }
+
+      // Score badge
+      const sc = a.top_score || 0;
+      const [r2,g2,b2] = sc>=80?[34,197,94]:sc>=60?[249,115,22]:[239,68,68];
+      doc.setFillColor(r2,g2,b2); doc.roundedRect(W-M-24,16,26,20,3,3,'F');
+      setFont(14,'bold',[0,0,0]); doc.text(String(sc), W-M-11, 28, {align:'center'});
+      setFont(7,'normal',[0,0,0]); doc.text('/100', W-M-11, 33, {align:'center'});
+
+      // Divider
+      doc.setDrawColor(28,34,48); doc.setLineWidth(0.4); doc.line(22,52,W-M,52);
+
+      // Top zone highlight
+      setFont(8,'bold',[249,115,22]); doc.text('ZONA RECOMENDADA', 22, 61);
+      setFont(12,'bold',[236,238,242]); doc.text(a.top_zone || '—', 22, 70);
+
+      // Zones ranking
+      setFont(8,'bold',[90,100,120]); doc.text('RANKING DE ZONAS', 22, 83);
+      let zy = 91;
+      zones.slice(0,8).forEach((z,i) => {
+        const zscore = z.score || 0;
+        const medal = i===0?'1.':(i===1?'2.':(i===2?'3.':`${i+1}.`));
+        const [zr,zg,zb] = zscore>=80?[34,197,94]:zscore>=60?[249,115,22]:[239,68,68];
+        setFont(9,'normal',[138,149,168]); doc.text(medal, 22, zy);
+        setFont(9, i===0?'bold':'normal', [236,238,242]); doc.text(z.name||'', 32, zy);
+        // Score bar background
+        doc.setFillColor(28,34,48); doc.roundedRect(120, zy-4, 52, 5, 1, 1, 'F');
+        doc.setFillColor(zr,zg,zb); doc.roundedRect(120, zy-4, Math.round(zscore*0.52), 5, 1, 1, 'F');
+        setFont(8,'bold',[zr,zg,zb]); doc.text(`${zscore}`, 176, zy, {align:'right'});
+        zy += 9;
+      });
+
+      // Key insights
+      if(zones.length > 0){
+        const top = zones[0];
+        doc.setDrawColor(28,34,48); doc.line(22, zy+4, W-M, zy+4);
+        zy += 12;
+        setFont(8,'bold',[249,115,22]); doc.text('DATOS CLAVE', 22, zy);
+        zy += 8;
+        const facts = [];
+        if(top.competencia !== undefined) facts.push(`Competencia en ${top.name||'—'}: ${top.competencia}/100 libre`);
+        if(top.total_negocios) facts.push(`Total negocios en zona: ${top.total_negocios.toLocaleString()}`);
+        facts.push(`Giro analizado: ${label}`);
+        facts.push(`Presupuesto: ${budgetStr}`);
+        facts.forEach(f => {
+          setFont(8,'normal',[180,185,195]); doc.text(`• ${f}`, 22, zy); zy+=7;
+        });
+      }
+
+      // Footer
+      setFont(7,'normal',[60,70,90]);
+      doc.text('LocaIA · locaia.vercel.app · Datos DENUE INEGI Feb 2026 · PMD Saltillo 2025-2027', W/2, 287, {align:'center'});
+      doc.text(`Pág. ${idx+2}`, W-M, 287);
+    });
+
+    doc.save(`LocaIA-Reporte-${new Date().toISOString().slice(0,10)}.pdf`);
+  } catch(err) {
+    console.error('PDF error:', err);
+    const t=document.getElementById('toast');
+    t.textContent='❌ Error al generar PDF';t.style.background='#dc2626';
+    t.classList.add('show');setTimeout(()=>{t.classList.remove('show');t.style.background='';},2500);
+  } finally {
+    btn.innerHTML = origText;
+    btn.disabled = false;
+  }
+}
+
+// ── PRO MODAL ──
+function openProModal(){
+  document.getElementById('proModal').classList.add('open');
+}
+function closeProModal(){
+  document.getElementById('proModal').classList.remove('open');
+}
+function handleProUpgrade(){
+  // Placeholder — conectar MercadoPago aquí
+  closeProModal();
+  const t=document.getElementById('toast');
+  t.textContent='💳 Próximamente: pago con MercadoPago';
+  t.style.background='#6d28d9';
+  t.classList.add('show');
+  setTimeout(()=>{t.classList.remove('show');t.style.background='';},3000);
+}
+
 </script>
+
+<!-- PRO MODAL -->
+<div class="modal-overlay" id="proModal" onclick="if(event.target===this)closeProModal()">
+  <div style="background:var(--surface);border:1px solid rgba(249,115,22,.3);border-radius:20px;max-width:460px;width:100%;padding:32px;box-shadow:0 24px 80px rgba(0,0,0,.8);position:relative;overflow:hidden;">
+    <div style="position:absolute;top:0;right:0;width:200px;height:200px;background:radial-gradient(circle,rgba(249,115,22,.08),transparent 70%);pointer-events:none;"></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;letter-spacing:-.03em;margin-bottom:6px;">Actualiza a <span style="color:var(--accent)">Pro</span></div>
+        <div style="color:var(--muted2);font-size:.85rem;">Desbloquea análisis más profundos</div>
+      </div>
+      <button onclick="closeProModal()" style="background:var(--card);border:1px solid var(--border);color:var(--muted2);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:.8rem;">✕</button>
+    </div>
+    <!-- Plans -->
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px;">
+      <div style="background:linear-gradient(135deg,rgba(249,115,22,.12),rgba(249,115,22,.04));border:1.5px solid rgba(249,115,22,.4);border-radius:14px;padding:18px;position:relative;">
+        <div style="position:absolute;top:12px;right:12px;background:var(--accent);color:#000;font-size:.65rem;font-weight:700;padding:3px 8px;border-radius:10px;font-family:'Syne',sans-serif;">POPULAR</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;margin-bottom:2px;">Pro</div>
+        <div style="font-size:1.6rem;font-weight:800;font-family:'Syne',sans-serif;color:var(--accent);">$299<span style="font-size:.8rem;font-weight:400;color:var(--muted2)"> MXN/mes</span></div>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px;font-size:.82rem;color:#c5cad4;">
+          <div>✓ Análisis ilimitados</div>
+          <div>✓ Perfil de negocio avanzado (ticket, presencia, tipo cliente)</div>
+          <div>✓ Recomendación IA personalizada por zona</div>
+          <div>✓ Descarga PDF de reportes</div>
+          <div>✓ Hasta 3 usuarios</div>
+        </div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;">
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;margin-bottom:2px;">Business</div>
+        <div style="font-size:1.4rem;font-weight:800;font-family:'Syne',sans-serif;color:var(--text);">$799<span style="font-size:.8rem;font-weight:400;color:var(--muted2)"> MXN/mes</span></div>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px;font-size:.82rem;color:#c5cad4;">
+          <div>✓ Todo lo de Pro</div>
+          <div>✓ Comparativa multi-zona simultánea</div>
+          <div>✓ Acceso API de datos DENUE</div>
+          <div>✓ Usuarios ilimitados + soporte prioritario</div>
+        </div>
+      </div>
+    </div>
+    <button onclick="handleProUpgrade()" style="width:100%;background:var(--accent);color:#000;border:none;border-radius:12px;padding:15px;font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;cursor:pointer;transition:all .2s;letter-spacing:.01em;">
+      Actualizar a Pro — $299/mes →
+    </button>
+    <p style="text-align:center;font-size:.72rem;color:var(--muted);margin-top:12px;">Pago seguro · Cancela cuando quieras · Sin contratos</p>
+  </div>
+</div>
+
 </body>
 </html>
