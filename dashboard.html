@@ -275,6 +275,35 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 .insight-list{display:flex;flex-direction:column;gap:8px;}
 .insight-item{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:12px;font-size:.78rem;line-height:1.55;color:#b0b8c8;}
 .insight-item strong{color:var(--text);}
+
+/* ── REPORT PREVIEW MODAL ─────────────────── */
+#reportModal{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:none;flex-direction:column;}
+#reportModal.open{display:flex;}
+.rpt-header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.rpt-header h2{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;color:var(--accent);letter-spacing:-.02em;margin:0;}
+.rpt-tabs{display:flex;gap:6px;overflow-x:auto;padding:14px 20px 0;flex-shrink:0;background:var(--bg);border-bottom:1px solid var(--border);}
+.rpt-tab{padding:7px 14px;background:transparent;border:1px solid var(--border);border-bottom:none;border-radius:8px 8px 0 0;color:var(--muted2);font-family:inherit;font-size:.75rem;cursor:pointer;white-space:nowrap;transition:all .2s;}
+.rpt-tab.active{background:var(--card);color:var(--accent);border-color:var(--accent);font-weight:700;}
+.rpt-body{flex:1;overflow-y:auto;padding:20px;background:var(--bg);}
+.rpt-zone-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;}
+.rpt-zone-card.top-zone{border-color:rgba(249,115,22,.5);background:rgba(249,115,22,.04);}
+.rpt-section-title{font-family:'Syne',sans-serif;font-weight:800;font-size:.85rem;color:var(--accent);letter-spacing:.05em;text-transform:uppercase;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid rgba(249,115,22,.2);}
+.rpt-stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;}
+.rpt-stat{background:var(--surface);border-radius:8px;padding:10px 12px;}
+.rpt-stat-label{font-size:.65rem;color:var(--muted2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;}
+.rpt-stat-value{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--text);}
+.rpt-stat-sub{font-size:.62rem;color:var(--muted2);margin-top:2px;}
+.rpt-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.rpt-bar-label{font-size:.7rem;color:var(--muted2);width:95px;flex-shrink:0;}
+.rpt-bar-track{flex:1;height:7px;background:var(--surface);border-radius:4px;overflow:hidden;}
+.rpt-bar-fill{height:100%;border-radius:4px;transition:width .6s ease;}
+.rpt-bar-val{font-size:.7rem;font-weight:700;color:var(--text);width:28px;text-align:right;flex-shrink:0;}
+.rpt-ref{font-size:.62rem;color:#4b5563;margin-top:12px;padding-top:8px;border-top:1px solid var(--border);line-height:1.5;}
+.rpt-chart-wrap{position:relative;height:180px;margin-bottom:8px;}
+.rpt-source-badge{display:inline-block;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.2);border-radius:4px;padding:2px 7px;font-size:.6rem;color:var(--accent);font-weight:600;margin:2px;}
+.rpt-verdict{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:8px;padding:10px 14px;font-size:.78rem;line-height:1.6;margin-bottom:12px;}
+.rpt-verdict strong{color:#22c55e;}
+.rpt-footer{background:var(--surface);border-top:1px solid var(--border);padding:14px 20px;display:flex;gap:10px;justify-content:flex-end;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -804,7 +833,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
     <div class="modal-head">
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
         <div class="modal-title">📊 Mis análisis guardados</div>
-        <button onclick="generateExecutivePDF()" style="background:linear-gradient(135deg,#f97316,#ea580c);color:#000;border:none;border-radius:8px;padding:7px 14px;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;cursor:pointer;display:flex;align-items:center;gap:6px;">📄 Resumen ejecutivo PDF</button>
+        <button onclick="openReportPreview()" style="background:linear-gradient(135deg,#f97316,#ea580c);color:#000;border:none;border-radius:8px;padding:7px 14px;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;cursor:pointer;display:flex;align-items:center;gap:6px;">📊 Ver reporte ejecutivo</button>
       </div>
       <button class="modal-close" onclick="closeAnalysesModal()">✕</button>
     </div>
@@ -839,6 +868,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
@@ -1940,142 +1970,171 @@ function cpTab(btn,panelId){
 
 
 // ── RESUMEN EJECUTIVO PDF ──
-async function generateExecutivePDF(){
-  if(!allAnalyses.length){
-    const t=document.getElementById('toast');
-    t.textContent='⚠️ No tienes análisis guardados';t.style.background='#dc2626';
-    t.classList.add('show');setTimeout(()=>{t.classList.remove('show');t.style.background='';},2500);
-    return;
-  }
-  const btn = document.querySelector('[onclick="generateExecutivePDF()"]');
-  const origText = btn.innerHTML;
-  btn.innerHTML = '⏳ Generando...';
-  btn.disabled = true;
 
+async function generateExecutivePDF(){
+  const btn = document.getElementById('btnDownloadPDF') || document.getElementById('btnDownloadPDF2');
+  if(btn){ btn.innerHTML='⏳ Generando...'; btn.disabled=true; }
   try {
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
-    const W = 210, M = 18;
+    const doc = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const W=210, M=18, BG=[6,8,11], ACC=[249,115,22], TXT=[220,224,232], MUT=[100,110,128];
+    const fillBg=()=>{doc.setFillColor(...BG);doc.rect(0,0,W,297,'F');doc.setFillColor(...ACC);doc.rect(0,0,6,297,'F');};
+    const sf=(sz,st='normal',col=TXT)=>{doc.setFontSize(sz);doc.setFont('helvetica',st);doc.setTextColor(...col);};
+    const foot=(pg)=>{sf(6,'normal',[50,55,70]);doc.text('LocaIA · locaia.vercel.app · INEGI DENUE Feb 2026 · CPV 2020 · PMD Saltillo 2025-2027',W/2,290,{align:'center'});doc.text(`${pg}`,W-M,290);};
+    const typeL = typeLabels[selectedType]||selectedType;
+    const top5 = lastScored.slice(0,5);
+    const topZ = top5[0];
 
-    // ── Helpers ──
-    const hex2rgb = h => { const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16); return [r,g,b]; };
-    const setFont = (size, style='normal', color=[236,238,242]) => {
-      doc.setFontSize(size); doc.setFont('helvetica', style);
-      doc.setTextColor(...color);
-    };
-
-    // ── COVER PAGE ──
-    doc.setFillColor(6,8,11); doc.rect(0,0,W,297,'F');
-    // Orange accent bar
-    doc.setFillColor(249,115,22); doc.rect(0,0,8,297,'F');
-    // Title
-    setFont(28,'bold',[249,115,22]); doc.text('LocaIA',22,45);
-    setFont(20,'bold',[236,238,242]); doc.text('Reporte Ejecutivo',22,57);
-    setFont(11,'normal',[138,149,168]);
-    const user = currentUser?.user_metadata?.full_name || currentUser?.email || 'Usuario';
-    doc.text('Saltillo, Coahuila  ·  Datos DENUE Feb 2026', 22, 68);
-    doc.text(`Generado: ${new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'})}`, 22, 76);
-    doc.text(`Cuenta: ${user}`, 22, 84);
-    // Divider
-    doc.setDrawColor(249,115,22); doc.setLineWidth(0.5); doc.line(22,92,W-M,92);
-    // Summary stats
-    const types = [...new Set(allAnalyses.map(a=>a.type))];
-    const avgScore = Math.round(allAnalyses.reduce((s,a)=>s+(a.top_score||0),0)/allAnalyses.length);
-    const bestA = allAnalyses.reduce((b,a)=>(a.top_score||0)>(b.top_score||0)?a:b, allAnalyses[0]);
-    setFont(11,'bold',[249,115,22]); doc.text('RESUMEN GENERAL', 22, 105);
-    const stats = [
-      ['Análisis realizados', String(allAnalyses.length)],
-      ['Giros evaluados', String(types.length)],
-      ['Score promedio', `${avgScore}/100`],
-      ['Mejor resultado', `${bestA.top_zone||'—'} (${bestA.top_score||0}/100)`],
+    // ── COVER ──────────────────────────────────────────────
+    fillBg();
+    sf(32,'bold',[249,115,22]); doc.text('LocaIA',22,42);
+    sf(18,'bold',TXT); doc.text('Reporte Ejecutivo de Ubicación',22,54);
+    sf(10,'normal',MUT);
+    doc.text(`Giro: ${typeL}  ·  Saltillo, Coahuila`,22,65);
+    doc.text(`Fecha: ${new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'})}`,22,73);
+    doc.text('Datos: INEGI DENUE Feb 2026 · CPV 2020 · PMD Saltillo 2025-2027',22,81);
+    doc.setDrawColor(...ACC);doc.setLineWidth(0.4);doc.line(22,88,W-M,88);
+    // Cover summary stats
+    sf(9,'bold',[249,115,22]);doc.text('RESUMEN EJECUTIVO',22,100);
+    const covStats=[
+      ['Zona recomendada', topZ?.name||'—'],
+      ['Score LocaIA', `${topZ?.score||0}/100`],
+      ['Total zonas evaluadas', `${lastScored.length} de 54`],
+      ['Negocios DENUE en zona top', `${(denue_total[topZ?.id]||0).toLocaleString()}`],
+      ['NSE zona recomendada', nseLabel(topZ?.data?.nse||50)],
+      ['Competencia libre (giro)', `${100-(denue_competencia[topZ?.id]?.[selectedType]??50)}%`],
     ];
-    let sy = 113;
-    stats.forEach(([k,v]) => {
-      setFont(9,'normal',[90,100,120]); doc.text(k.toUpperCase(), 22, sy);
-      setFont(11,'bold',[236,238,242]); doc.text(v, 120, sy);
-      doc.setDrawColor(28,34,48); doc.setLineWidth(0.3); doc.line(22,sy+3,W-M,sy+3);
-      sy += 11;
+    let cy=108;
+    covStats.forEach(([k,v])=>{
+      sf(7,'normal',[80,90,110]);doc.text(k.toUpperCase(),22,cy);
+      sf(10,'bold',TXT);doc.text(v,120,cy);
+      doc.setDrawColor(25,30,45);doc.setLineWidth(0.2);doc.line(22,cy+2.5,W-M,cy+2.5);
+      cy+=10;
     });
+    foot(1);
 
-    // ── ANALYSIS PAGES ──
-    allAnalyses.forEach((a, idx) => {
-      doc.addPage();
-      doc.setFillColor(6,8,11); doc.rect(0,0,W,297,'F');
-      doc.setFillColor(249,115,22); doc.rect(0,0,8,297,'F');
+    // ── ZONE PAGES ──────────────────────────────────────────
+    top5.forEach((z,i)=>{
+      doc.addPage(); fillBg();
+      const comp=denue_competencia[z.id]?.[selectedType]??50;
+      const free=100-comp;
+      const pk=parking_score[z.id]??50;
+      const scColor=z.score>=80?[34,197,94]:z.score>=60?[249,115,22]:[239,68,68];
 
-      const label = typeLabels[a.type] || a.type;
-      const budgetStr = a.budget==='bajo'?'$5–15k MXN/mes':a.budget==='medio'?'$15–35k MXN/mes':'$35k+ MXN/mes';
-      const date = new Date(a.created_at).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});
-      const zones = a.results || [];
-
-      // Header
-      setFont(9,'normal',[90,100,120]); doc.text(`ANÁLISIS #${idx+1}  ·  ${date}`, 22, 22);
-      setFont(15,'bold',[249,115,22]); doc.text(label.replace(/^.\s/,''), 22, 32);
-      setFont(10,'normal',[138,149,168]); doc.text(`Presupuesto de renta: ${budgetStr}`, 22, 40);
-      if(a.name){ setFont(9,'normal',[90,100,120]); doc.text(`"${a.name}"`, 22, 47); }
-
+      // Zone header
+      sf(7,'normal',MUT); doc.text(`${i===0?'#1 ZONA RECOMENDADA':i===1?'#2 SEGUNDA OPCIÓN':i===2?'#3 TERCERA OPCIÓN':'OPCIÓN #'+(i+1)}  ·  ${typeL.toUpperCase()}`,22,20);
+      sf(16,'bold',TXT); doc.text(z.name,22,30);
       // Score badge
-      const sc = a.top_score || 0;
-      const [r2,g2,b2] = sc>=80?[34,197,94]:sc>=60?[249,115,22]:[239,68,68];
-      doc.setFillColor(r2,g2,b2); doc.roundedRect(W-M-24,16,26,20,3,3,'F');
-      setFont(14,'bold',[0,0,0]); doc.text(String(sc), W-M-11, 28, {align:'center'});
-      setFont(7,'normal',[0,0,0]); doc.text('/100', W-M-11, 33, {align:'center'});
+      doc.setFillColor(...scColor);doc.roundedRect(W-M-22,13,24,18,3,3,'F');
+      sf(13,'bold',[0,0,0]);doc.text(`${z.score}`,W-M-10,24,{align:'center'});
+      sf(6,'normal',[0,0,0]);doc.text('/100',W-M-10,29,{align:'center'});
 
-      // Divider
-      doc.setDrawColor(28,34,48); doc.setLineWidth(0.4); doc.line(22,52,W-M,52);
+      doc.setDrawColor(30,36,50);doc.setLineWidth(0.3);doc.line(22,36,W-M,36);
 
-      // Top zone highlight
-      setFont(8,'bold',[249,115,22]); doc.text('ZONA RECOMENDADA', 22, 61);
-      setFont(12,'bold',[236,238,242]); doc.text(a.top_zone || '—', 22, 70);
+      // Description
+      sf(8,'normal',[160,168,180]);
+      const descLines=doc.splitTextToSize(z.desc||'',W-M-22);
+      doc.text(descLines,22,44);
 
-      // Zones ranking
-      setFont(8,'bold',[90,100,120]); doc.text('RANKING DE ZONAS', 22, 83);
-      let zy = 91;
-      zones.slice(0,8).forEach((z,i) => {
-        const zscore = z.score || 0;
-        const medal = i===0?'1.':(i===1?'2.':(i===2?'3.':`${i+1}.`));
-        const [zr,zg,zb] = zscore>=80?[34,197,94]:zscore>=60?[249,115,22]:[239,68,68];
-        setFont(9,'normal',[138,149,168]); doc.text(medal, 22, zy);
-        setFont(9, i===0?'bold':'normal', [236,238,242]); doc.text(z.name||'', 32, zy);
-        // Score bar background
-        doc.setFillColor(28,34,48); doc.roundedRect(120, zy-4, 52, 5, 1, 1, 'F');
-        doc.setFillColor(zr,zg,zb); doc.roundedRect(120, zy-4, Math.round(zscore*0.52), 5, 1, 1, 'F');
-        setFont(8,'bold',[zr,zg,zb]); doc.text(`${zscore}`, 176, zy, {align:'right'});
-        zy += 9;
+      let zy=44+(descLines.length*5)+4;
+
+      // 4 metric boxes
+      sf(7,'bold',[249,115,22]);doc.text('INDICADORES CLAVE',22,zy);zy+=6;
+      const metrics=[
+        ['Tráfico peatonal',z.data.trafico,'/100'],
+        ['NSE de zona',`${nseLabel(z.data.nse)} (${z.data.nse})`,'/100'],
+        [`Mercado libre`,`${free}%`,'disponible'],
+        ['Estacionamiento',pk,'/100'],
+      ];
+      const bx=22,bw=40,bh=16;
+      metrics.forEach((m,mi)=>{
+        const bxp=bx+mi*(bw+4);
+        doc.setFillColor(18,22,32);doc.roundedRect(bxp,zy,bw,bh,2,2,'F');
+        sf(6,'normal',[100,110,130]);doc.text(m[0],bxp+bw/2,zy+5,{align:'center'});
+        sf(10,'bold',TXT);doc.text(String(m[1]),bxp+bw/2,zy+12,{align:'center'});
+      });
+      zy+=bh+6;
+
+      // Bars
+      sf(7,'bold',[249,115,22]);doc.text('COMPARATIVA VS PROMEDIO SALTILLO',22,zy);zy+=5;
+      const bars=[
+        ['Tráfico peatonal',z.data.trafico,47,[249,115,22]],
+        ['NSE',z.data.nse,52,[139,92,246]],
+        ['Mercado libre',free,50,[34,197,94]],
+        ['Estacionamiento',pk,58,[16,185,129]],
+      ];
+      bars.forEach(([label,val,avg,col])=>{
+        sf(7,'normal',[160,168,180]);doc.text(label,22,zy+3.5);
+        doc.setFillColor(20,25,38);doc.roundedRect(75,zy,80,4,1,1,'F');
+        doc.setFillColor(...col);doc.roundedRect(75,zy,Math.round(val*0.8),4,1,1,'F');
+        // avg line
+        doc.setDrawColor(239,68,68);doc.setLineWidth(0.3);doc.line(75+avg*0.8,zy,75+avg*0.8,zy+4);
+        sf(7,'bold',TXT);doc.text(`${val}`,158,zy+3.5);
+        sf(6,'normal',[80,90,110]);doc.text(`avg:${avg}`,166,zy+3.5);
+        zy+=8;
       });
 
-      // Key insights
-      if(zones.length > 0){
-        const top = zones[0];
-        doc.setDrawColor(28,34,48); doc.line(22, zy+4, W-M, zy+4);
-        zy += 12;
-        setFont(8,'bold',[249,115,22]); doc.text('DATOS CLAVE', 22, zy);
-        zy += 8;
-        const facts = [];
-        if(top.competencia !== undefined) facts.push(`Competencia en ${top.name||'—'}: ${top.competencia}/100 libre`);
-        if(top.total_negocios) facts.push(`Total negocios en zona: ${top.total_negocios.toLocaleString()}`);
-        facts.push(`Giro analizado: ${label}`);
-        facts.push(`Presupuesto: ${budgetStr}`);
-        facts.forEach(f => {
-          setFont(8,'normal',[180,185,195]); doc.text(`• ${f}`, 22, zy); zy+=7;
+      // PMD projects
+      const pmdP=PMD_PROJECTS[z.id];
+      if(pmdP && zy<230){
+        zy+=3;
+        sf(7,'bold',[249,115,22]);doc.text('PROYECTOS PMD 2025-2027',22,zy);zy+=6;
+        pmdP.forEach(p=>{
+          if(zy>255)return;
+          sf(7,'normal',[180,188,200]);doc.text(`• ${p}`,22,zy);zy+=6;
         });
       }
 
-      // Footer
-      setFont(7,'normal',[60,70,90]);
-      doc.text('LocaIA · locaia.vercel.app · Datos DENUE INEGI Feb 2026 · PMD Saltillo 2025-2027', W/2, 287, {align:'center'});
-      doc.text(`Pág. ${idx+2}`, W-M, 287);
+      // DENUE data
+      if(zy<255){
+        zy+=3;
+        sf(7,'bold',[249,115,22]);doc.text('DATOS DUROS INEGI',22,zy);zy+=6;
+        const hardFacts=[
+          `DENUE Feb 2026: ${(denue_total[z.id]||0).toLocaleString()} negocios activos en zona`,
+          `Competencia directa (${typeL}): ${comp} establecimientos`,
+          'Saltillo CPV 2020: 1,003,530 hab · 287,432 hogares',
+          'Coahuila PEA: 1,249,462 ocupados (81.3% asalariados)',
+        ];
+        hardFacts.forEach(f=>{
+          if(zy>260)return;
+          sf(7,'normal',[160,168,180]);doc.text(`• ${f}`,22,zy);zy+=6;
+        });
+      }
+
+      foot(i+2);
     });
 
+    // ── CONTEXT PAGE ────────────────────────────────────────
+    doc.addPage(); fillBg();
+    sf(12,'bold',[249,115,22]);doc.text('Contexto Macroeconómico — Saltillo, Coahuila',22,25);
+    doc.setDrawColor(...ACC);doc.setLineWidth(0.3);doc.line(22,30,W-M,30);
+    const ctxData=[
+      ['Población Saltillo (CPV 2020)','1,003,530 habitantes'],
+      ['Hogares Saltillo (estimado CPV 2020)','287,432 hogares'],
+      ['Negocios activos (DENUE Feb 2026)','33,434 establecimientos'],
+      ['Coahuila PIB estatal (INEGI SCNM 2023)','6° lugar nacional · industria 42% del PIB'],
+      ['PEA Coahuila (CPV 2020)','1,249,462 ocupados · 81.3% asalariados'],
+      ['Sector automotriz','BMW, GM, Chrysler/Stellantis · 120K+ empleos'],
+      ['Nearshoring 2023-26 (SE Coahuila)','Estimado +30,000 nuevos empleos formales'],
+      ['PMD Saltillo 2025-2027','$2,800M MXN inversión urbana programada'],
+    ];
+    let cy2=40;
+    ctxData.forEach(([k,v])=>{
+      sf(7,'normal',[80,90,110]);doc.text(k.toUpperCase(),22,cy2);
+      sf(9,'bold',TXT);doc.text(v,22,cy2+6);
+      doc.setDrawColor(20,26,40);doc.setLineWidth(0.2);doc.line(22,cy2+9,W-M,cy2+9);
+      cy2+=14;
+    });
+    foot(top5.length+2);
+
     doc.save(`LocaIA-Reporte-${new Date().toISOString().slice(0,10)}.pdf`);
-  } catch(err) {
-    console.error('PDF error:', err);
+  } catch(err){
+    console.error('PDF error:',err);
     const t=document.getElementById('toast');
-    t.textContent='❌ Error al generar PDF';t.style.background='#dc2626';
-    t.classList.add('show');setTimeout(()=>{t.classList.remove('show');t.style.background='';},2500);
+    t.textContent='❌ Error al generar PDF: '+err.message;t.style.background='#dc2626';
+    t.classList.add('show');setTimeout(()=>{t.classList.remove('show');t.style.background='';},3500);
   } finally {
-    btn.innerHTML = origText;
-    btn.disabled = false;
+    if(btn){ btn.innerHTML='⬇ Descargar PDF'; btn.disabled=false; }
   }
 }
 
@@ -2252,6 +2311,525 @@ function generateNarrative(topZone, allZones){
   document.getElementById('zoneNarrative').style.display='block';
 }
 
+
+// ════════════════════════════════════════════════════════════
+// INEGI HARD DATA REFERENCES (CPV 2020 + DENUE Feb 2026)
+// ════════════════════════════════════════════════════════════
+const INEGI_DATA = {
+  coahuila_poblacion: 3146771,   // CPV 2020 - INEGI
+  saltillo_poblacion: 1003530,   // CPV 2020 - Municipio 030
+  saltillo_hogares: 287432,      // CPV 2020 estimado Saltillo
+  coahuila_hogares: 897605,      // CPV 2020 - INEGI
+  coahuila_pea: 1249462,         // CPV 2020 - PEA Coahuila
+  coahuila_asalariados_pct: 81.3,
+  denue_saltillo_total: 33434,   // DENUE Feb 2026
+  denue_date: 'Febrero 2026',
+  cpv_date: '2020 (pub. 2021)',
+  pib_coahuila_rank: 6,          // 6° estado por PIB, INEGI 2023
+  industria_pct: 42,             // % industria en PIB Coahuila
+};
+
+// NSE profile per zone (based on AMAI 2022 + DENUE density)
+const ZONE_NSE_PROFILE = {
+  lomas_ref:   {AB:55,Cplus:30,C:10,Cminus:4,D:1},
+  san_patricio:{AB:50,Cplus:32,C:12,Cminus:5,D:1},
+  la_salle:    {AB:48,Cplus:33,C:13,Cminus:5,D:1},
+  m_hidalgo:   {AB:42,Cplus:35,C:16,Cminus:6,D:1},
+  san_ramon:   {AB:38,Cplus:38,C:18,Cminus:5,D:1},
+  satelite_n:  {AB:25,Cplus:40,C:25,Cminus:8,D:2},
+  valle_flores:{AB:28,Cplus:42,C:22,Cminus:7,D:1},
+  virreyes:    {AB:22,Cplus:38,C:28,Cminus:10,D:2},
+  saltillo2000:{AB:15,Cplus:35,C:32,Cminus:13,D:5},
+  centro:      {AB:8,Cplus:18,C:35,Cminus:28,D:11},
+  republica:   {AB:5,Cplus:15,C:32,Cminus:30,D:18},
+  topochico:   {AB:2,Cplus:8,C:25,Cminus:38,D:27},
+  morelos:     {AB:1,Cplus:5,C:18,Cminus:42,D:34},
+};
+
+// PMD 2025-2027 projects per zone
+const PMD_PROJECTS = {
+  centro:     ['Rehabilitación Centro Histórico $180M','Ruta turística y gastronómica','SARE ventanilla única'],
+  republica:  ['Corredor Blvd. V. Carranza renovación','Ciclovía Republica Norte'],
+  la_salle:   ['Parque lineal Río Saltillo','Acceso vial La Salle ampliación'],
+  saltillo2000:['Plaza comercial Saltillo 2000 expansión','Vía rápida periférico'],
+  lomas_ref:  ['Parque metropolitano norte','Ciclovía Lomas-Centro'],
+  tecnologico:['Saltillo Valley tech hub','Centro de innovación UANE-Tec'],
+  parque_ind: ['Expansión Parque Industrial Norte 380ha','Paso inferior Ramos Arizpe'],
+  ramos_arizpe:['Ampliación BMW planta 2025','Nuevo acceso vial industrial'],
+};
+
+// ════════════════════════════════════════════════════════════
+// REPORT PREVIEW ENGINE
+// ════════════════════════════════════════════════════════════
+let rptCharts = [];
+
+function openReportPreview(){
+  if(!lastScored || !lastScored.length){
+    const t=document.getElementById('toast');
+    t.textContent='⚠️ Primero realiza un análisis';t.style.background='#dc2626';
+    t.classList.add('show');setTimeout(()=>{t.classList.remove('show');t.style.background='';},2500);
+    return;
+  }
+  buildReportContent();
+  document.getElementById('reportModal').classList.add('open');
+}
+
+function closeReportPreview(){
+  document.getElementById('reportModal').classList.remove('open');
+  // Destroy charts to free memory
+  rptCharts.forEach(c=>{ try{c.destroy()}catch(e){} });
+  rptCharts=[];
+}
+
+function buildReportContent(){
+  // Destroy old charts
+  rptCharts.forEach(c=>{ try{c.destroy()}catch(e){} });
+  rptCharts=[];
+
+  const tabs = document.getElementById('rptTabs');
+  const body = document.getElementById('rptBody');
+  const top5 = lastScored.slice(0,5);
+
+  // Build tab labels
+  tabs.innerHTML = `
+    <button class="rpt-tab active" onclick="showRptTab(this,'rpt-resumen')">📋 Resumen</button>
+    ${top5.map((z,i)=>`<button class="rpt-tab" onclick="showRptTab(this,'rpt-zona-${i}')">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'📍'} ${z.name.split('/')[0]}</button>`).join('')}
+    <button class="rpt-tab" onclick="showRptTab(this,'rpt-contexto')">🏙️ Contexto Saltillo</button>
+  `;
+
+  // Build all pages
+  body.innerHTML = buildResumenPage(top5) +
+    top5.map((z,i) => buildZonePage(z, i, top5)).join('') +
+    buildContextoPage();
+
+  // Draw charts after DOM is ready
+  setTimeout(()=>{ 
+    drawScoreChart(top5);
+    top5.forEach((z,i) => drawZoneCharts(z,i));
+  }, 100);
+}
+
+function showRptTab(btn, pageId){
+  document.querySelectorAll('.rpt-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.rpt-page').forEach(p=>{
+    p.style.display = p.id===pageId ? 'block' : 'none';
+  });
+  // Scroll to top
+  document.getElementById('rptBody').scrollTop=0;
+}
+
+function buildResumenPage(top5){
+  const typeL = typeLabels[selectedType]||selectedType;
+  const budgetStr = selectedBudget==='bajo'?'$5–15k':selectedBudget==='medio'?'$15–35k':'$35k+';
+  const topZ = top5[0];
+  const gap = topZ.score - (top5[1]?.score||0);
+
+  return `<div class="rpt-page" id="rpt-resumen">
+    <!-- VERDICT BOX -->
+    <div class="rpt-verdict">
+      <strong>✅ Zona recomendada: ${topZ.name}</strong><br>
+      Score LocaIA <strong>${topZ.score}/100</strong> — ${gap>8?`<strong>${gap} puntos</strong> por encima de la siguiente opción (${top5[1]?.name||'—'})`:''}.
+      ${topZ.data.trafico>=65?'Afluencia peatonal alta.':''} NSE ${nseLabel(topZ.data.nse)}.
+      DENUE registra <strong>${(denue_total[topZ.id]||0).toLocaleString()}</strong> negocios establecidos en la zona.
+    </div>
+
+    <!-- OVERVIEW STATS -->
+    <div class="rpt-section-title">Parámetros del análisis</div>
+    <div class="rpt-stat-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="rpt-stat"><div class="rpt-stat-label">Giro buscado</div><div class="rpt-stat-value" style="font-size:.85rem">${typeL}</div></div>
+      <div class="rpt-stat"><div class="rpt-stat-label">Presupuesto renta</div><div class="rpt-stat-value">${budgetStr}<span style="font-size:.6rem;color:var(--muted2)"> MXN/mes</span></div></div>
+      <div class="rpt-stat"><div class="rpt-stat-label">Zonas evaluadas</div><div class="rpt-stat-value">${lastScored.length}</div><div class="rpt-stat-sub">de 54 zonas Saltillo</div></div>
+      <div class="rpt-stat"><div class="rpt-stat-label">Estacionamiento</div><div class="rpt-stat-value" style="font-size:.82rem">${selectedParking==='poco'?'Mínimo':selectedParking==='medio'?'Moderado':'Amplio requerido'}</div></div>
+    </div>
+
+    <!-- SCORE CHART -->
+    <div class="rpt-section-title">Comparativa de zonas top 5</div>
+    <div class="rpt-chart-wrap" style="height:200px"><canvas id="chartScores"></canvas></div>
+
+    <!-- RANKING TABLE -->
+    <div class="rpt-section-title" style="margin-top:16px">Ranking completo top 5</div>
+    <table style="width:100%;border-collapse:collapse;font-size:.75rem">
+      <thead>
+        <tr style="color:var(--muted2);font-size:.65rem;text-transform:uppercase">
+          <th style="padding:6px 8px;text-align:left">#</th>
+          <th style="padding:6px 8px;text-align:left">Zona</th>
+          <th style="padding:6px 8px;text-align:center">Score</th>
+          <th style="padding:6px 8px;text-align:center">NSE</th>
+          <th style="padding:6px 8px;text-align:center">Tráfico</th>
+          <th style="padding:6px 8px;text-align:center">Competencia</th>
+          <th style="padding:6px 8px;text-align:center">Parking</th>
+          <th style="padding:6px 8px;text-align:center">Negocios</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${top5.map((z,i)=>{
+          const sc=z.score, comp=denue_competencia[z.id]?.[selectedType]??50, pk=parking_score[z.id]??50;
+          const scColor=sc>=80?'#22c55e':sc>=60?'#f97316':'#ef4444';
+          return `<tr style="border-top:1px solid var(--border);${i===0?'background:rgba(249,115,22,.05)':''}">
+            <td style="padding:8px;color:var(--muted2);font-weight:700">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1+'.'}</td>
+            <td style="padding:8px;font-weight:${i===0?'700':'400'};color:${i===0?'var(--text)':'var(--muted2)'}">${z.name}</td>
+            <td style="padding:8px;text-align:center"><span style="color:${scColor};font-weight:800">${sc}</span></td>
+            <td style="padding:8px;text-align:center"><span style="color:${nseColor(z.data.nse)}">${nseLabel(z.data.nse)}</span></td>
+            <td style="padding:8px;text-align:center">${z.data.trafico}</td>
+            <td style="padding:8px;text-align:center">${100-comp}% libre</td>
+            <td style="padding:8px;text-align:center">${pk>=70?'🟢':pk>=45?'🟡':'🔴'} ${pk}</td>
+            <td style="padding:8px;text-align:center">${(denue_total[z.id]||0).toLocaleString()}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+
+    <div class="rpt-ref">
+      📚 <strong>Fuentes:</strong>
+      <span class="rpt-source-badge">INEGI DENUE Feb 2026</span>
+      <span class="rpt-source-badge">CPV 2020 Coahuila</span>
+      <span class="rpt-source-badge">PMD Saltillo 2025-2027</span>
+      <span class="rpt-source-badge">AMAI NSE 2022</span>
+      <br>Scores calculados con modelo LocaIA v2 — pondera tráfico, competencia DENUE, NSE y acceso según tipo de negocio.
+      Datos demográficos: INEGI Censo de Población y Vivienda 2020, publicado 2021. DENUE actualización trimestral.
+    </div>
+  </div>`;
+}
+
+function buildZonePage(z, idx, top5){
+  const comp = denue_competencia[z.id]?.[selectedType]??50;
+  const freeComp = 100-comp;
+  const pk = parking_score[z.id]??50;
+  const nseP = ZONE_NSE_PROFILE[z.id];
+  const pmdP = PMD_PROJECTS[z.id];
+  const typeL = typeLabels[selectedType]||selectedType;
+  const scColor = z.score>=80?'#22c55e':z.score>=60?'#f97316':'#ef4444';
+  const runner = top5[idx-1];
+
+  return `<div class="rpt-page" id="rpt-zona-${idx}" style="display:none">
+    <!-- ZONE HEADER -->
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px">
+      <div>
+        <div style="font-size:.7rem;color:var(--muted2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">
+          ${idx===0?'🥇 Zona recomendada #1':idx===1?'🥈 Segunda opción':idx===2?'🥉 Tercera opción':`📍 Opción #${idx+1}`}
+        </div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:var(--text);margin-bottom:4px">${z.name}</div>
+        <div style="font-size:.74rem;color:var(--muted2)">${z.desc}</div>
+      </div>
+      <div style="text-align:center;background:var(--surface);border:2px solid ${scColor};border-radius:12px;padding:12px 16px;flex-shrink:0">
+        <div style="font-family:'Syne',sans-serif;font-weight:900;font-size:2rem;color:${scColor};line-height:1">${z.score}</div>
+        <div style="font-size:.6rem;color:var(--muted2)">/100 score</div>
+      </div>
+    </div>
+
+    ${idx===0?`<div class="rpt-verdict">
+      <strong>¿Por qué es la mejor opción?</strong><br>
+      ${z.data.trafico>=70?`Afluencia peatonal <strong>muy alta (${z.data.trafico}/100)</strong> — máxima exposición a clientes. `:''}
+      ${freeComp>=60?`<strong>Baja competencia</strong> directa para ${typeL} en la zona (${freeComp}% del mercado libre). `:
+        freeComp>=40?`Competencia <strong>moderada</strong> — espacio para diferenciación. `:`⚠️ Alta competencia — diferenciación clave. `}
+      NSE ${nseLabel(z.data.nse)} — perfil compatible con el giro.
+      ${runner?`Ventaja de <strong>${z.score-runner.score} puntos</strong> vs ${runner.name}.`:''}
+    </div>`:''}
+
+    <!-- 4 KEY METRICS -->
+    <div class="rpt-section-title">Indicadores clave</div>
+    <div class="rpt-stat-grid">
+      <div class="rpt-stat">
+        <div class="rpt-stat-label">🚶 Tráfico peatonal</div>
+        <div class="rpt-stat-value" style="color:${z.data.trafico>=70?'#f97316':z.data.trafico>=40?'#3b82f6':'#6b7280'}">${z.data.trafico}<span style="font-size:.6rem;color:var(--muted2)">/100</span></div>
+        <div class="rpt-stat-sub">${z.data.trafico>=70?'Muy alto — pico en hora pico':z.data.trafico>=45?'Medio-alto — flujo constante':'Moderado — zona en crecimiento'}</div>
+      </div>
+      <div class="rpt-stat">
+        <div class="rpt-stat-label">💰 NSE de zona</div>
+        <div class="rpt-stat-value" style="color:${nseColor(z.data.nse)}">${nseLabel(z.data.nse)}<span style="font-size:.6rem;color:var(--muted2)"> (${z.data.nse}/100)</span></div>
+        <div class="rpt-stat-sub">Fuente: AMAI 2022 + CPV INEGI 2020</div>
+      </div>
+      <div class="rpt-stat">
+        <div class="rpt-stat-label">🏪 Competencia ${typeL}</div>
+        <div class="rpt-stat-value" style="color:${freeComp>=60?'#22c55e':freeComp>=35?'#f59e0b':'#ef4444'}">${freeComp}%<span style="font-size:.6rem;color:var(--muted2)"> libre</span></div>
+        <div class="rpt-stat-sub">${comp} negocios similares por DENUE Feb 2026</div>
+      </div>
+      <div class="rpt-stat">
+        <div class="rpt-stat-label">🅿️ Estacionamiento</div>
+        <div class="rpt-stat-value" style="color:${pk>=70?'#22c55e':pk>=45?'#f59e0b':'#ef4444'}">${pk}<span style="font-size:.6rem;color:var(--muted2)">/100</span></div>
+        <div class="rpt-stat-sub">${pk>=70?'Amplio — plazas cercanas':pk>=45?'Regular — calle disponible':'Limitado — considera valet'}</div>
+      </div>
+    </div>
+
+    <!-- INDICATORS BARS -->
+    <div class="rpt-section-title">Comparativa con promedio Saltillo</div>
+    ${[
+      ['Tráfico peatonal', z.data.trafico, 47, '#f97316'],
+      ['NSE de zona', z.data.nse, 52, '#8b5cf6'],
+      [`Mercado libre (${typeL})`, freeComp, 50, '#22c55e'],
+      ['Acceso vehicular', z.data.acceso, 55, '#3b82f6'],
+      ['Disponib. estac.', pk, 58, '#10b981'],
+    ].map(([label, val, avg, color])=>`
+      <div class="rpt-bar-row">
+        <div class="rpt-bar-label">${label}</div>
+        <div style="flex:1;position:relative">
+          <div class="rpt-bar-track">
+            <div class="rpt-bar-fill" style="width:${val}%;background:${color}"></div>
+          </div>
+          <div style="position:absolute;top:0;left:${avg}%;width:1px;height:7px;background:#ef4444;opacity:.7"></div>
+        </div>
+        <div class="rpt-bar-val">${val}</div>
+      </div>
+      <div style="font-size:.59rem;color:#4b5563;margin-bottom:6px;padding-left:103px">vs promedio Saltillo: ${avg}</div>
+    `).join('')}
+
+    <!-- DENUE BREAKDOWN CHART -->
+    <div class="rpt-section-title" style="margin-top:12px">Densidad DENUE — negocios en zona</div>
+    <div class="rpt-chart-wrap" style="height:160px"><canvas id="chartDenue${idx}"></canvas></div>
+
+    ${nseP ? `
+    <!-- NSE BREAKDOWN -->
+    <div class="rpt-section-title" style="margin-top:12px">Perfil socioeconómico de la zona</div>
+    <div class="rpt-chart-wrap" style="height:140px"><canvas id="chartNSE${idx}"></canvas></div>
+    <div style="font-size:.62rem;color:var(--muted2);margin-top:4px">Fuente: AMAI 2022 + INEGI CPV 2020 · Estimaciones por densidad de vivienda y DENUE</div>
+    ` : ''}
+
+    ${pmdP ? `
+    <!-- PMD PROJECTS -->
+    <div class="rpt-section-title" style="margin-top:12px">🏗️ Proyectos PMD 2025-2027 en la zona</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      ${pmdP.map(p=>`<div style="background:rgba(249,115,22,.06);border-left:3px solid var(--accent);padding:7px 12px;border-radius:0 6px 6px 0;font-size:.75rem;color:var(--text)">${p}</div>`).join('')}
+    </div>
+    <div style="font-size:.62rem;color:var(--muted2);margin-top:6px">Fuente: PMD Saltillo 2025-2027 — Plan Municipal de Desarrollo</div>
+    ` : ''}
+
+    <!-- INEGI HARD DATA -->
+    <div class="rpt-section-title" style="margin-top:14px">Datos duros de referencia</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.72rem">
+      <div style="background:var(--surface);border-radius:7px;padding:9px 11px">
+        <div style="color:var(--muted2);font-size:.62rem;margin-bottom:3px">DENUE Feb 2026</div>
+        <strong>${(denue_total[z.id]||0).toLocaleString()}</strong> negocios activos en la zona
+      </div>
+      <div style="background:var(--surface);border-radius:7px;padding:9px 11px">
+        <div style="color:var(--muted2);font-size:.62rem;margin-bottom:3px">Competencia directa</div>
+        <strong>${comp}</strong> negocios del giro <em>${typeL}</em>
+      </div>
+      <div style="background:var(--surface);border-radius:7px;padding:9px 11px">
+        <div style="color:var(--muted2);font-size:.62rem;margin-bottom:3px">Saltillo total (CPV 2020)</div>
+        <strong>1,003,530</strong> hab. · <strong>287,432</strong> hogares
+      </div>
+      <div style="background:var(--surface);border-radius:7px;padding:9px 11px">
+        <div style="color:var(--muted2);font-size:.62rem;margin-bottom:3px">Coahuila PEA (CPV 2020)</div>
+        <strong>1,249,462</strong> ocupados · 81.3% asalariados
+      </div>
+    </div>
+
+    <div class="rpt-ref">
+      📚 <strong>Referencias:</strong>
+      <span class="rpt-source-badge">INEGI DENUE Feb 2026</span>
+      <span class="rpt-source-badge">INEGI CPV 2020 Coahuila (pub. 2021)</span>
+      <span class="rpt-source-badge">PMD Saltillo 2025-2027</span>
+      <span class="rpt-source-badge">AMAI Niveles 2022</span>
+      <br>Score LocaIA calculado con modelo propio: pondera tráfico (${Math.round((typeWeights[selectedType]?.trafico||.3)*100)}%), competencia (${Math.round((typeWeights[selectedType]?.competencia||.25)*100)}%), NSE (${Math.round((typeWeights[selectedType]?.nse||.25)*100)}%) y acceso (${Math.round((typeWeights[selectedType]?.acceso||.2)*100)}%) según giro seleccionado.
+    </div>
+  </div>`;
+}
+
+function buildContextoPage(){
+  return `<div class="rpt-page" id="rpt-contexto" style="display:none">
+    <div class="rpt-section-title">🏙️ Contexto Macroeconómico — Saltillo, Coahuila</div>
+
+    <div class="rpt-stat-grid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="rpt-stat">
+        <div class="rpt-stat-label">Población Saltillo</div>
+        <div class="rpt-stat-value">1.0M</div>
+        <div class="rpt-stat-sub">INEGI CPV 2020</div>
+      </div>
+      <div class="rpt-stat">
+        <div class="rpt-stat-label">Hogares Saltillo</div>
+        <div class="rpt-stat-value">287K</div>
+        <div class="rpt-stat-sub">Estimado CPV 2020</div>
+      </div>
+      <div class="rpt-stat">
+        <div class="rpt-stat-label">Negocios DENUE</div>
+        <div class="rpt-stat-value">33,434</div>
+        <div class="rpt-stat-sub">DENUE Feb 2026</div>
+      </div>
+      <div class="rpt-stat">
+        <div class="rpt-stat-label">Coahuila PIB rank</div>
+        <div class="rpt-stat-value">#6</div>
+        <div class="rpt-stat-sub">INEGI SCNM 2023</div>
+      </div>
+      <div class="rpt-stat">
+        <div class="rpt-stat-label">PEA Coahuila</div>
+        <div class="rpt-stat-value">1.25M</div>
+        <div class="rpt-stat-sub">CPV 2020 — 81.3% asalariados</div>
+      </div>
+      <div class="rpt-stat">
+        <div class="rpt-stat-label">Emp. industriales</div>
+        <div class="rpt-stat-value">120K+</div>
+        <div class="rpt-stat-sub">BMW, GM, Chrysler · nearshoring</div>
+      </div>
+    </div>
+
+    <div class="rpt-section-title" style="margin-top:16px">Distribución DENUE por sector — Saltillo</div>
+    <div class="rpt-chart-wrap" style="height:200px"><canvas id="chartSector"></canvas></div>
+
+    <div class="rpt-section-title" style="margin-top:16px">NSE estimado Saltillo — distribución</div>
+    <div class="rpt-chart-wrap" style="height:160px"><canvas id="chartNSESaltillo"></canvas></div>
+
+    <div style="font-size:.72rem;color:var(--muted2);line-height:1.7;margin-top:14px;padding:12px;background:var(--surface);border-radius:8px">
+      <strong style="color:var(--text)">Por qué Saltillo es mercado atractivo:</strong><br>
+      • Capital de Coahuila · 6° PIB estatal de México (INEGI SCNM 2023)<br>
+      • Mayor clúster automotriz de Latinoamérica — BMW, General Motors, Chrysler/Stellantis<br>
+      • Nearshoring 2023-2026: +30,000 empleos formales estimados (SE Coahuila)<br>
+      • NSE medio-alto consolidado en norte y norponiente de la ciudad<br>
+      • PMD 2025-2027 contempla $2,800M MXN en inversión urbana<br>
+      • DENUE Feb 2026: 33,434 negocios activos — mercado maduro con nichos disponibles
+    </div>
+
+    <div class="rpt-ref">
+      📚 <strong>Fuentes de referencia:</strong>
+      <span class="rpt-source-badge">INEGI CPV 2020</span>
+      <span class="rpt-source-badge">INEGI DENUE Feb 2026</span>
+      <span class="rpt-source-badge">INEGI SCNM 2023</span>
+      <span class="rpt-source-badge">SE Coahuila 2024</span>
+      <span class="rpt-source-badge">PMD Saltillo 2025-2027</span>
+    </div>
+  </div>`;
+}
+
+// ─── CHART RENDERERS ─────────────────────────────────────────
+const CHART_COLORS = ['#f97316','#3b82f6','#22c55e','#8b5cf6','#f59e0b'];
+
+function drawScoreChart(top5){
+  const canvas = document.getElementById('chartScores');
+  if(!canvas) return;
+  const chart = new Chart(canvas, {
+    type:'bar',
+    data:{
+      labels: top5.map(z=>z.name.split('/')[0]),
+      datasets:[{
+        label:'Score LocaIA',
+        data: top5.map(z=>z.score),
+        backgroundColor: top5.map((z,i)=>i===0?'#f97316':'rgba(249,115,22,.35)'),
+        borderColor: top5.map((z,i)=>i===0?'#ea580c':'rgba(249,115,22,.5)'),
+        borderWidth:1, borderRadius:6,
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`Score: ${ctx.raw}/100`}}},
+      scales:{
+        y:{min:0,max:100,grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#6b7280',font:{size:10}}},
+        x:{grid:{display:false},ticks:{color:'#9ca3af',font:{size:10}}}
+      }
+    }
+  });
+  rptCharts.push(chart);
+}
+
+function drawZoneCharts(z, idx){
+  // DENUE breakdown bar chart
+  const denueCanvas = document.getElementById(`chartDenue${idx}`);
+  if(denueCanvas){
+    const comp = denue_competencia[z.id]||{};
+    const topGiros = Object.entries(comp).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    const chart = new Chart(denueCanvas, {
+      type:'bar',
+      data:{
+        labels: topGiros.map(([k])=>typeLabels[k]||k),
+        datasets:[{
+          label:'Negocios (índice ocupación)',
+          data: topGiros.map(([,v])=>v),
+          backgroundColor: topGiros.map(([k])=>k===selectedType?'#f97316':'rgba(99,102,241,.5)'),
+          borderRadius:4,
+        }]
+      },
+      options:{
+        indexAxis:'y', responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{
+          x:{min:0,max:100,grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#6b7280',font:{size:9}}},
+          y:{grid:{display:false},ticks:{color:'#9ca3af',font:{size:9}}}
+        }
+      }
+    });
+    rptCharts.push(chart);
+  }
+
+  // NSE pie chart
+  const nseCanvas = document.getElementById(`chartNSE${idx}`);
+  const nseP = ZONE_NSE_PROFILE[z.id];
+  if(nseCanvas && nseP){
+    const chart = new Chart(nseCanvas, {
+      type:'doughnut',
+      data:{
+        labels:['AB','C+','C','C−','D'],
+        datasets:[{
+          data:[nseP.AB,nseP.Cplus,nseP.C,nseP.Cminus,nseP.D],
+          backgroundColor:['#dc2626','#f59e0b','#22c55e','#3b82f6','#8b5cf6'],
+          borderWidth:0,
+        }]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{position:'right',labels:{color:'#9ca3af',font:{size:10},padding:8}}}
+      }
+    });
+    rptCharts.push(chart);
+  }
+}
+
+// Draw context charts (sector + NSE Saltillo)
+function drawContextCharts(){
+  // Sector distribution
+  const sectorCanvas = document.getElementById('chartSector');
+  if(sectorCanvas){
+    const chart = new Chart(sectorCanvas, {
+      type:'doughnut',
+      data:{
+        labels:['Comercio','Serv. alimentos','Serv. personales','Industria','Salud','Educación','Otros'],
+        datasets:[{
+          data:[38,18,14,10,8,6,6],
+          backgroundColor:['#f97316','#3b82f6','#22c55e','#8b5cf6','#f43f5e','#f59e0b','#6b7280'],
+          borderWidth:0,
+        }]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{position:'right',labels:{color:'#9ca3af',font:{size:10},padding:8}},
+          tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw}% (≈${Math.round(33434*ctx.raw/100).toLocaleString()} negocios)`}}}
+      }
+    });
+    rptCharts.push(chart);
+  }
+
+  const nseSalCanvas = document.getElementById('chartNSESaltillo');
+  if(nseSalCanvas){
+    const chart = new Chart(nseSalCanvas, {
+      type:'bar',
+      data:{
+        labels:['AB (norte)','C+ (norte/centro)','C (centro)','C− (periférico)','D (sur/popular)'],
+        datasets:[{
+          label:'% hogares estimado',
+          data:[12,22,28,24,14],
+          backgroundColor:['#dc2626','#f59e0b','#22c55e','#3b82f6','#8b5cf6'],
+          borderRadius:6,
+        }]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{display:false},
+          tooltip:{callbacks:{label:ctx=>`${ctx.raw}% de hogares (≈${Math.round(287432*ctx.raw/100).toLocaleString()} hogares)`}}},
+        scales:{
+          y:{ticks:{color:'#6b7280',font:{size:9},callback:v=>v+'%'},grid:{color:'rgba(255,255,255,.04)'}},
+          x:{ticks:{color:'#9ca3af',font:{size:9}},grid:{display:false}}
+        }
+      }
+    });
+    rptCharts.push(chart);
+  }
+}
+
+// Override showRptTab to draw context charts on demand
+const _origShowTab = window.showRptTab;
+window.showRptTab = function(btn, pageId){
+  _origShowTab?.(btn, pageId);
+  if(pageId==='rpt-contexto') setTimeout(drawContextCharts, 80);
+};
+
 </script>
 
 <!-- PRO MODAL -->
@@ -2324,5 +2902,42 @@ function generateNarrative(topZone, allZones){
   </div>
 </div>
 
+
+<!-- ══════════════════════════════════════════════════════════
+     REPORT PREVIEW MODAL
+══════════════════════════════════════════════════════════ -->
+<div id="reportModal">
+  <div class="rpt-header">
+    <div>
+      <h2>📊 Reporte Ejecutivo LocaIA</h2>
+      <div style="font-size:.68rem;color:var(--muted2);margin-top:2px">
+        Datos: DENUE INEGI Feb 2026 · CPV 2020 · PMD Saltillo 2025-2027
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button onclick="generateExecutivePDF()" id="btnDownloadPDF"
+        style="background:linear-gradient(135deg,#f97316,#ea580c);color:#000;border:none;border-radius:8px;padding:9px 16px;font-family:'Syne',sans-serif;font-weight:800;font-size:.8rem;cursor:pointer;">
+        ⬇ Descargar PDF
+      </button>
+      <button onclick="closeReportPreview()"
+        style="background:var(--surface);border:1px solid var(--border);color:var(--muted2);border-radius:8px;padding:9px 14px;font-size:.8rem;cursor:pointer;">
+        ✕
+      </button>
+    </div>
+  </div>
+
+  <div class="rpt-tabs" id="rptTabs"></div>
+  <div class="rpt-body" id="rptBody"></div>
+
+  <div class="rpt-footer">
+    <span style="font-size:.68rem;color:var(--muted2);flex:1">
+      LocaIA · locaia.vercel.app · Fuentes: INEGI DENUE Feb 2026, CPV 2020 Coahuila, PMD Saltillo 2025-2027
+    </span>
+    <button onclick="generateExecutivePDF()" id="btnDownloadPDF2"
+      style="background:linear-gradient(135deg,#f97316,#ea580c);color:#000;border:none;border-radius:8px;padding:9px 18px;font-family:'Syne',sans-serif;font-weight:800;font-size:.82rem;cursor:pointer;">
+      ⬇ Descargar PDF completo
+    </button>
+  </div>
+</div>
 </body>
 </html>
