@@ -878,6 +878,31 @@ sb.auth.getSession().then(({data})=>{
 
 async function handleLogout(){await sb.auth.signOut();window.location.href='login.html';}
 
+// ── CARGA SCORES REALES DESDE SUPABASE ──
+async function loadDenueFromDB(){
+  try {
+    const { data, error } = await sb.from('denue_zona_scores').select('*');
+    if (error || !data || data.length === 0) return;
+    const giros = ['comida_rapida','restaurante','cafeteria','panaderia','ropa','farmacia',
+      'papeleria','estetica','gym','tech','veterinaria','lavanderia','bar','ferreteria',
+      'supermercado','salon_eventos','escuela','consultorio'];
+    const maxPorGiro = {};
+    for (const g of giros) maxPorGiro[g] = Math.max(1, ...data.map(r => r['cnt_'+g] || 0));
+    for (const row of data) {
+      const zid = row.zona_id;
+      denue_total[zid] = row.total_negocios || 0;
+      if (!denue_competencia[zid]) denue_competencia[zid] = {};
+      for (const g of giros) {
+        const cnt = row['cnt_'+g] || 0;
+        const satPct = maxPorGiro[g] > 0 ? Math.sqrt(cnt / maxPorGiro[g]) : 0;
+        denue_competencia[zid][g] = Math.round(100 - satPct * 100);
+      }
+    }
+    console.log('✅ DENUE real cargado: ' + data.length + ' zonas');
+  } catch(e) { console.warn('loadDenueFromDB fallback:', e.message); }
+}
+loadDenueFromDB();
+
 // INEGI live
 (async()=>{
   try{
@@ -3066,6 +3091,7 @@ window.showRptTab = function(btn, pageId){
   _origShowTab?.(btn, pageId);
   if(pageId==='rpt-contexto') setTimeout(drawContextCharts, 80);
 };
+
 
 const BEST_SPOTS = {"centro": [25.4241, -100.9991, "Allende & Victoria"], "republica": [25.438, -100.9892, "Blvd. V. Carranza & Norte"], "topochico": [25.4295, -100.9812, "Blvd. Venustiano Carranza"], "ant_cardenas": [25.4252, -101.0065, "Antonio Cárdenas & Periférico"], "morelos": [25.4108, -100.9438, "Morelos & Zaragoza"], "la_madrid": [25.4008, -100.9905, "La Madrid & Miravalle"], "guanajuato": [25.4418, -100.9803, "Guanajuato & Latinoam."], "lourdes": [25.392, -101.0018, "Blvd. Lourdes & 5 de Mayo"], "chamizal": [25.413, -101.0272, "Blvd. Vito Alessio Robles"], "la_salle": [25.4519, -100.9918, "Blvd. La Salle & Circuito"], "bellavista": [25.4058, -101.0055, "Olímpica & Bellavista"], "cuauhtemoc": [25.4352, -100.9941, "Cuauhtémoc & Periférico"], "san_ramon": [25.421, -100.9708, "San Ramón & Fundadores"], "plaza_fiesta": [25.4548, -100.9882, "Blvd. Fundadores & Plaza"], "valle_flores": [25.4328, -100.9582, "Valle de las Flores"], "bonanza": [25.4438, -100.9585, "Bonanza & Oceanía"], "v_olimpica": [25.4605, -100.9818, "Villa Olímpica & Periférico"], "tecnologico": [25.4478, -101.0148, "Tecnológico & Satélite"], "satelite_n": [25.459, -101.0158, "Satélite Norte & Blvd."], "saltillo2000": [25.464, -101.0278, "Saltillo 2000 & Periférico"], "col25": [25.4775, -100.9772, "Col. 25 & Blvd. Norte"], "pedregal": [25.4158, -101.0398, "Pedregal & Blvd."], "universidad": [25.4028, -100.9644, "Universidad & Tlaloc"], "bosques": [25.4578, -101.0042, "Bosques & Periférico"], "nazario": [25.4645, -100.9992, "Nazario Ortiz & Blvd."], "vistahermosa": [25.4122, -100.949, "Fundadores & V. Hermosa"], "virreyes": [25.4652, -100.9862, "Col. Virreyes & Circuito"], "san_patricio": [25.4578, -100.9562, "San Patricio & Fundadores"], "rancho_pena": [25.4735, -100.978, "Rancho de Peña & Blvd."], "mitras": [25.4478, -100.9782, "Mitras & Periférico"], "pradosSur": [25.4675, -100.9895, "Prados del Sur & Blvd."], "laFloresta": [25.4882, -101.0042, "La Floresta & Acceso Norte"], "coloniaObraPre": [25.4388, -100.9705, "Obra Previsora & Circuito"], "boulevardIsidro": [25.4308, -101.0125, "Blvd. Isidro López Sur"], "rioGrandePte": [25.4288, -101.0415, "Río Grande & Poniente"], "internacionalSur": [25.3958, -100.9758, "Periférico Internacional Sur"], "lomas_ref": [25.3512, -101.0118, "Lomas del Refugio"], "landin": [25.4008, -101.0265, "Landín & Blvd. Alessio"], "mirasierra": [25.4238, -100.9238, "Mirasierra & Fundadores"], "fraccPuertaDelNorte": [25.5008, -101.0048, "Puerta del Norte"], "parque_ind": [25.5082, -101.0202, "Parque Industrial Norte"], "ramos_arizpe": [25.5458, -100.9382, "Ramos Arizpe Centro"], "lomas_zap": [25.3917, -100.9514, "Lomas de Zapalinamé"], "nueva_mir": [25.4093, -100.9189, "Nueva Mirasierra"], "lomalinda": [25.419, -100.908, "Loma Linda"], "mision_orte": [25.4238, -100.9015, "Misión del Norte"], "fed_berrueto": [25.3853, -100.977, "Fed. Berrueto Ramírez"], "el_salvador": [25.41, -100.97, "El Salvador & Fundadores"], "b_aires": [25.405, -101.015, "Buenos Aires & Blvd."], "satelite_s": [25.4529, -101.0207, "Satélite Sur & Periférico"], "n_teresitas": [25.37, -101.02, "Nuevas Teresitas"], "las_teresitas": [25.3644, -101.0093, "Las Teresitas"], "hacienda_n": [25.3632, -101.0339, "Hacienda Norte"], "m_hidalgo": [25.3886, -100.9853, "Miguel Hidalgo & Blvd."], "zamoraSanLuis": [25.436, -101.028, "Zamora & San Luis"], "sanIsidro": [25.454, -101.038, "San Isidro & Periférico"], "anahuac": [25.413, -101.015, "Anáhuac & Blvd."], "colosioOriente": [25.449, -100.915, "Colosio Oriente"], "lomatoscana": [25.462, -101.048, "Loma Toscana & Periférico"], "zaragozaSur": [25.377, -101.0, "Zaragoza Sur"], "ejidoSan": [25.385, -100.938, "Ejido San José"], "montesCarpatos": [25.446, -100.937, "Montes Cárpatos"], "pradosVertiz": [25.441, -100.945, "Prados de Vertiz"], "haciendaElRoble": [25.372, -101.045, "Hacienda El Roble"], "queretaro": [25.427, -101.02, "Querétaro & Blvd."], "fraccLasAmericasNorte": [25.482, -100.971, "Las Américas Norte"], "cumbresElite": [25.4755, -100.958, "Cumbres Elite"], "coloniaVerde": [25.418, -100.965, "Colonia Verde"], "misionDeLas": [25.494, -101.014, "Misión de Las Flores"], "roma": [25.4469, -101.0214, "Colonia Roma"], "los_gonzalez": [25.4718, -100.9467, "Los González"], "los_pinos": [25.4624, -100.9648, "Los Pinos"], "los_pinos2": [25.398, -101.058, "Los Pinos 2"], "olimpica_norte": [25.42, -100.98, "Olímpica Norte"], "sj_cerritos": [25.435, -100.925, "San José de los Cerritos"], "ign_zaragoza": [25.4213, -100.9338, "Ignacio Zaragoza"], "vic_guerrero": [25.393, -100.9831, "Vicente Guerrero"]};
 
