@@ -851,6 +851,14 @@ const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentUser=null, allAnalyses=[], activeFilter='all';
+// Variables globales del mapa — declaradas aquí para evitar Temporal Dead Zone
+let zonePolygonsGeo = {};  // id → GeoJSON polygon geometry desde Supabase
+let polygonLayer    = null; // L.layerGroup de polígonos de zonas
+let agebLayer       = null; // L.layerGroup de vialidades
+let bestSpotMarker  = null;
+let heatLayer       = 'none';
+let heatLayerGroup  = null;
+let pinMarker       = null;
 
 // ── AUTH INSTANTÁNEO: lee localStorage sin red ──
 (function fastAuth(){
@@ -926,13 +934,31 @@ loadDenueFromDB();
 const map=L.map('map',{center:[25.4231,-101.0035],zoom:13,zoomControl:true,attributionControl:false});
 map.on('click', ()=>{ if(pinMarker){ map.removeLayer(pinMarker); pinMarker=null; } if(bestSpotMarker){ map.removeLayer(bestSpotMarker); bestSpotMarker=null; } });
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(map);
+// polygonLayer (zonas) debajo, circleLayer (pins/fallback) encima
+polygonLayer = L.layerGroup().addTo(map);
 const circleLayer=L.layerGroup().addTo(map);
+
+// ── Cargar polígonos reales de zonas desde Supabase ──
+async function loadZonePolygons(){
+  try{
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/zones?select=id,polygon_geojson,centroid_lat,centroid_lng`,{
+      headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}
+    });
+    if(!res.ok) throw new Error('zones fetch failed');
+    const rows = await res.json();
+    rows.forEach(r=>{ if(r.polygon_geojson) zonePolygonsGeo[r.id]=r.polygon_geojson; });
+    console.log(`[LocaIA] ${rows.length} polígonos de zonas cargados`);
+  }catch(e){
+    console.warn('[LocaIA] Polígonos no disponibles, usando círculos de fallback',e);
+  }
+}
+
 // Auto-activar mapa de calor NSE en vista inicial
-setTimeout(()=>{
+loadZonePolygons().then(()=>{
   const nseBtn=document.querySelector('.ht-btn[data-hl="nse"]');
   if(nseBtn) setHeat(nseBtn,'nse');
   renderAgebPolygons(null);
-},400);
+});
 
 // DENUE Feb 2026 — score 100=libre, 0=saturado
 const denue_competencia={
@@ -1314,27 +1340,39 @@ function scoreColor(s){return s>=85?'#f97316':s>=70?'#3b82f6':'#8b5cf6';}
 function analyze(){
   analyzed=true;
   circleLayer.clearLayers(); // FIX: limpia correctamente todos los círculos
+  if(polygonLayer) polygonLayer.clearLayers(); // limpiar polígonos anteriores
 
   lastScored=zones.map(z=>({...z,score:scoreZone(z)})).sort((a,b)=>b.score-a.score);
   if(lastScored[0])updateInegiZone(lastScored[0].id);
 
   lastScored.forEach((z,i)=>{
     const color=scoreColor(z.score);
-    // Círculo invisible — solo área de click
-    const c=L.circle([z.lat,z.lng],{radius:Math.max(z.radius*0.30,200),color,fillColor:color,fillOpacity:0.20,weight:1.8,opacity:0.88,interactive:true});
     const rank=i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`;
     const pmdTag=PMD_BONUS[z.id]?`<div style="font-size:.68rem;color:#818cf8;margin-top:4px">🏗️ ${PMD_BONUS[z.id].motivo}</div>`:"";
     const zCanil=canibalIndex(z);const zCap=marketCapacity(z);
     const zCaniColor=zCanil>70?'#ef4444':zCanil>40?'#f97316':'#22c55e';
     const zCaniLabel=zCanil>70?'Alta':zCanil>40?'Media':'Baja';
-    // Click → drop animated pin + fly + popup
-    c.on('click', function(){
-      dropPin(z, rank, color, zCanil, zCaniLabel, zCap);
-    });
-    c.on('mouseover', function(){
-      dropPin(z, rank, color, zCanil, zCaniLabel, zCap);
-    });
-    circleLayer.addLayer(c);
+
+    const onClickFn = function(){ dropPin(z, rank, color, zCanil, zCaniLabel, zCap); };
+
+    if(zonePolygonsGeo[z.id]){
+      // ── Polígono real desde Supabase ──
+      const fillOpacity = i===0 ? 0.28 : i<=2 ? 0.20 : 0.10;
+      const weight      = i===0 ? 2.5  : i<=2 ? 2.0  : 1.5;
+      const poly = L.geoJSON({type:'Feature',geometry:zonePolygonsGeo[z.id]},{
+        style:{ color, fillColor:color, fillOpacity, weight, opacity:0.90 }
+      });
+      poly.on('click', onClickFn);
+      poly.on('mouseover', function(){ this.setStyle({fillOpacity: Math.min(fillOpacity+0.15,0.45)}); onClickFn(); });
+      poly.on('mouseout',  function(){ this.setStyle({fillOpacity}); });
+      polygonLayer.addLayer(poly);
+    } else {
+      // ── Fallback: círculo si no hay polígono ──
+      const c=L.circle([z.lat,z.lng],{radius:Math.max(z.radius*0.30,200),color,fillColor:color,fillOpacity:0.20,weight:1.8,opacity:0.88,interactive:true});
+      c.on('click', onClickFn);
+      c.on('mouseover', onClickFn);
+      circleLayer.addLayer(c);
+    }
   });
 
   document.getElementById('results-type-label').textContent=typeLabels[selectedType].replace(/^.\s/,'');
@@ -1649,15 +1687,27 @@ function closeDetailModal(){document.getElementById('detailModal').classList.rem
 function replayOnMap(aRaw){
   const a=typeof aRaw==='string'?JSON.parse(aRaw):aRaw;
   circleLayer.clearLayers();
+  if(polygonLayer) polygonLayer.clearLayers();
   (a.results||[]).forEach((r,i)=>{
     const z=zones.find(z=>z.id===r.id||z.name===r.name);
     if(!z)return;
     const color=scoreColor(r.score||0);
-    const c=L.circle([z.lat,z.lng],{radius:z.radius,color,fillColor:color,fillOpacity:.10,weight:2.2,opacity:.88});
     const rank=i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`;
-    c.bindPopup(`<div class="popup-name">${rank} ${z.name}</div><div class="popup-score">${r.score}<span style="font-size:.65rem;color:#5a6478"> / 100</span></div><div class="popup-desc">${z.desc}</div>`);
-    c.on('mouseover',function(){this.openPopup();});
-    circleLayer.addLayer(c);
+    const popupHtml=`<div class="popup-name">${rank} ${z.name}</div><div class="popup-score">${r.score}<span style="font-size:.65rem;color:#5a6478"> / 100</span></div><div class="popup-desc">${z.desc}</div>`;
+    if(zonePolygonsGeo[z.id]){
+      const fillOpacity = i===0?0.28:i<=2?0.20:0.10;
+      const poly=L.geoJSON({type:'Feature',geometry:zonePolygonsGeo[z.id]},{
+        style:{color,fillColor:color,fillOpacity,weight:2.0,opacity:0.88}
+      });
+      poly.bindPopup(popupHtml);
+      poly.on('mouseover',function(){this.openPopup();});
+      polygonLayer.addLayer(poly);
+    } else {
+      const c=L.circle([z.lat,z.lng],{radius:z.radius,color,fillColor:color,fillOpacity:.10,weight:2.2,opacity:.88});
+      c.bindPopup(popupHtml);
+      c.on('mouseover',function(){this.openPopup();});
+      circleLayer.addLayer(c);
+    }
   });
   const first=a.results?.[0];
   if(first){const z0=zones.find(z=>z.id===first.id||z.name===first.name);if(z0)map.setView([z0.lat,z0.lng],14);}
@@ -2252,7 +2302,6 @@ function hexToRgb(hex){
 // ════════════════════════════════════════════════════════
 // AGEB POLYGON LAYER — polígonos reales INEGI 2020
 // ════════════════════════════════════════════════════════
-let agebLayer = null;
 
 function renderAgebPolygons(scoreByZone){
   if(agebLayer){ map.removeLayer(agebLayer); agebLayer=null; }
@@ -2284,11 +2333,10 @@ function renderAgebPolygons(scoreByZone){
   });
 
   agebLayer.addTo(map);
+  if(polygonLayer) polygonLayer.bringToFront();
   if(circleLayer) circleLayer.bringToFront();
 }
 
-
-let bestSpotMarker = null;
 
 function dropBestSpot(zone){
   if(bestSpotMarker){ map.removeLayer(bestSpotMarker); bestSpotMarker=null; }
@@ -2409,9 +2457,6 @@ function dropPin(z, rank, color, zCanil, zCaniLabel, zCap){
 // ════════════════════════════════════════════════════════
 // HEAT MAP — toggle simple NSE / Tráfico / Score
 // ════════════════════════════════════════════════════════
-let heatLayer = 'none';
-let heatLayerGroup = null;
-let pinMarker = null;  // active pinpoint marker
 
 const heatCfg = {
   nse: {
@@ -2535,6 +2580,7 @@ function renderHeat(){
   const imageBounds = [[BOUNDS.minLat, BOUNDS.minLng],[BOUNDS.maxLat, BOUNDS.maxLng]];
   heatLayerGroup = L.imageOverlay(canvas.toDataURL(), imageBounds, {opacity:1, interactive:false});
   heatLayerGroup.addTo(map);
+  if(polygonLayer) polygonLayer.bringToFront();
   circleLayer.bringToFront();
 }
 
