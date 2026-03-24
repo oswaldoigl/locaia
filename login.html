@@ -245,19 +245,21 @@ input::placeholder{color:var(--muted);}
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded',function(){
 const SUPABASE_URL = 'https://etdjlwtopaehamhlwwrd.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_OLKBJ7H2vfDMbCr0v9YnqA_yVrLfL0M';
-const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Check if already logged in
-sb.auth.getSession().then(({ data }) => {
-  if (data.session) window.location.href = 'dashboard.html';
+let sb;
+window.addEventListener('load', function(){
+  const { createClient } = supabase;
+  sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+  // Check if already logged in
+  sb.auth.getSession().then(({ data }) => {
+    if (data.session) window.location.href = 'dashboard.html';
+  });
 });
 
 function showTab(tab) {
-  document.getElementById('form-login').style.display   = tab==='login'    ? 'block' : 'none';
+  document.getElementById('form-login').style.display    = tab==='login'    ? 'block' : 'none';
   document.getElementById('form-register').style.display = tab==='register' ? 'block' : 'none';
   document.getElementById('tab-login').className    = 'tab' + (tab==='login'    ? ' active' : '');
   document.getElementById('tab-register').className = 'tab' + (tab==='register' ? ' active' : '');
@@ -273,7 +275,6 @@ function showMsg(text, type='error') {
 function hideMsg() {
   document.getElementById('msg').style.display = 'none';
 }
-
 function setLoading(btnId, spinId, loading) {
   const btn = document.getElementById(btnId);
   const spin = document.getElementById(spinId);
@@ -324,7 +325,6 @@ document.addEventListener('keydown', e => {
   const activeTab = document.getElementById('form-login').style.display !== 'none';
   if (activeTab) handleLogin(); else handleRegister();
 });
-}); // end DOMContentLoaded
 </script>
 </body>
 </html>
