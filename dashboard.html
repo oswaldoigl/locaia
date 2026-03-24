@@ -1346,6 +1346,9 @@ function analyze(){
   if(lastScored[0])updateInegiZone(lastScored[0].id);
 
   lastScored.forEach((z,i)=>{
+    // Solo mostrar zonas con score > 50
+    if(z.score <= 50) return;
+
     const color=scoreColor(z.score);
     const rank=i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`;
     const pmdTag=PMD_BONUS[z.id]?`<div style="font-size:.68rem;color:#818cf8;margin-top:4px">🏗️ ${PMD_BONUS[z.id].motivo}</div>`:"";
@@ -1357,18 +1360,21 @@ function analyze(){
 
     if(zonePolygonsGeo[z.id]){
       // ── Polígono real desde Supabase ──
-      const fillOpacity = i===0 ? 0.28 : i<=2 ? 0.20 : 0.10;
-      const weight      = i===0 ? 2.5  : i<=2 ? 2.0  : 1.5;
+      // Opacidad escalonada: top3 más visible, resto sutil
+      const fillOpacity = i===0 ? 0.30 : i<=2 ? 0.18 : 0.08;
+      const weight      = i===0 ? 2.5  : i<=2 ? 1.8  : 1.2;
+      const opacity     = i===0 ? 0.95 : i<=2 ? 0.80 : 0.55;
       const poly = L.geoJSON({type:'Feature',geometry:zonePolygonsGeo[z.id]},{
-        style:{ color, fillColor:color, fillOpacity, weight, opacity:0.90 }
+        style:{ color, fillColor:color, fillOpacity, weight, opacity }
       });
       poly.on('click', onClickFn);
-      poly.on('mouseover', function(){ this.setStyle({fillOpacity: Math.min(fillOpacity+0.15,0.45)}); onClickFn(); });
-      poly.on('mouseout',  function(){ this.setStyle({fillOpacity}); });
+      poly.on('mouseover', function(){ this.setStyle({fillOpacity: Math.min(fillOpacity+0.18,0.50), weight: weight+0.8}); onClickFn(); });
+      poly.on('mouseout',  function(){ this.setStyle({fillOpacity, weight}); });
       polygonLayer.addLayer(poly);
     } else {
       // ── Fallback: círculo si no hay polígono ──
-      const c=L.circle([z.lat,z.lng],{radius:Math.max(z.radius*0.30,200),color,fillColor:color,fillOpacity:0.20,weight:1.8,opacity:0.88,interactive:true});
+      const fillOpacity = i===0 ? 0.25 : i<=2 ? 0.15 : 0.08;
+      const c=L.circle([z.lat,z.lng],{radius:Math.max(z.radius*0.30,200),color,fillColor:color,fillOpacity,weight:1.8,opacity:0.88,interactive:true});
       c.on('click', onClickFn);
       c.on('mouseover', onClickFn);
       circleLayer.addLayer(c);
@@ -1689,6 +1695,7 @@ function replayOnMap(aRaw){
   circleLayer.clearLayers();
   if(polygonLayer) polygonLayer.clearLayers();
   (a.results||[]).forEach((r,i)=>{
+    if((r.score||0) <= 50) return; // solo score > 50
     const z=zones.find(z=>z.id===r.id||z.name===r.name);
     if(!z)return;
     const color=scoreColor(r.score||0);
