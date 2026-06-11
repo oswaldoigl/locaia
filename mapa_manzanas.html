@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>LocaIA · Oráculo de Hielo · Manzanas</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+  :root{
+    --A:#1a9850; --B:#91cf60; --C:#fee08b; --D:#fc8d59; --E:#d73027; --NA:#cfcfcf;
+    --bg:#0e1116; --panel:#161b22; --ink:#e6edf3; --muted:#8b949e; --line:#30363d;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Arial}
+  #map{position:absolute;inset:0;background:#0b0e13}
+  /* gate */
+  #gate{position:absolute;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(80% 80% at 50% 30%,#11161d,#0b0e13);color:var(--ink)}
+  #gate .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:28px 26px;width:min(360px,90vw);text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  #gate h1{font-size:18px;margin:0 0 4px;letter-spacing:.5px}
+  #gate p{color:var(--muted);font-size:12px;margin:0 0 18px}
+  #gate input{width:100%;padding:11px 12px;border-radius:9px;border:1px solid var(--line);
+    background:#0d1117;color:var(--ink);font-size:14px;outline:none}
+  #gate input:focus{border-color:#3b82f6}
+  #gate button{margin-top:12px;width:100%;padding:11px;border:0;border-radius:9px;cursor:pointer;
+    background:#2563eb;color:#fff;font-weight:600;font-size:14px}
+  #gate .err{color:#f85149;font-size:12px;min-height:16px;margin-top:8px}
+  /* hud */
+  .hud{position:absolute;z-index:600;background:rgba(22,27,34,.92);color:var(--ink);
+    border:1px solid var(--line);border-radius:12px;backdrop-filter:blur(6px)}
+  #legend{left:12px;bottom:18px;padding:12px 14px;font-size:12px;min-width:160px}
+  #legend b{display:block;font-size:11px;letter-spacing:.6px;color:var(--muted);margin-bottom:8px;text-transform:uppercase}
+  .row{display:flex;align-items:center;gap:8px;margin:5px 0;cursor:pointer;user-select:none;opacity:.95}
+  .row.off{opacity:.32}
+  .sw{width:14px;height:14px;border-radius:3px;border:1px solid rgba(255,255,255,.25)}
+  #stat{right:12px;top:12px;padding:10px 13px;font-size:12px;color:var(--muted)}
+  #stat b{color:var(--ink)}
+  .leaflet-popup-content{font-size:12.5px;line-height:1.5}
+  .badge{display:inline-block;padding:1px 7px;border-radius:6px;color:#08120a;font-weight:700}
+  #spin{position:absolute;z-index:700;left:50%;top:50%;transform:translate(-50%,-50%);
+    color:var(--ink);font-size:13px;background:rgba(22,27,34,.92);border:1px solid var(--line);
+    padding:10px 16px;border-radius:10px}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="spin" style="display:none">Cargando manzanas…</div>
+
+<div id="legend" class="hud" style="display:none">
+  <b>Score por manzana</b>
+  <div class="row" data-c="A"><span class="sw" style="background:var(--A)"></span>Clase A · óptima</div>
+  <div class="row" data-c="B"><span class="sw" style="background:var(--B)"></span>Clase B · buena</div>
+  <div class="row" data-c="C"><span class="sw" style="background:var(--C)"></span>Clase C · media</div>
+  <div class="row" data-c="D"><span class="sw" style="background:var(--D)"></span>Clase D · baja</div>
+  <div class="row" data-c="E"><span class="sw" style="background:var(--E)"></span>Clase E · marginal</div>
+  <div class="row" data-c="NA"><span class="sw" style="background:var(--NA)"></span>Sin dato</div>
+</div>
+<div id="stat" class="hud" style="display:none"></div>
+
+<div id="gate">
+  <div class="card">
+    <h1>🧊 Oráculo de Hielo</h1>
+    <p>Inteligencia de ubicación · Saltillo</p>
+    <input id="pw" type="password" placeholder="Contraseña" autocomplete="off"/>
+    <div class="err" id="err"></div>
+    <button id="go">Entrar</button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const SB = "https://etdjlwtopaehamhlwwrd.supabase.co";
+const GEO_URL = SB + "/storage/v1/object/public/locaia-data/manzanas/mz_ciudad.geojson";
+const MAPA_FN = SB + "/functions/v1/mapa";
+
+const COLOR = {A:"#1a9850",B:"#91cf60",C:"#fee08b",D:"#fc8d59",E:"#d73027",NA:"#cfcfcf"};
+let KEY = "";
+let map, layer, scoreMap = new Map();
+const hidden = new Set();
+
+const $ = s => document.querySelector(s);
+
+$("#go").onclick = enter;
+$("#pw").addEventListener("keydown", e => { if(e.key==="Enter") enter(); });
+
+async function enter(){
+  KEY = $("#pw").value.trim();
+  $("#err").textContent = "";
+  if(!KEY){ $("#err").textContent="Escribe la contraseña."; return; }
+  $("#go").disabled = true; $("#go").textContent = "Verificando…";
+  try{
+    const r = await fetch(MAPA_FN, { headers:{ "x-key": KEY }});
+    if(r.status===401){ throw new Error("Contraseña incorrecta."); }
+    if(!r.ok) throw new Error("Error del servidor ("+r.status+").");
+    const j = await r.json();
+    for(const [cve,s,c] of j.mz) scoreMap.set(cve, {s, c});
+    $("#gate").style.display="none";
+    initMap();
+    await loadManzanas();
+  }catch(e){
+    $("#err").textContent = e.message;
+    $("#go").disabled=false; $("#go").textContent="Entrar";
+  }
+}
+
+function initMap(){
+  map = L.map("map", { preferCanvas:true, zoomControl:true })
+        .setView([25.4232,-100.9737], 12);
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{
+    attribution:"© OpenStreetMap, © CARTO · INEGI MGN 2020", maxZoom:19, subdomains:"abcd"
+  }).addTo(map);
+  $("#legend").style.display="block";
+  $("#stat").style.display="block";
+  document.querySelectorAll("#legend .row").forEach(row=>{
+    row.onclick=()=>{
+      const c=row.dataset.c;
+      if(hidden.has(c)){hidden.delete(c);row.classList.remove("off");}
+      else{hidden.add(c);row.classList.add("off");}
+      if(layer) layer.setStyle(styleFor);
+    };
+  });
+}
+
+function classOf(props){
+  const cve = props.CVEGEO;
+  const sc = scoreMap.get(cve);
+  return sc ? sc.c : "NA";
+}
+function styleFor(f){
+  const c = classOf(f.properties);
+  const off = hidden.has(c);
+  return {
+    color:"#0b0e13", weight:0.3,
+    fillColor: COLOR[c]||COLOR.NA,
+    fillOpacity: off ? 0 : 0.72,
+    stroke: !off
+  };
+}
+
+async function loadManzanas(){
+  $("#spin").style.display="block";
+  const r = await fetch(GEO_URL);
+  const gj = await r.json();
+  $("#spin").style.display="none";
+
+  let counts={A:0,B:0,C:0,D:0,E:0,NA:0};
+  for(const f of gj.features){ counts[classOf(f.properties)]++; }
+
+  layer = L.geoJSON(gj, {
+    style: styleFor,
+    onEachFeature:(f,lyr)=>{
+      lyr.on("click",()=>{
+        const p=f.properties, sc=scoreMap.get(p.CVEGEO);
+        const c = sc?sc.c:"NA";
+        const badge = `<span class="badge" style="background:${COLOR[c]}">${c}</span>`;
+        lyr.bindPopup(
+          `<b>Manzana</b> ${p.CVEGEO}<br>AGEB ${p.CVE_AGEB}<br>`+
+          (sc?`Score ${sc.s} · clase ${badge}`:`Sin score ${badge}`)
+        ).openPopup();
+      });
+    }
+  }).addTo(map);
+
+  $("#stat").innerHTML =
+    `<b>${gj.features.length.toLocaleString()}</b> manzanas · `+
+    `A:<b>${counts.A}</b> B:<b>${counts.B}</b> C:<b>${counts.C}</b> `+
+    `D:<b>${counts.D}</b> E:<b>${counts.E}</b>`;
+}
+</script>
+</body>
+</html>
