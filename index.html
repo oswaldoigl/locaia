@@ -141,11 +141,23 @@
         <button class="chip" data-c="D" style="border-color:var(--cD)">D</button>
         <button class="chip" data-c="E" style="border-color:var(--cE)">E</button>
         <button class="chip" data-c="RM" style="border-color:#4ade80">Roadmap</button>
+        <button class="chip" data-c="MAQ" style="border-color:#22d3ee">Mis máquinas</button>
       </div>
       <div class="list" id="list"></div>
       <div class="foot" style="padding:8px 18px;border-top:1px solid var(--line);font-size:10.5px;color:var(--muted2)">⚠️ Máquinas automáticas no están en DENUE — verificar en campo.</div>
     </aside>
   </main>
+</div>
+
+<div id="maqmodal" style="display:none;position:fixed;inset:0;z-index:4000;background:rgba(4,8,15,.72);backdrop-filter:blur(4px);align-items:center;justify-content:center">
+  <div style="width:330px;background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.6)">
+    <h3 style="font-family:'Bricolage Grotesque',sans-serif;margin:0 0 4px;font-size:16px">Registrar máquina</h3>
+    <p id="maqsub" style="color:var(--muted);font-size:11.5px;margin:0 0 14px;line-height:1.5"></p>
+    <input id="maqnombre" placeholder="Nombre (ej. Máquina suegro #1)" style="width:100%;margin-bottom:8px;background:#0a1424;border:1px solid var(--line);border-radius:9px;color:var(--ink);padding:9px 11px;font-size:13px;font-family:inherit">
+    <input id="maqprop" placeholder="Propietario (ej. Suegro)" style="width:100%;margin-bottom:8px;background:#0a1424;border:1px solid var(--line);border-radius:9px;color:var(--ink);padding:9px 11px;font-size:13px;font-family:inherit">
+    <input id="maqprecio" type="number" placeholder="Precio por bolsa (MXN, opcional)" style="width:100%;margin-bottom:14px;background:#0a1424;border:1px solid var(--line);border-radius:9px;color:var(--ink);padding:9px 11px;font-size:13px;font-family:inherit">
+    <div style="display:flex;gap:8px"><button class="btn ghost" id="maqcancel" style="flex:1">Cancelar</button><button class="btn" id="maqsave" style="flex:1">Guardar</button></div>
+  </div>
 </div>
 
 <script>
@@ -158,7 +170,7 @@ const ROADQ={motorway:100,trunk:100,primary:96,secondary:82,tertiary:68,unclassi
 const ROADNAME={motorway:'Autopista',trunk:'Vía principal',primary:'Avenida principal',secondary:'Avenida secundaria',tertiary:'Calle colectora',unclassified:'Calle',residential:'Calle residencial',living_street:'Calle interior',service:'Servidumbre/interior',pedestrian:'Peatonal',track:'Terracería'};
 const LAT0=25.330,LAT1=25.520,LNG0=-101.070,LNG1=-100.880,STEP=0.0038,MAXD=0.020,COSLAT=Math.cos(25.42*Math.PI/180);
 const fmt=n=>(+n).toLocaleString('es-MX');
-let AGEB=[],MC=[],COMP=[],MAQ=[],MCIDX={},NSErank=[],map,gridLayer,compLayer,pickMarker=null,lastCtx=null;
+let AGEB=[],MC=[],COMP=[],MAQ=[],VENTAS=[],MCIDX={},NSErank=[],map,gridLayer,compLayer,maqLayer,pickMarker=null,lastCtx=null;
 
 /* ---------- GATE ---------- */
 async function tryKey(k){try{const r=await fetch(FN+"/oraculo",{headers:{'x-key':k}});if(r.status===401)return 'bad';if(!r.ok)return 'err';return await r.json();}catch(e){return 'err';}}
@@ -187,22 +199,23 @@ function initMap(){
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',{maxZoom:19,attribution:'&copy; OSM &copy; CARTO'}).addTo(map);
   map.createPane('labels');map.getPane('labels').style.zIndex=550;map.getPane('labels').style.pointerEvents='none';
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',{pane:'labels',maxZoom:19}).addTo(map);
-  gridLayer=L.layerGroup().addTo(map);compLayer=L.layerGroup().addTo(map);
+  gridLayer=L.layerGroup().addTo(map);compLayer=L.layerGroup().addTo(map);maqLayer=L.layerGroup().addTo(map);
   map.on('click',e=>evaluate(e.latlng.lat,e.latlng.lng));
   const legend=L.control({position:'bottomright'});
   legend.onAdd=function(){const d=L.DomUtil.create('div','legend');d.innerHTML=
     '<b>OPORTUNIDAD</b><br><span class="sw" style="background:#22d3ee"></span>A · Muy alta<br><span class="sw" style="background:#4ade80"></span>B · Alta<br><span class="sw" style="background:#facc15"></span>C · Media<br><span class="sw" style="background:#fb923c"></span>D · Baja<br><span class="sw" style="background:#ef4444"></span>E · Muy baja<br><span class="pinln" style="background:#ec4899"></span>Competidor';
     return d;};
   legend.addTo(map);
-  L.control.layers(null,{"Oportunidad":gridLayer,"Competidores":compLayer},{collapsed:true,position:'topright'}).addTo(map);
+  L.control.layers(null,{"Oportunidad":gridLayer,"Competidores":compLayer,"Mis máquinas":maqLayer},{collapsed:true,position:'topright'}).addTo(map);
 }
 function boot(data){
   if(!map)initMap();
   AGEB=(data.ageb||[]).filter(a=>a.lat&&a.lng).map(a=>({...a,lat:+a.lat,lng:+a.lng,score100:+a.score100,pobtot:+a.pobtot,vivtot:+a.vivtot,graproes:+a.graproes,demanda_com:+a.demanda_com,competencia:+a.competencia,f_pob:+a.f_pob,f_com:+a.f_com,f_ice:+a.f_ice}));
   MC=data.mc||[];MC.forEach(m=>MCIDX[m.ageb]=m);
-  COMP=data.competidores||[];MAQ=data.maquinas||[];
+  COMP=data.competidores||[];MAQ=data.maquinas||[];VENTAS=data.ventas||[];
   NSErank=AGEB.map(a=>a.graproes||0).sort((x,y)=>x-y);
-  drawGrid();renderList('ALL');
+  compLayer.clearLayers();maqLayer.clearLayers();drawMaquinas();
+  drawGrid();renderList(document.querySelector('.chip.on')?document.querySelector('.chip.on').dataset.c:'ALL');
   document.getElementById('k-pob').textContent=fmt(AGEB.reduce((s,a)=>s+a.pobtot,0));
   document.getElementById('k-a').textContent=AGEB.filter(a=>a.clase==='A').length;
   document.getElementById('k-cap').textContent=MC.reduce((s,m)=>s+(+m.maquinas_caben||0),0);
@@ -223,6 +236,10 @@ function nearestAgeb(la,ln){let best=null,bd=1e9;for(const a of AGEB){const dx=l
 function nsePct(g){if(!NSErank.length)return .5;let i=0;while(i<NSErank.length&&NSErank[i]<g)i++;return i/NSErank.length;}
 function nearbyComp(la,ln){let nearest=Infinity,within=0;for(const c of COMP){if(!c.latitud||!c.longitud)continue;const d=distM(la,ln,+c.latitud,+c.longitud);if(d<nearest)nearest=d;if(d<=1000)within++;}return{nearest,within};}
 function canib(la,ln){const a=MAQ.filter(m=>m.activa!==false&&m.lat&&m.lng);if(!a.length)return{txt:'Sin máquinas propias',score:100};let nd=Infinity;for(const m of a){const d=distM(la,ln,+m.lat,+m.lng);if(d<nd)nd=d;}if(nd>1000)return{txt:'0% (más cercana a '+(nd/1000).toFixed(1)+' km)',score:100};const ov=Math.round((1-nd/1000)*100);return{txt:ov+'% ('+Math.round(nd)+' m)',score:100-ov};}
+function maqIcon(){return L.divIcon({className:'',html:`<div style="width:17px;height:17px;background:#22d3ee;border:2px solid #fff;border-radius:4px;box-shadow:0 1px 6px rgba(0,0,0,.7);display:grid;place-items:center;color:#04141a;font-size:10px;font-weight:800">❄</div>`,iconSize:[17,17],iconAnchor:[8,8]});}
+function drawMaquinas(){if(!maqLayer)return;maqLayer.clearLayers();for(const m of MAQ){if(!m.lat||!m.lng)continue;const tot=VENTAS.filter(v=>v.maquina_id===m.id).reduce((s,v)=>s+(+v.bolsas||0),0);L.marker([+m.lat,+m.lng],{icon:maqIcon()}).bindPopup(`<div class="pop-h">${m.nombre||'Máquina'}</div>${m.propietario?('<span style="color:#8094b3;font-size:11px">'+m.propietario+'</span><br>'):''}${m.zona||''}<br>Acumulado: <b>${fmt(tot)} bolsas</b>`).addTo(maqLayer);}}
+async function writeReg(payload){const k=localStorage.getItem('oraculo_key');try{const r=await fetch(FN+'/registrar',{method:'POST',headers:{'x-key':k,'Content-Type':'application/json'},body:JSON.stringify(payload)});return r.ok?await r.json():null;}catch(e){return null;}}
+async function reload(){const d=await tryKey(localStorage.getItem('oraculo_key'));if(d&&typeof d==='object')boot(d);}
 
 /* ---------- OVERPASS: vialidad + generadores ---------- */
 async function viaYgeneradores(la,ln){
@@ -320,7 +337,9 @@ function renderReport(){
     `<div class="kv"><span>Máquinas viables aquí</span><b style="color:#4ade80">${c.cap!=null?(c.cap>0?c.cap+' (≈'+fmt(c.demNeta)+' bolsas/sem)':'0 — cubierto'):'—'}</b></div>`+
     `<div class="kv"><span>Canibalización propia</span><b>${c.canibTxt}</b></div>`+
     `</div><div class="verdict"><b>Veredicto:</b> ${c.verdict}</div>`+
-    (c.overpassErr?'<div style="color:#fca5a5;font-size:11px;margin-top:6px">No se pudo leer la red vial (Overpass); técnico estimado.</div>':'');
+    (c.overpassErr?'<div style="color:#fca5a5;font-size:11px;margin-top:6px">No se pudo leer la red vial (Overpass); técnico estimado.</div>':'')+
+    `<button class="btn" id="r-regmaq" style="width:100%;margin-top:10px;background:transparent;border:1px solid var(--accent);color:var(--accent)">➕ Registrar máquina aquí</button>`;
+  const rb=document.getElementById('r-regmaq');if(rb)rb.onclick=openMaqForm;
   document.getElementById('report').style.display='block';
   map.flyTo([c.la,c.ln],15,{duration:.6});
 }
@@ -384,6 +403,20 @@ function renderList(filter){
   if(filter==='RM'){let i=0;MC.filter(m=>+m.maquinas_caben>0).sort((x,y)=>(+y.maquinas_caben)-(+x.maquinas_caben)||(+y.score100)-(+x.score100)).forEach(m=>{i++;const d=document.createElement('div');d.className='row';
     d.innerHTML=`<div class="rank">${i}</div><div class="badge" style="background:${CC[m.clase]||'#64748b'}">+${m.maquinas_caben}</div><div class="nm"><b>${m.zona||'AGEB '+m.ageb}</b><small>${fmt(m.demanda_bolsas_sem)} bolsas/sem · clase ${m.clase}</small></div><div class="sc" style="color:#4ade80">${m.maquinas_caben}</div>`;
     d.onclick=()=>evaluate(+m.lat,+m.lng);el.appendChild(d);});return;}
+  if(filter==='MAQ'){
+    if(!MAQ.length){el.innerHTML='<div style="padding:18px;color:var(--muted);font-size:12.5px;line-height:1.6">Aún no hay máquinas registradas.<br><br>Evalúa un punto y usa <b style="color:var(--accent)">“➕ Registrar máquina aquí”</b> para dar de alta la de tu suegro y empezar a llevar sus ventas semanales.</div>';return;}
+    MAQ.forEach(m=>{
+      const vts=VENTAS.filter(v=>v.maquina_id===m.id);
+      const tot=vts.reduce((s,v)=>s+(+v.bolsas||0),0), prom=vts.length?Math.round(tot/vts.length):0;
+      const d=document.createElement('div');d.className='row';d.style.cssText='cursor:default;display:block;border-color:var(--line);background:var(--panel);margin-bottom:8px';
+      d.innerHTML=`<div style="display:flex;align-items:center;gap:10px"><div class="badge" style="background:${CC[m.clase_estimada]||'#22d3ee'}">${m.clase_estimada||'❄'}</div><div class="nm" style="flex:1"><b>${m.nombre||'Máquina'}</b><small>${m.zona||''}${m.propietario?' · '+m.propietario:''}${m.score_estimado?' · score '+m.score_estimado:''}</small></div></div>`+
+        `<div style="display:flex;gap:10px;margin:8px 0 6px;font-size:11px;color:var(--muted)"><span>📦 <b style="color:var(--ink)">${fmt(tot)}</b> bolsas</span><span>📈 <b style="color:var(--ink)">${fmt(prom)}</b>/sem</span><span>🗓️ ${vts.length} sem.</span></div>`+
+        `<div style="display:flex;gap:5px"><input type="date" class="vfecha" style="flex:1;min-width:0;background:#0a1424;border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:5px 6px;font-size:11px"><input type="number" class="vbolsas" placeholder="bolsas" style="width:62px;background:#0a1424;border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:5px 6px;font-size:11px"><input type="number" class="vingreso" placeholder="$" style="width:50px;background:#0a1424;border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:5px 6px;font-size:11px"><button class="btn vadd" style="padding:5px 10px;font-size:13px">+</button></div>`;
+      d.querySelector('.vadd').onclick=async(ev)=>{const bo=d.querySelector('.vbolsas').value;if(!bo){alert('Anota las bolsas vendidas');return;}ev.target.textContent='…';await writeReg({action:'add_venta',maquina_id:m.id,semana:d.querySelector('.vfecha').value||new Date().toISOString().slice(0,10),bolsas:+bo,ingreso:d.querySelector('.vingreso').value?+d.querySelector('.vingreso').value:null});await reload();renderList('MAQ');};
+      el.appendChild(d);
+    });
+    return;
+  }
   AGEB.filter(a=>filter==='ALL'||a.clase===filter).sort((x,y)=>y.score100-x.score100).slice(0,60).forEach((a,i)=>{
     const d=document.createElement('div');d.className='row';
     d.innerHTML=`<div class="rank">${i+1}</div><div class="badge" style="background:${CC[a.clase]}">${a.clase}</div><div class="nm"><b>${a.zona||'AGEB '+a.ageb}</b><small>${fmt(a.pobtot)} hab · ${a.competencia==0?'sin competencia':a.competencia+' comp.'}</small></div><div class="sc" style="color:${CC[a.clase]}">${a.score100}</div>`;
@@ -403,6 +436,13 @@ document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter')d
 document.getElementById('rclose').onclick=()=>{document.getElementById('report').style.display='none';if(pickMarker)map.removeLayer(pickMarker);};
 document.getElementById('geo').onclick=()=>{const st=document.getElementById('status');if(!navigator.geolocation){st.style.opacity='1';st.textContent='Geolocalización no disponible';return;}st.style.opacity='1';st.textContent='Obteniendo ubicación…';navigator.geolocation.getCurrentPosition(p=>evaluate(p.coords.latitude,p.coords.longitude),()=>{st.textContent='Permiso denegado.';st.style.background='#7f1d1d';});};
 document.getElementById('filters').addEventListener('click',e=>{if(!e.target.classList.contains('chip'))return;document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));e.target.classList.add('on');renderList(e.target.dataset.c);});
+
+function openMaqForm(){if(!lastCtx||!lastCtx.grade)return;document.getElementById('maqsub').textContent=(lastCtx.zona||'')+' · '+(lastCtx.addr||(lastCtx.la.toFixed(5)+', '+lastCtx.ln.toFixed(5)))+' · score '+lastCtx.score+' ('+lastCtx.grade+')';document.getElementById('maqnombre').value='';document.getElementById('maqprop').value='';document.getElementById('maqprecio').value='';document.getElementById('maqmodal').style.display='flex';}
+document.getElementById('maqcancel').onclick=()=>document.getElementById('maqmodal').style.display='none';
+document.getElementById('maqsave').onclick=async()=>{const c=lastCtx;if(!c)return;const btn=document.getElementById('maqsave');btn.textContent='Guardando…';
+  await writeReg({action:'add_maquina',nombre:document.getElementById('maqnombre').value||'Máquina',propietario:document.getElementById('maqprop').value||null,precio_bolsa:document.getElementById('maqprecio').value?+document.getElementById('maqprecio').value:null,lat:c.la,lng:c.ln,zona:c.zona,direccion:c.addr||null,score_estimado:c.score,clase_estimada:c.grade,fecha_instalacion:new Date().toISOString().slice(0,10)});
+  btn.textContent='Guardar';document.getElementById('maqmodal').style.display='none';await reload();
+  document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));const mc=document.querySelector('.chip[data-c="MAQ"]');if(mc)mc.classList.add('on');renderList('MAQ');};
 </script>
 </body>
 </html>
