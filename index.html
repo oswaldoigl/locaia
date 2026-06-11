@@ -3,169 +3,339 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>LocaIA · Oráculo de Hielo · Manzanas</title>
+<title>LocaIA · Oráculo de Hielo · Saltillo</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
   :root{
-    --A:#1a9850; --B:#91cf60; --C:#fee08b; --D:#fc8d59; --E:#d73027; --NA:#cfcfcf;
-    --bg:#0e1116; --panel:#161b22; --ink:#e6edf3; --muted:#8b949e; --line:#30363d;
+    --A:#1a9850;--B:#91cf60;--C:#fee08b;--D:#fc8d59;--E:#d73027;--NA:#cfcfcf;
+    --bg:#0b0e13;--panel:#161b22;--panel2:#1c232c;--ink:#e6edf3;--muted:#8b949e;
+    --line:#2a313c;--accent:#2563eb;
   }
   *{box-sizing:border-box}
-  html,body{height:100%;margin:0;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Arial}
+  html,body{height:100%;margin:0;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--ink)}
   #map{position:absolute;inset:0;background:#0b0e13}
-  /* gate */
-  #gate{position:absolute;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;
-    background:radial-gradient(80% 80% at 50% 30%,#11161d,#0b0e13);color:var(--ink)}
-  #gate .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;
-    padding:28px 26px;width:min(360px,90vw);text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-  #gate h1{font-size:18px;margin:0 0 4px;letter-spacing:.5px}
-  #gate p{color:var(--muted);font-size:12px;margin:0 0 18px}
-  #gate input{width:100%;padding:11px 12px;border-radius:9px;border:1px solid var(--line);
-    background:#0d1117;color:var(--ink);font-size:14px;outline:none}
-  #gate input:focus{border-color:#3b82f6}
-  #gate button{margin-top:12px;width:100%;padding:11px;border:0;border-radius:9px;cursor:pointer;
-    background:#2563eb;color:#fff;font-weight:600;font-size:14px}
-  #gate .err{color:#f85149;font-size:12px;min-height:16px;margin-top:8px}
-  /* hud */
-  .hud{position:absolute;z-index:600;background:rgba(22,27,34,.92);color:var(--ink);
-    border:1px solid var(--line);border-radius:12px;backdrop-filter:blur(6px)}
-  #legend{left:12px;bottom:18px;padding:12px 14px;font-size:12px;min-width:160px}
-  #legend b{display:block;font-size:11px;letter-spacing:.6px;color:var(--muted);margin-bottom:8px;text-transform:uppercase}
-  .row{display:flex;align-items:center;gap:8px;margin:5px 0;cursor:pointer;user-select:none;opacity:.95}
-  .row.off{opacity:.32}
-  .sw{width:14px;height:14px;border-radius:3px;border:1px solid rgba(255,255,255,.25)}
-  #stat{right:12px;top:12px;padding:10px 13px;font-size:12px;color:var(--muted)}
+  #bar{position:absolute;z-index:600;top:10px;left:50%;transform:translateX(-50%);
+    display:flex;gap:4px;background:rgba(22,27,34,.92);border:1px solid var(--line);
+    border-radius:12px;padding:4px;backdrop-filter:blur(8px)}
+  #bar button{border:0;background:transparent;color:var(--muted);padding:8px 14px;border-radius:9px;
+    cursor:pointer;font-size:13px;font-weight:600}
+  #bar button.on{background:var(--accent);color:#fff}
+  .pane{position:absolute;z-index:600;top:62px;right:12px;width:min(360px,92vw);max-height:calc(100% - 90px);
+    overflow:auto;background:rgba(22,27,34,.96);border:1px solid var(--line);border-radius:14px;
+    padding:16px;backdrop-filter:blur(8px);display:none}
+  .pane h2{margin:0 0 4px;font-size:15px}
+  .pane .sub{color:var(--muted);font-size:12px;margin:0 0 12px}
+  .legend{position:absolute;z-index:600;left:12px;bottom:16px;background:rgba(22,27,34,.92);
+    border:1px solid var(--line);border-radius:12px;padding:11px 13px;font-size:12px}
+  .legend b{display:block;font-size:10px;letter-spacing:.6px;color:var(--muted);margin-bottom:7px;text-transform:uppercase}
+  .lrow{display:flex;align-items:center;gap:8px;margin:4px 0;cursor:pointer;user-select:none}
+  .lrow.off{opacity:.3}
+  .sw{width:13px;height:13px;border-radius:3px;border:1px solid rgba(255,255,255,.2)}
+  #stat{position:absolute;z-index:600;right:12px;top:62px;background:rgba(22,27,34,.92);
+    border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:12px;color:var(--muted);display:none}
   #stat b{color:var(--ink)}
-  .leaflet-popup-content{font-size:12.5px;line-height:1.5}
-  .badge{display:inline-block;padding:1px 7px;border-radius:6px;color:#08120a;font-weight:700}
+  .toggles{position:absolute;z-index:600;left:12px;top:62px;background:rgba(22,27,34,.92);
+    border:1px solid var(--line);border-radius:10px;padding:8px 11px;font-size:12px;display:none}
+  .toggles label{display:block;margin:3px 0;cursor:pointer}
+  input,select,textarea{width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--line);
+    background:#0d1117;color:var(--ink);font-size:13px;outline:none;margin:4px 0}
+  input:focus,select:focus{border-color:var(--accent)}
+  .btn{display:inline-block;width:100%;padding:10px;border:0;border-radius:9px;cursor:pointer;
+    background:var(--accent);color:#fff;font-weight:600;font-size:13px;margin-top:6px}
+  .btn.alt{background:#374151}.btn.danger{background:#7f1d1d}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:11px;margin:8px 0}
+  .badge{display:inline-block;padding:1px 8px;border-radius:6px;color:#08120a;font-weight:700}
+  .kv{display:flex;justify-content:space-between;margin:3px 0;font-size:13px}
+  .kv span:first-child{color:var(--muted)}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase}
+  .hint{font-size:11px;color:var(--muted);margin:6px 0}
+  #gate{position:absolute;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(80% 80% at 50% 25%,#11161d,#0b0e13)}
+  #gate .g{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:30px 26px;
+    width:min(360px,90vw);text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.55)}
+  #gate h1{font-size:20px;margin:0 0 4px}
+  #gate p{color:var(--muted);font-size:12px;margin:0 0 18px}
+  #gate .err{color:#f85149;font-size:12px;min-height:16px;margin-top:8px}
   #spin{position:absolute;z-index:700;left:50%;top:50%;transform:translate(-50%,-50%);
-    color:var(--ink);font-size:13px;background:rgba(22,27,34,.92);border:1px solid var(--line);
-    padding:10px 16px;border-radius:10px}
+    background:rgba(22,27,34,.95);border:1px solid var(--line);padding:10px 16px;border-radius:10px;
+    font-size:13px;display:none}
+  .leaflet-popup-content{font-size:12.5px;line-height:1.5}
 </style>
 </head>
 <body>
 <div id="map"></div>
-<div id="spin" style="display:none">Cargando manzanas…</div>
+<div id="spin">Cargando…</div>
 
-<div id="legend" class="hud" style="display:none">
-  <b>Score por manzana</b>
-  <div class="row" data-c="A"><span class="sw" style="background:var(--A)"></span>Clase A · óptima</div>
-  <div class="row" data-c="B"><span class="sw" style="background:var(--B)"></span>Clase B · buena</div>
-  <div class="row" data-c="C"><span class="sw" style="background:var(--C)"></span>Clase C · media</div>
-  <div class="row" data-c="D"><span class="sw" style="background:var(--D)"></span>Clase D · baja</div>
-  <div class="row" data-c="E"><span class="sw" style="background:var(--E)"></span>Clase E · marginal</div>
-  <div class="row" data-c="NA"><span class="sw" style="background:var(--NA)"></span>Sin dato</div>
+<div id="bar" style="display:none">
+  <button data-tab="mapa" class="on">🗺️ Mapa</button>
+  <button data-tab="evaluar">📍 Evaluador</button>
+  <button data-tab="roadmap">🚀 Roadmap</button>
+  <button data-tab="maquinas">🧊 Mis máquinas</button>
 </div>
-<div id="stat" class="hud" style="display:none"></div>
+
+<div class="toggles" id="toggles">
+  <label><input type="checkbox" id="tMz" checked> Manzanas</label>
+  <label><input type="checkbox" id="tComp"> Competencia (hielo/agua)</label>
+  <label><input type="checkbox" id="tMaq" checked> Mis máquinas</label>
+</div>
+
+<div class="legend" id="legend" style="display:none">
+  <b>Score por manzana</b>
+  <div class="lrow" data-c="A"><span class="sw" style="background:var(--A)"></span>A · óptima</div>
+  <div class="lrow" data-c="B"><span class="sw" style="background:var(--B)"></span>B · buena</div>
+  <div class="lrow" data-c="C"><span class="sw" style="background:var(--C)"></span>C · media</div>
+  <div class="lrow" data-c="D"><span class="sw" style="background:var(--D)"></span>D · baja</div>
+  <div class="lrow" data-c="E"><span class="sw" style="background:var(--E)"></span>E · marginal</div>
+  <div class="lrow" data-c="NA"><span class="sw" style="background:var(--NA)"></span>Sin dato</div>
+</div>
+
+<div id="stat"></div>
+
+<div class="pane" id="pane-evaluar">
+  <h2>📍 Evaluador por punto</h2>
+  <p class="sub">Haz clic en cualquier manzana del mapa para evaluarla.</p>
+  <div id="evalbody"><div class="hint">Esperando que selecciones una manzana…</div></div>
+</div>
+
+<div class="pane" id="pane-roadmap">
+  <h2>🚀 Roadmap de expansión</h2>
+  <p class="sub" id="roadsub"></p>
+  <div id="roadbody"></div>
+</div>
+
+<div class="pane" id="pane-maquinas">
+  <h2>🧊 Mis máquinas</h2>
+  <p class="sub">Registra unidades y ventas reales para calibrar el modelo.</p>
+  <div id="maqlist"></div>
+  <div class="card">
+    <b style="font-size:13px">➕ Agregar máquina</b>
+    <input id="m_nombre" placeholder="Nombre (ej. Suegro - Centro)">
+    <input id="m_prop" placeholder="Propietario">
+    <input id="m_dir" placeholder="Dirección / colonia">
+    <input id="m_precio" type="number" step="0.5" placeholder="Precio por bolsa (MXN)">
+    <div class="hint" id="m_coords">Coordenadas: haz clic en el mapa para fijarlas →</div>
+    <button class="btn alt" id="m_pick">Fijar ubicación en el mapa</button>
+    <button class="btn" id="m_save">Guardar máquina</button>
+  </div>
+  <div class="card">
+    <b style="font-size:13px">➕ Registrar venta semanal</b>
+    <select id="v_maq"></select>
+    <input id="v_semana" type="week">
+    <input id="v_bolsas" type="number" placeholder="Bolsas vendidas">
+    <input id="v_ingreso" type="number" step="0.01" placeholder="Ingreso (MXN)">
+    <input id="v_notas" placeholder="Notas (opcional)">
+    <button class="btn" id="v_save">Guardar venta</button>
+  </div>
+</div>
 
 <div id="gate">
-  <div class="card">
+  <div class="g">
     <h1>🧊 Oráculo de Hielo</h1>
     <p>Inteligencia de ubicación · Saltillo</p>
-    <input id="pw" type="password" placeholder="Contraseña" autocomplete="off"/>
+    <input id="pw" type="password" placeholder="Contraseña" autocomplete="off">
     <div class="err" id="err"></div>
-    <button id="go">Entrar</button>
+    <button class="btn" id="go">Entrar</button>
   </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const SB = "https://etdjlwtopaehamhlwwrd.supabase.co";
-const GEO_URL = SB + "/storage/v1/object/public/locaia-data/manzanas/mz_ciudad.geojson";
-const MAPA_FN = SB + "/functions/v1/mapa";
+const SB="https://etdjlwtopaehamhlwwrd.supabase.co";
+const GEO=SB+"/storage/v1/object/public/locaia-data/manzanas/mz_ciudad.geojson";
+const FN_MAPA=SB+"/functions/v1/mapa";
+const FN_ORA=SB+"/functions/v1/oraculo";
+const FN_REG=SB+"/functions/v1/registrar";
+const COLOR={A:"#1a9850",B:"#91cf60",C:"#fee08b",D:"#fc8d59",E:"#d73027",NA:"#cfcfcf"};
+const $=s=>document.querySelector(s);
+let KEY="",map,mzLayer,compLayer,maqLayer,gj;
+let scoreMap=new Map(),ORA={},tab="mapa";
+const hidden=new Set();
+let pickMode=false,picked=null,pickMarker=null;
 
-const COLOR = {A:"#1a9850",B:"#91cf60",C:"#fee08b",D:"#fc8d59",E:"#d73027",NA:"#cfcfcf"};
-let KEY = "";
-let map, layer, scoreMap = new Map();
-const hidden = new Set();
-
-const $ = s => document.querySelector(s);
-
-$("#go").onclick = enter;
-$("#pw").addEventListener("keydown", e => { if(e.key==="Enter") enter(); });
+$("#go").onclick=enter;
+$("#pw").addEventListener("keydown",e=>{if(e.key==="Enter")enter();});
 
 async function enter(){
-  KEY = $("#pw").value.trim();
-  $("#err").textContent = "";
-  if(!KEY){ $("#err").textContent="Escribe la contraseña."; return; }
-  $("#go").disabled = true; $("#go").textContent = "Verificando…";
+  KEY=$("#pw").value.trim();$("#err").textContent="";
+  if(!KEY){$("#err").textContent="Escribe la contraseña.";return;}
+  $("#go").disabled=true;$("#go").textContent="Verificando…";
   try{
-    const r = await fetch(MAPA_FN, { headers:{ "x-key": KEY }});
-    if(r.status===401){ throw new Error("Contraseña incorrecta."); }
-    if(!r.ok) throw new Error("Error del servidor ("+r.status+").");
-    const j = await r.json();
-    for(const [cve,s,c] of j.mz) scoreMap.set(cve, {s, c});
+    const [rm,ro]=await Promise.all([
+      fetch(FN_MAPA,{headers:{"x-key":KEY}}),
+      fetch(FN_ORA,{headers:{"x-key":KEY}})
+    ]);
+    if(rm.status===401||ro.status===401) throw new Error("Contraseña incorrecta.");
+    if(!rm.ok||!ro.ok) throw new Error("Error del servidor.");
+    const jm=await rm.json(); ORA=await ro.json();
+    for(const [cve,s,c,dem,comp,pob] of jm.mz) scoreMap.set(cve,{s,c,dem,comp,pob});
     $("#gate").style.display="none";
-    initMap();
-    await loadManzanas();
-  }catch(e){
-    $("#err").textContent = e.message;
-    $("#go").disabled=false; $("#go").textContent="Entrar";
-  }
+    boot();
+  }catch(e){$("#err").textContent=e.message;$("#go").disabled=false;$("#go").textContent="Entrar";}
 }
 
-function initMap(){
-  map = L.map("map", { preferCanvas:true, zoomControl:true })
-        .setView([25.4232,-100.9737], 12);
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{
-    attribution:"© OpenStreetMap, © CARTO · INEGI MGN 2020", maxZoom:19, subdomains:"abcd"
-  }).addTo(map);
-  $("#legend").style.display="block";
-  $("#stat").style.display="block";
-  document.querySelectorAll("#legend .row").forEach(row=>{
-    row.onclick=()=>{
-      const c=row.dataset.c;
-      if(hidden.has(c)){hidden.delete(c);row.classList.remove("off");}
-      else{hidden.add(c);row.classList.add("off");}
-      if(layer) layer.setStyle(styleFor);
-    };
+async function boot(){
+  map=L.map("map",{preferCanvas:true}).setView([25.4232,-100.9737],12);
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    {attribution:"© OSM, © CARTO · INEGI MGN 2020 · DENUE",maxZoom:19,subdomains:"abcd"}).addTo(map);
+  $("#bar").style.display="flex";$("#legend").style.display="block";
+  $("#stat").style.display="block";$("#toggles").style.display="block";
+  document.querySelectorAll("#bar button").forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+  document.querySelectorAll("#legend .lrow").forEach(r=>r.onclick=()=>{
+    const c=r.dataset.c;
+    hidden.has(c)?(hidden.delete(c),r.classList.remove("off")):(hidden.add(c),r.classList.add("off"));
+    if(mzLayer)mzLayer.setStyle(styleFor);
   });
+  $("#tMz").onchange=e=>e.target.checked?map.addLayer(mzLayer):map.removeLayer(mzLayer);
+  $("#tComp").onchange=e=>e.target.checked?compLayer.addTo(map):map.removeLayer(compLayer);
+  $("#tMaq").onchange=e=>e.target.checked?maqLayer.addTo(map):map.removeLayer(maqLayer);
+  map.on("click",onMapClick);
+  $("#m_pick").onclick=()=>{pickMode=true;$("#m_coords").textContent="Haz clic en el mapa…";};
+  $("#m_save").onclick=saveMaquina;
+  $("#v_save").onclick=saveVenta;
+  await loadManzanas();
+  buildComp(); buildMaquinas(); buildRoadmap(); refreshMaqUI();
 }
 
-function classOf(props){
-  const cve = props.CVEGEO;
-  const sc = scoreMap.get(cve);
-  return sc ? sc.c : "NA";
+function setTab(t){
+  tab=t;
+  document.querySelectorAll("#bar button").forEach(b=>b.classList.toggle("on",b.dataset.tab===t));
+  document.querySelectorAll(".pane").forEach(p=>p.style.display="none");
+  if(t!=="mapa") $("#pane-"+t).style.display="block";
 }
+
+function classOf(p){const sc=scoreMap.get(p.CVEGEO);return sc?sc.c:"NA";}
 function styleFor(f){
-  const c = classOf(f.properties);
-  const off = hidden.has(c);
-  return {
-    color:"#0b0e13", weight:0.3,
-    fillColor: COLOR[c]||COLOR.NA,
-    fillOpacity: off ? 0 : 0.72,
-    stroke: !off
-  };
+  const c=classOf(f.properties),off=hidden.has(c);
+  return{color:"#0b0e13",weight:.3,fillColor:COLOR[c]||COLOR.NA,fillOpacity:off?0:.72,stroke:!off};
 }
-
 async function loadManzanas(){
   $("#spin").style.display="block";
-  const r = await fetch(GEO_URL);
-  const gj = await r.json();
+  gj=await (await fetch(GEO)).json();
   $("#spin").style.display="none";
+  let cnt={A:0,B:0,C:0,D:0,E:0,NA:0};
+  gj.features.forEach(f=>cnt[classOf(f.properties)]++);
+  mzLayer=L.geoJSON(gj,{style:styleFor,onEachFeature:(f,l)=>{
+    l.on("click",ev=>{L.DomEvent.stop(ev);onManzana(f,l);});
+  }}).addTo(map);
+  $("#stat").innerHTML=`<b>${gj.features.length.toLocaleString()}</b> manzanas · `+
+    `A:<b>${cnt.A}</b> B:<b>${cnt.B}</b> C:<b>${cnt.C}</b> D:<b>${cnt.D}</b> E:<b>${cnt.E}</b>`;
+}
 
-  let counts={A:0,B:0,C:0,D:0,E:0,NA:0};
-  for(const f of gj.features){ counts[classOf(f.properties)]++; }
+function buildComp(){
+  const pts=(ORA.competidores||[]).filter(c=>c.latitud&&c.longitud);
+  compLayer=L.layerGroup(pts.map(c=>L.circleMarker([c.latitud,c.longitud],
+    {radius:5,color:"#fff",weight:1,fillColor:"#38bdf8",fillOpacity:.9})
+    .bindPopup(`<b>${c.nombre||"—"}</b><br>${c.categoria}<br>${c.colonia||""}`)));
+}
+function buildMaquinas(){
+  if(maqLayer)map.removeLayer(maqLayer);
+  const ms=(ORA.maquinas||[]).filter(m=>m.lat&&m.lng);
+  maqLayer=L.layerGroup(ms.map(m=>L.marker([m.lat,m.lng])
+    .bindPopup(`<b>🧊 ${m.nombre}</b><br>${m.zona||""}<br>${m.direccion||""}`)));
+  if($("#tMaq").checked)maqLayer.addTo(map);
+}
 
-  layer = L.geoJSON(gj, {
-    style: styleFor,
-    onEachFeature:(f,lyr)=>{
-      lyr.on("click",()=>{
-        const p=f.properties, sc=scoreMap.get(p.CVEGEO);
-        const c = sc?sc.c:"NA";
-        const badge = `<span class="badge" style="background:${COLOR[c]}">${c}</span>`;
-        lyr.bindPopup(
-          `<b>Manzana</b> ${p.CVEGEO}<br>AGEB ${p.CVE_AGEB}<br>`+
-          (sc?`Score ${sc.s} · clase ${badge}`:`Sin score ${badge}`)
-        ).openPopup();
-      });
-    }
-  }).addTo(map);
+function onMapClick(e){
+  if(pickMode){
+    picked={lat:+e.latlng.lat.toFixed(6),lng:+e.latlng.lng.toFixed(6)};
+    if(pickMarker)pickMarker.setLatLng(e.latlng); else pickMarker=L.marker(e.latlng).addTo(map);
+    $("#m_coords").textContent=`📍 ${picked.lat}, ${picked.lng}`;
+    pickMode=false;
+  }
+}
+function onManzana(f,l){
+  if(tab!=="evaluar"){
+    const p=f.properties,sc=scoreMap.get(p.CVEGEO),c=sc?sc.c:"NA";
+    const b=`<span class="badge" style="background:${COLOR[c]}">${c}</span>`;
+    let h=`<b>Manzana</b> ${p.CVEGEO}<br>AGEB ${p.CVE_AGEB}<br>`;
+    h+= sc?`<div style="margin:5px 0;font-size:14px"><b>${sc.s}</b>/100 · ${b}</div>🛒 Demanda local: <b>${sc.dem}</b><br>🧊 Competencia: <b>${sc.comp}</b><br>👥 Población: <b>${sc.pob??"—"}</b>`:`Sin score ${b}`;
+    l.bindPopup(h).openPopup();
+    return;
+  }
+  evaluar(f,l);
+}
 
-  $("#stat").innerHTML =
-    `<b>${gj.features.length.toLocaleString()}</b> manzanas · `+
-    `A:<b>${counts.A}</b> B:<b>${counts.B}</b> C:<b>${counts.C}</b> `+
-    `D:<b>${counts.D}</b> E:<b>${counts.E}</b>`;
+function evaluar(f,l){
+  const p=f.properties,sc=scoreMap.get(p.CVEGEO),c=sc?sc.c:"NA";
+  const center=l.getBounds().getCenter();
+  const near=(ORA.competidores||[]).filter(x=>x.latitud&&x.longitud)
+    .map(x=>({...x,d:dist(center.lat,center.lng,x.latitud,x.longitud)}))
+    .filter(x=>x.d<0.4).sort((a,b)=>a.d-b.d).slice(0,6);
+  const b=`<span class="badge" style="background:${COLOR[c]}">${c}</span>`;
+  let h=`<div class="card"><div class="kv"><span>Manzana</span><b>${p.CVEGEO}</b></div>`+
+    `<div class="kv"><span>AGEB</span><b>${p.CVE_AGEB}</b></div>`;
+  if(sc){
+    h+=`<div style="text-align:center;margin:10px 0"><div style="font-size:34px;font-weight:800">${sc.s}<span style="font-size:15px;color:var(--muted)">/100</span></div>${b}</div>`+
+      `<div class="kv"><span>🛒 Demanda local</span><b>${sc.dem} negocios</b></div>`+
+      `<div class="kv"><span>🧊 Competencia cerca</span><b>${sc.comp}</b></div>`+
+      `<div class="kv"><span>👥 Población manzana</span><b>${sc.pob??"—"}</b></div>`;
+  }else h+=`<div class="hint">Esta manzana no tiene score (AGEB sin datos).</div>`;
+  h+=`</div>`;
+  h+=`<div class="card"><b style="font-size:12px">Competidores en ~400 m (${near.length})</b>`;
+  h+= near.length?near.map(x=>`<div class="kv"><span>${x.categoria}</span><span>${Math.round(x.d*1000)} m</span></div>`).join(""):`<div class="hint">Ninguno — buena señal.</div>`;
+  h+=`</div>`;
+  h+=`<button class="btn alt" onclick="window.print()">🖨️ Imprimir ficha</button>`;
+  h+=`<div class="hint">⚠️ Score estimado sin calibrar con ventas reales.</div>`;
+  $("#evalbody").innerHTML=h;
+  if(window._sel)map.removeLayer(window._sel);
+  window._sel=L.geoJSON(f,{style:{color:"#fff",weight:2,fill:false}}).addTo(map);
+  $("#pane-evaluar").scrollTop=0;
+}
+function dist(la1,lo1,la2,lo2){const R=6371,r=Math.PI/180;
+  const dLa=(la2-la1)*r,dLo=(lo2-lo1)*r;
+  const a=Math.sin(dLa/2)**2+Math.cos(la1*r)*Math.cos(la2*r)*Math.sin(dLo/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
+
+function buildRoadmap(){
+  const mc=(ORA.mc||[]).slice().sort((a,b)=>(b.maquinas_caben||0)-(a.maquinas_caben||0)||(b.score100||0)-(a.score100||0));
+  const tot=mc.reduce((s,x)=>s+(+x.maquinas_caben||0),0);
+  $("#roadsub").textContent=`Capacidad estimada: ~${tot} máquinas en ${mc.length} zonas.`;
+  let h=`<table><tr><th>Zona</th><th>Clase</th><th>Caben</th><th>Dda neta</th></tr>`;
+  h+=mc.slice(0,30).map(x=>`<tr><td>${x.zona||x.ageb}</td><td>${x.clase||"-"}</td><td>${x.maquinas_caben??"-"}</td><td>${x.demanda_neta??"-"}</td></tr>`).join("");
+  h+=`</table>`;
+  $("#roadbody").innerHTML=h;
+}
+
+function refreshMaqUI(){
+  const ms=ORA.maquinas||[],vs=ORA.ventas||[];
+  let h=ms.length?"":`<div class="hint">Aún no hay máquinas registradas.</div>`;
+  ms.forEach(m=>{
+    const mv=vs.filter(v=>v.maquina_id===m.id);
+    const tb=mv.reduce((s,v)=>s+(+v.bolsas||0),0), ti=mv.reduce((s,v)=>s+(+v.ingreso||0),0);
+    h+=`<div class="card"><div class="kv"><span><b>🧊 ${m.nombre}</b></span><span>${m.zona||""}</span></div>`+
+       `<div class="kv"><span>Ventas</span><b>${mv.length} sem · ${tb} bolsas · $${ti.toLocaleString()}</b></div>`+
+       `<button class="btn danger" onclick="delMaquina(${m.id})">Eliminar</button></div>`;
+  });
+  $("#maqlist").innerHTML=h;
+  $("#v_maq").innerHTML=ms.map(m=>`<option value="${m.id}">${m.nombre}</option>`).join("")||`<option value="">(sin máquinas)</option>`;
+}
+async function reg(body){
+  const r=await fetch(FN_REG,{method:"POST",headers:{"x-key":KEY,"Content-Type":"application/json"},body:JSON.stringify(body)});
+  return r.ok;
+}
+async function reloadOra(){ORA=await (await fetch(FN_ORA,{headers:{"x-key":KEY}})).json();buildMaquinas();refreshMaqUI();}
+async function saveMaquina(){
+  if(!picked){alert("Primero fija la ubicación en el mapa.");return;}
+  const ok=await reg({action:"add_maquina",nombre:$("#m_nombre").value||"Máquina",
+    lat:picked.lat,lng:picked.lng,direccion:$("#m_dir").value,propietario:$("#m_prop").value,
+    precio_bolsa:parseFloat($("#m_precio").value)||null});
+  if(ok){["m_nombre","m_dir","m_prop","m_precio"].forEach(i=>$("#"+i).value="");
+    picked=null;if(pickMarker){map.removeLayer(pickMarker);pickMarker=null;}
+    $("#m_coords").textContent="Coordenadas: haz clic en el mapa →";await reloadOra();}
+  else alert("Error al guardar.");
+}
+async function saveVenta(){
+  const id=$("#v_maq").value; if(!id){alert("No hay máquina.");return;}
+  const ok=await reg({action:"add_venta",maquina_id:+id,semana:$("#v_semana").value,
+    bolsas:parseInt($("#v_bolsas").value)||null,ingreso:parseFloat($("#v_ingreso").value)||null,notas:$("#v_notas").value});
+  if(ok){["v_bolsas","v_ingreso","v_notas"].forEach(i=>$("#"+i).value="");await reloadOra();}
+  else alert("Error al guardar.");
+}
+async function delMaquina(id){
+  if(!confirm("¿Eliminar máquina?"))return;
+  if(await reg({action:"del_maquina",id})) await reloadOra();
 }
 </script>
 </body>
